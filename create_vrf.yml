@@ -1,0 +1,38 @@
+- name: Create VRF
+  connection: local
+  hosts: docker_netbox_19216820023
+  gather_facts: True
+
+  tasks:
+    - include_vars: external_vars.yml    # where "url_var: http://192.168.200.23:8001/"
+
+    - name: Obtain list of tenants from Netbox
+      debug:
+        msg: >
+          "Device {{ item.value.name }} (ID: {{ item.key }}) was"
+
+      loop: "{{ query('netbox.netbox.nb_lookup', 'tenants',
+                     api_endpoint='http://{{ url_var }}',
+                     token='{{ token_var }}' ) }}"
+
+  # creating a VRF assumes knowledge of tenant id;
+  # query first a list of tenants and get id of only one of interest
+    - name: Obtain id of specific tenant from Netbox
+      debug:
+        msg: "{{ query('netbox.netbox.nb_lookup', 'tenants',
+                     api_filter='name=Test_Tenant',
+                     api_endpoint='http://{{ url_var }}',
+                     token='{{ token_var }}' ) }}"
+
+#     - name: Create vrf with all information
+#       netbox_vrf:
+#         netbox_url: '{{ url_var }}'
+#         netbox_token: "{{ token_var }}"
+#         data:
+#           name: "{{ vrf_name }}"
+#           rd:  "{{ vrf_rd }}"
+#           tenant: 3
+# #          enforce_unique: true
+#           description: "{{ vrf_description }}"
+#          tags:
+#            - "{{ vrf_tag }}" 

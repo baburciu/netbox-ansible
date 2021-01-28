@@ -1,0 +1,13 @@
+---
+- name: Add an IP address entry in a specific VRF, in a specific Tenant, all 3 dependencies created at playbook runtime
+  hosts: docker_netbox_19216820023
+  tasks:
+    - include_vars: external_vars.yml    # where "url_var: http://192.168.200.23:8001/"
+
+# ======= How to run w non-root Ansible user: 
+# boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v add_IP_inVRF_inTenant.yml -e 'tag1_description="Management port"'
+# possibly with --become --ask-become-pass 
+
+- name: 1st, create the passwordless user ubuntu to target host Ubuntu KVM
+  import_playbook: create_passwordless_user.yml

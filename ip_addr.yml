@@ -1,30 +1,20 @@
-- name: "Test Netbox IP address module"
+- name: Create Tenant
   connection: local
   hosts: docker_netbox_19216820023
   gather_facts: True
 
   tasks:
-#    - name: Create IP address within Netbox with only required information
-#      netbox_ip_address:
-#        netbox_url: http://192.168.200.23:8001/
-#        netbox_token: b6383aa3e6c35d1eccf2fc09635ed0caeb6fe7c7
-#        data:
-#          address: 192.168.200.23
-#        state: present
     - name: Create tenant with all parameters
       netbox_tenant:
         netbox_url: http://192.168.200.23:8001/
         netbox_token: b6383aa3e6c35d1eccf2fc09635ed0caeb6fe7c7
         data:
           name: Test_Tenant
-#          group: Very Special Tenants
           description: ABC Incorporated
           comments: '### This tenant is super cool'
           slug: tenant_abc
 #          tags:
 #            - tagA
-#            - tagB
-#            - tagC
         state: present
   # query a list of devices
     - name: Obtain list of tenants from Netbox
@@ -35,6 +25,12 @@
       loop: "{{ query('netbox.netbox.nb_lookup', 'tenants',
                       api_endpoint='http://192.168.200.23:8001/',
                       token='b6383aa3e6c35d1eccf2fc09635ed0caeb6fe7c7') }}"
+    - name: Obtain id of specific tenant from Netbox
+      debug:
+        msg: "{{ query('netbox.netbox.nb_lookup', 'tenants',
+                      api_filter='tenant=Test_Tenant',
+                      api_endpoint='http://192.168.200.23:8001/',
+                      token='b6383aa3e6c35d1eccf2fc09635ed0caeb6fe7c7') }}"                     
     - name: Create vrf with all information
       netbox_vrf:
         netbox_url: http://192.168.200.23:8001/
@@ -63,3 +59,14 @@
 #          tags:
 #            - Test_Ansible NE40E
         state: present
+
+---
+- name: Add rke user to docker group, 3rd
+  hosts: ubuntu-rke
+  #remote_user: ubuntu
+  tasks:
+  - name: adding existing user rke to docker group
+    user:
+      name: "{{ rke_user}}"
+      groups: docker
+      append: yes

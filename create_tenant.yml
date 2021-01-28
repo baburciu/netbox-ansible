@@ -1,0 +1,17 @@
+- name: Create Tenant
+  connection: local
+  hosts: docker_netbox_19216820023
+  gather_facts: True
+
+  tasks:
+    - name: Create tenant with all parameters
+      netbox_tenant:
+        netbox_url: "{{ url_var }}"
+        netbox_token: "{{ token_var }}"
+        data:
+          name: "{{ tenant_name }}"
+          description: "{{ tenant_description }}"
+          comments: "{{ tenant_comments }}"
+          tags:
+            - "{{ tenant_tag }}"
+        state: present

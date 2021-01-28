@@ -1,0 +1,17 @@
+- name: Create Tag
+  connection: local
+  hosts: docker_netbox_19216820023
+  gather_facts: True
+
+  tasks:
+    - name: Create tags
+      netbox_tag:
+        netbox_url: "{{ url_var }}"
+        netbox_token: "{{ token_var }}"
+        data:
+          name: "{{ item.name }}"
+          description: "{{ item.description }}"
+      loop:
+        - { name: {{tag1_name}}, description: {{tag1_description}} }
+        - { name: {{tag2_name}}, description: {{tag2_description}} }     
+        - { name: {{tag3_name}}, description: {{tag3_description}} }            

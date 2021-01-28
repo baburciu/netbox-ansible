@@ -1,0 +1,23 @@
+---
+# external_vars.yml to be used in playbooks called in order by import_playbook
+
+url_var: http://192.168.200.23:8001/
+token_var: b6383aa3e6c35d1eccf2fc09635ed0caeb6fe7c7
+
+tag1_name: mgmt
+tag1_description: "Management port"
+tag2_name: srv
+tag2_description: Server
+tag3_name: oiaas
+tag3_description: "Orange IaaS deployment"
+
+tenant_name: Huawei_Contrail_calif
+tenant_description: "OIaaS G4R2 w/ Contrail SDN backend"
+tenant_comments: "OIaaS G4R2 w/ Contrail SDN backend"
+tenant_tag: oiaas
+
+vrf_name: PUB_API
+vrf_rd: 65000:92062
+vrf_description: "Interconnect VRF between OIaaS FW and IP Fabric Leaf SWs" 
+vrf_tag: oiaas
+
