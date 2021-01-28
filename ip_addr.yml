@@ -1,0 +1,65 @@
+- name: "Test Netbox IP address module"
+  connection: local
+  hosts: docker_netbox_19216820023
+  gather_facts: True
+
+  tasks:
+#    - name: Create IP address within Netbox with only required information
+#      netbox_ip_address:
+#        netbox_url: http://192.168.200.23:8001/
+#        netbox_token: b6383aa3e6c35d1eccf2fc09635ed0caeb6fe7c7
+#        data:
+#          address: 192.168.200.23
+#        state: present
+    - name: Create tenant with all parameters
+      netbox_tenant:
+        netbox_url: http://192.168.200.23:8001/
+        netbox_token: b6383aa3e6c35d1eccf2fc09635ed0caeb6fe7c7
+        data:
+          name: Test_Tenant
+#          group: Very Special Tenants
+          description: ABC Incorporated
+          comments: '### This tenant is super cool'
+          slug: tenant_abc
+#          tags:
+#            - tagA
+#            - tagB
+#            - tagC
+        state: present
+  # query a list of devices
+    - name: Obtain list of tenants from Netbox
+      debug:
+        msg: >
+          "Device {{ item.value.name }} (ID: {{ item.key }}) was"
+#           manufactured by {{ item.value.device_type.manufacturer.name }}"
+      loop: "{{ query('netbox.netbox.nb_lookup', 'tenants',
+                      api_endpoint='http://192.168.200.23:8001/',
+                      token='b6383aa3e6c35d1eccf2fc09635ed0caeb6fe7c7') }}"
+    - name: Create vrf with all information
+      netbox_vrf:
+        netbox_url: http://192.168.200.23:8001/
+        netbox_token: b6383aa3e6c35d1eccf2fc09635ed0caeb6fe7c7
+        data:
+          name: Test_VRF
+          rd: "65000:1"
+          tenant: 3
+#          enforce_unique: true
+          description: VRF description
+#          tags:
+#            - Test_Ansible
+        state: present
+    - name: Create IP address with several specified options
+      netbox_ip_address:
+        netbox_url: http://192.168.200.23:8001/
+        netbox_token: b6383aa3e6c35d1eccf2fc09635ed0caeb6fe7c7
+        data:
+          family: 4
+          address: 192.168.201.1
+          vrf: Test_VRF
+          tenant: 3
+          status: Reserved
+          role: Loopback
+          description: Test description
+#          tags:
+#            - Test_Ansible NE40E
+        state: present
