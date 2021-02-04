@@ -1,9 +1,10 @@
 # netbox-ansible
-Ansible playbooks usage for Netbox automation, based on Galaxy collection https://docs.ansible.com/ansible/latest/collections/netbox/netbox/.
+## Ansible playbooks usage for Netbox automation, based on Galaxy collection https://docs.ansible.com/ansible/latest/collections/netbox/netbox/.
 
-boburciu@WX-5CG020BDT2: ~$ ` cd ~/netbox-ansible-automation `
-boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$
-boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` cat external_vars.yml `
+## How to add/remove NetBox WebUI Organization tab objects:
+boburciu@WX-5CG020BDT2: ~$ ` cd ~/netbox-ansible-automation ` <br/>
+boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$  <br/>
+boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` cat external_vars.yml `  <br/>
 ```
 ---
 # external_vars.yml to be used in playbooks called in order by import_playbook
@@ -71,7 +72,7 @@ vrf_tag: oiaas
 
 boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$
 ```
-boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` ansible-playbook -i ./hosts -v main_organization.yml -e 'site_description="Orange DC in Romania, Bucharest"' `
+boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` ansible-playbook -i ./hosts -v main_organization.yml -e 'site_description="Orange DC in Romania, Bucharest"' ` 
 
-### Results in Netbox WebUI > Rack :
-![Netbox ](./images/rack_image.png)
+### Results in Netbox WebUI > Racks page:
+![Netbox ](./images/rack_image.PNG)
