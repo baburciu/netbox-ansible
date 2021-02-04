@@ -1,0 +1,32 @@
+# ======= How to run w non-root Ansible user: 
+# boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_region.yml
+# possibly with --become --ask-become-pass     
+
+- name: Create Region
+  connection: local
+  hosts: docker_netbox_19216820023
+  gather_facts: False
+  collections:
+    - netbox.netbox 
+  tasks:
+    - include_vars: external_vars.yml  
+
+    - name: Create region
+      netbox_region:
+        netbox_url: '{{ url_var }}'
+        netbox_token: "{{ token_var }}"
+        data:
+          name: "{{ region_name }}"
+        state: present   # prevent duplicate prefixes/IP addresses within this VRF, true or false  
+
+    - name:  Obtain all regions
+      debug: 
+        msg: "{{ item }}"    
+      # debug: 
+      #   msg: >      
+      #     "{{ item.value.name }}"
+
+      loop: "{{ query('netbox.netbox.nb_lookup', 'regions', 
+                    api_endpoint=url_var,
+                    token=token_var) }}"        

@@ -1,0 +1,63 @@
+# ======= How to run standalone:
+# boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_rack.yml -e 'rack_role_color="08DFC0"'
+
+- name: Create rack group, rack role and assign to rack
+  connection: local
+  hosts: docker_netbox_19216820023
+  gather_facts: False
+  collections:
+    - netbox.netbox 
+  tasks:
+    - include_vars: external_vars.yml  
+
+   # Create first a rack group, a rack role and add the afterwards created rack to these
+    - name: Create rack group within Netbox with only required information
+      netbox_rack_group:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          name: '{{ rack_group_name }}'
+          site: '{{ rack_site }}'  # needs to exist prior
+        state: present    
+
+    - name: Create rack role within Netbox with only required information
+      netbox_rack_role:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          name: '{{ rack_role_name }}'
+          color: '{{ rack_role_color }}'
+        state: present
+
+    - name: Create rack 
+      netbox_rack:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          name: '{{ rack_name }}'
+          rack_group: '{{ rack_group_name }}' 
+          rack_role: '{{ rack_role_name }}'
+          site: '{{ rack_site }}'
+          desc_units: '{{ rack_desc_units }}'
+          outer_unit: '{{ rack_outer_unit }}'
+          outer_width: '{{ rack_outer_width }}'
+          outer_depth: '{{ rack_outer_depth }}'
+          type: '{{ rack_type }}'
+          u_height: '{{ rack_u_height }}'
+          width: '{{ rack_width }}'
+          serial: '{{ rack_serial }}'
+          facility_id: '{{ rack_facility_id }}'
+          comments: '{{ rack_comments }}'
+        state: present
+
+    - name:  Obtain all racks
+      debug: 
+        msg: '{{ item }}'  
+      # debug: 
+      #   msg: >      
+      #     "{{ item.value.name }}"
+
+      loop: "{{ query('netbox.netbox.nb_lookup', 'racks', 
+                    api_endpoint=url_var,
+                    token=token_var) }}"   

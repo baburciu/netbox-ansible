@@ -1,50 +1,31 @@
+# ======= How to run standalone:
+# boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_vrf.yml -e 'tenant_name="TestTen"'
+
 - name: Create VRF
   connection: local
   hosts: docker_netbox_19216820023
   gather_facts: False
   collections:
     - netbox.netbox 
-  vars:
-    netbox_url: "{{ url_var }}"
-    netbox_token: "{{ token_var }}"
-    netbox_tenant: "{{ tenant_name }}"
   tasks:
     - include_vars: external_vars.yml    # where "url_var: http://192.168.200.23:8001/"
-
-# ======= How to run w non-root Ansible user: 
-# boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
-# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_vrf.yml -e 'tenant_name=3'
-# possibly with --become --ask-become-pass     
 
   # creating a VRF assumes knowledge of tenant id;
   # query first a list of tenants and get id of only one of interest
 
-    - name:  Obtain id of specific tenant from Netbox
-      debug:
-        msg: "{{ item.value.id }}"
-      register: tenant_id 
-      loop: "{{ query('netbox.netbox.nb_lookup', 'tenants', api_filter='name=Test_Tenant',
-                    api_endpoint=url_var,
-                    token=token_var) }}"
-
-    # - name: "TASK 7: GET DATA FROM NETBOX VIA THE REST API"
-    #   uri:
-    #     url: "{% raw %}netbox_url/api/dcim/devices/?site=netbox_tenant"
-    #     method: "GET"
-    #     headers:
-    #       Content-Type: "application/json"
-    #       Authorization: "token {{ lookup('env', 'NETBOX_TOKEN') }}"
-    #     status_code: 200
-    #   register: search_result
-
-    # - name:  Show data from REST API
+    # - name:  Obtain id of specific tenant "Test_tenant" from Netbox
     #   debug:
-    #     msg: "{{ search_result }}"      
+    #     msg: "{{ item.value.id }}"
+    #   register: tenant_id 
+    #   loop: "{{ query('netbox.netbox.nb_lookup', 'tenants', api_filter='name=TestTen',
+    #                 api_endpoint=url_var,
+    #                 token=token_var) }}"
 
-    - name:  See tenant id
-      debug:
-        msg: "{{tenant_id.results[0].item.value.id}}"
-        msg: "{{tenant_id.results[0].item.key | int }}"         
+    # - name:  See tenant id
+    #   debug:
+    #     msg: "{{tenant_id.results[0].item.value.id}}"
+    #     msg: "{{tenant_id.results[0].item.key | int }}"         
 
     - name: Create vrf with all information
       netbox.netbox.netbox_vrf:
@@ -53,11 +34,13 @@
         data:
           name: "{{ vrf_name }}"
           rd:  "{{ vrf_rd }}"
-          # tenant: "Test_Tenant"
+          tenant: "{{ tenant_name }}"
           # tenant: "{{tenant_id.results[0].item.value.id | int }}"
-          # tenant: "{{ netbox_tenant | int }}"
+          # tenant: "{{ tenant_name | int }}"
           # tenant: 3          
-          # tenant: "{{tenant_id.results[0].item.key | int }}"
           description: "{{ vrf_description }}"
+          enforce_unique: true   # prevent duplicate prefixes/IP addresses within this VRF, true or false
           tags:
             - "{{ vrf_tag }}" 
+        state: present   # prevent duplicate prefixes/IP addresses within this VRF, true or false  
+            

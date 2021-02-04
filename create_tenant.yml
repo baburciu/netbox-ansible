@@ -1,17 +1,34 @@
+# ======= How to run standalone:
+# boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_tenant.yml -e 'tenant_name="G4R2Huawei"'
+
 - name: Create Tenant
   connection: local
   hosts: docker_netbox_19216820023
-  gather_facts: True
-
+  gather_facts: False
+  collections:
+    - netbox.netbox 
   tasks:
+    - include_vars: external_vars.yml  
+ 
+   # Create first a tenant group and add the afterwards created tenant to it
     - name: Create tenant with all parameters
-      netbox_tenant:
+      netbox_tenant_group:
         netbox_url: "{{ url_var }}"
         netbox_token: "{{ token_var }}"
         data:
-          name: "{{ tenant_name }}"
-          description: "{{ tenant_description }}"
-          comments: "{{ tenant_comments }}"
-          tags:
-            - "{{ tenant_tag }}"
+          name: "{{ tenant_group_name }}"
         state: present
+
+    # - name: Create tenant with all parameters
+    #   netbox_tenant:
+    #     netbox_url: "{{ url_var }}"
+    #     netbox_token: "{{ token_var }}"
+    #     data:
+    #       name: "{{ tenant_name }}"
+    #       tenant_group: "{{ tenant_group_name }}"
+    #       description: "{{ tenant_description }}"
+    #       comments: "{{ tenant_comments }}"
+    #       tags:
+    #         - "{{ tenant_tag }}"
+    #     state: present

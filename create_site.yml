@@ -1,6 +1,29 @@
 - name: Create Site
   connection: local
   hosts: docker_netbox_19216820023
-  gather_facts: True
-
+  gather_facts: False
+  collections:
+    - netbox.netbox 
   tasks:
+    # - include_vars: external_vars.yml  
+
+    - name: Create site with all parameters
+      netbox_site:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          name: '{{ site_name }}'
+          status: '{{ site_status }}'
+          region: '{{ site_region }}'
+          facility: '{{ site_facility }}'
+          asn: '{{ site_asn }}'
+          time_zone: '{{ site_time_zone }}'
+          description: '{{ site_description }}'
+          physical_address: '{{ site_physical_address }}'
+          shipping_address: '{{ site_shipping_address }}'
+          latitude: '{{ site_latitude }}'
+          longitude: '{{ site_longitude }}'
+          contact_name: '{{ site_contact_name }}'
+          contact_phone: '{{ site_contact_phone }}'
+          contact_email: '{{ site_contact_email }}'
+        state: present   # prevent duplicate prefixes/IP addresses within this VRF, true or false  
