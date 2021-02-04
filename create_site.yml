@@ -1,0 +1,6 @@
+- name: Create Site
+  connection: local
+  hosts: docker_netbox_19216820023
+  gather_facts: True
+
+  tasks:

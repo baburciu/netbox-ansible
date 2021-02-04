@@ -1,9 +1,17 @@
+# ======= How to run w non-root Ansible user: 
+# boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_tag.yml -e 'tag1_name="contrail" tag1_description="Juniper Contrail SDN backend"'
+# possibly with --become --ask-become-pass    
+
 - name: Create Tag
   connection: local
   hosts: docker_netbox_19216820023
-  gather_facts: True
-
+  gather_facts: False
+  collections:
+    - netbox.netbox 
   tasks:
+    - include_vars: external_vars.yml
+
     - name: Create tags
       netbox_tag:
         netbox_url: "{{ url_var }}"
@@ -11,7 +19,21 @@
         data:
           name: "{{ item.name }}"
           description: "{{ item.description }}"
+          color:  "{{ item.color }}"
+        state: present  # Use present or absent for adding/creation or removing/deletion
       loop:
-        - { name: {{tag1_name}}, description: {{tag1_description}} }
-        - { name: {{tag2_name}}, description: {{tag2_description}} }     
-        - { name: {{tag3_name}}, description: {{tag3_description}} }            
+        - { name: "{{tag1_name}}", description: "{{tag1_description}}", color: "{{tag1_color}}" }
+        - { name: "{{tag2_name}}", description: "{{tag2_description}}", color: "{{tag2_color}}" }     
+        - { name: "{{tag3_name}}", description: "{{tag3_description}}", color: "{{tag3_color}}" }            
+
+    - name:  Obtain all tags
+      # debug: 
+      #   msg: "{{ item }}"
+
+      debug: 
+        msg: >      
+          "Tag {{ item.value.name }} has description:{{ item.value.description }} "
+
+      loop: "{{ query('netbox.netbox.nb_lookup', 'tags', 
+                    api_endpoint=url_var,
+                    token=token_var) }}"

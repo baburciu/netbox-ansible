@@ -1,15 +1,18 @@
 ---
 # external_vars.yml to be used in playbooks called in order by import_playbook
 
-url_var: http://192.168.200.23:8001/
-token_var: b6383aa3e6c35d1eccf2fc09635ed0caeb6fe7c7
+url_var: "http://192.168.200.23:8001/"
+token_var: "97dab58500f94c141d63fb78b6406f9b53a119ac"
 
 tag1_name: mgmt
 tag1_description: "Management port"
+tag1_color: 0000FF  # RGB color in hexadecimal
 tag2_name: srv
 tag2_description: Server
+tag2_color: FF00FF
 tag3_name: oiaas
 tag3_description: "Orange IaaS deployment"
+tag3_color: FFA500
 
 tenant_name: Huawei_Contrail_calif
 tenant_description: "OIaaS G4R2 w/ Contrail SDN backend"

@@ -28,7 +28,7 @@
     - name: Obtain id of specific tenant from Netbox
       debug:
         msg: "{{ query('netbox.netbox.nb_lookup', 'tenants',
-                      api_filter='tenant=Test_Tenant',
+                      api_filter='name=Test_Tenant',
                       api_endpoint='http://192.168.200.23:8001/',
                       token='b6383aa3e6c35d1eccf2fc09635ed0caeb6fe7c7') }}"                     
     - name: Create vrf with all information
