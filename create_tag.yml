@@ -10,7 +10,7 @@
   collections:
     - netbox.netbox 
   tasks:
-    - include_vars: external_vars.yml
+    # - include_vars: external_vars.yml
 
     - name: Create tags
       netbox_tag:

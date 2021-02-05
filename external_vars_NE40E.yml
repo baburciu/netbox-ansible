@@ -25,7 +25,7 @@ site_region: "EMEA"
 site_facility: Hyperscale DC
 site_asn: 8953    # found by trail and error that needs to be integer
 site_time_zone: Europe/Bucharest
-site_description: ORANGE/TGI/OLN/CISS/ITE DC in Romania
+site_description: Orange DC in Bucharest, Romania
 site_physical_address: Blvd Dimitrie Pompeiu 8, Bucharest, 020337
 site_shipping_address: Blvd Dimitrie Pompeiu 8, Bucharest, 020337
 site_latitude: '44.480367'    # found by trail and error the need to ensure  there are no more than 8 digits in total  
@@ -53,36 +53,36 @@ rack_type: 4-post cabinet    # Choices: 2-post frame, 4-post frame, 4-post cabin
 rack_u_height: 42
 rack_width: 23     # the rail-to-rail width, choices: 10, 19, 21, 23
 rack_serial: 00000000
-rack_facility_id: 00000000
+rack_facility_id: "E203 R4-P8"
 rack_comments: "Room E203, Row#4 Rack#1"
 
 
 ##  ======== variables used for NetBox WebUI Devices tab objects ======== ##
 device_manufacturer_name: "Huawei Technologies"
-device_model: CE6851-48S6Q-HI
-device_part_number: 02350JAR
-device_u_height: 1
+device_model: NE40E-X3A
+device_part_number: 02350FML
+device_u_height: 6
 device_is_full_depth: no    # whether or not the device consumes both front and rear rack faces, yer or no
 device_subdevice_role: parent    # whether the device type is parent, child, or neither
-device_hw_set_id: CE6800-HI    # just a tag for the set of hardware params above; found by trail and error that it should not be part of model of manufacturer, i.e. CE6851 is not accepted 
+device_hw_set_id: NetEngine40E    # just a tag for the set of hardware params above; found by trail and error that it should not be part of model of manufacturer, i.e. CE6851 is not accepted 
 #
-device_role_name: ToR_SW
-device_role_color: 2008DF
+device_role_name: Router
+device_role_color: 27B020
 #
-device_hostname: SWH-TOR-R1-01
+device_hostname: NE40E
 device_site: Feper-Bucharest
 device_face: front    # front/rear
-device_primary_ip4:  '192.168.201.24/24'
-device_serial: 2102350JASDMK4000611
+device_primary_ip4:  '192.168.201.26/24'
+device_serial: 2102350FMLN0J9000004
 device_rack_name: R1
-device_position_in_rack: 35
+device_position_in_rack: 36
 device_tenant: HuaweiContrailcalif
 device_comments: " N/A "
 device_tag: oiaas
 #
-interface_device: SWH-TOR-R1-01
-interface_name: MEth0/0/0
-interface_mac_address: c4b8-b434-41b0
+interface_device: NE40E
+interface_name: GigabitEthernet0/0/0
+interface_mac_address: 18de-d7ec-83f2
 interface_enabled: true
 interface_type: 1000BASE-T
 interface_mtu: 1500
@@ -96,13 +96,13 @@ vrf_rd: 65001:92062
 vrf_description: "OOB for underlay switches and firewalls and IPMI network of servers" 
 vrf_tag: oiaas
 #
-ip_addr_address: '192.168.201.24/24'
+ip_addr_address: '192.168.201.26/24'
 ip_addr_vrf: OOB
 ip_addr_tenant: HuaweiContrailcalif
 ip_addr_status: Reserved
 ip_addr_role: VIP     # the role of the IP address: Loopback, Secondary, Anycast, VIP, VRRP, HSRP, GLBP, CARP
 ip_addr_description: "Mgmt interface"
-ip_addr_interface_name: MEth0/0/0
-ip_addr_interface_device: SWH-TOR-R1-01 
+ip_addr_interface_name: GigabitEthernet0/0/0
+ip_addr_interface_device: NE40E 
 
 

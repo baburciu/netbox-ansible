@@ -9,7 +9,7 @@
   collections:
     - netbox.netbox 
   tasks:
-    - include_vars: external_vars.yml  
+    # - include_vars: external_vars.yml  
 
     - name: Create manufacturer within Netbox with only required information
       netbox_manufacturer:
@@ -47,8 +47,7 @@
         netbox_url: '{{ url_var }}'
         netbox_token: '{{ token_var }}'
         data:
-          name:  '{{ device_hostname }}' 
-          # device_type: '{{ device_model }}' 
+          name:  '{{ device_hostname }}'  
           device_type: '{{ device_hw_set_id }}'           
           device_role: '{{ device_role_name }}'
           # platform: '{{ device_hw_set_id }}' 
@@ -57,12 +56,21 @@
           rack: '{{ device_rack_name }}'   # must be created prior (different playbook) 
           position:  '{{ device_position_in_rack }}'
           tenant: '{{ device_tenant }}'  
-          primary_ip4: '{{ device_primary_ip4 }}'   # must be created prior (different playbook)
+          # primary_ip4: '{{ device_primary_ip4 }}'   # must be created prior (different playbook)
           serial: '{{ device_serial }}'    
           comments: '{{ device_comments }}'  
           tags:
             - '{{ device_tag }}' 
         state: present
+
+    - name: Update device with mgmt interface primary IP address
+      netbox_device:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          name:  '{{ device_hostname }}'  
+          primary_ip4: '{{ device_primary_ip4 }}'   # must be created prior (different playbook), so we'll ignore errors as long it is not
+      ignore_errors: True
 
     - name:  Obtain all devices
       debug: 

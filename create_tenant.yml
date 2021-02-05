@@ -9,7 +9,7 @@
   collections:
     - netbox.netbox 
   tasks:
-    - include_vars: external_vars.yml  
+    # - include_vars: external_vars.yml  
  
    # Create first a tenant group and add the afterwards created tenant to it
     - name: Create tenant with all parameters

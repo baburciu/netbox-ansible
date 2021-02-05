@@ -9,7 +9,7 @@
   collections:
     - netbox.netbox 
   tasks:
-    - include_vars: external_vars.yml    # where "url_var: http://192.168.200.23:8001/"
+    # - include_vars: external_vars.yml    # where "url_var: http://192.168.200.23:8001/"
 
   # creating a VRF assumes knowledge of tenant id;
   # query first a list of tenants and get id of only one of interest

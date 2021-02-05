@@ -10,7 +10,7 @@
   collections:
     - netbox.netbox 
   tasks:
-    - include_vars: external_vars.yml  
+    # - include_vars: external_vars.yml  
 
     - name: Create region
       netbox_region:
