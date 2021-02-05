@@ -20,15 +20,15 @@
           name: "{{ tenant_group_name }}"
         state: present
 
-    # - name: Create tenant with all parameters
-    #   netbox_tenant:
-    #     netbox_url: "{{ url_var }}"
-    #     netbox_token: "{{ token_var }}"
-    #     data:
-    #       name: "{{ tenant_name }}"
-    #       tenant_group: "{{ tenant_group_name }}"
-    #       description: "{{ tenant_description }}"
-    #       comments: "{{ tenant_comments }}"
-    #       tags:
-    #         - "{{ tenant_tag }}"
-    #     state: present
+    - name: Create tenant with all parameters
+      netbox_tenant:
+        netbox_url: "{{ url_var }}"
+        netbox_token: "{{ token_var }}"
+        data:
+          name: "{{ tenant_name }}"
+          tenant_group: "{{ tenant_group_name }}"
+          description: "{{ tenant_description }}"
+          comments: "{{ tenant_comments }}"
+          tags:
+            - "{{ tenant_tag }}"
+        state: present

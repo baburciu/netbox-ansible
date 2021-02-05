@@ -1,0 +1,76 @@
+# ======= How to run standalone:
+# boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_device.yml -e 'device_hw_set_id="CE6800-HI"'
+
+- name: Create device manufacturer, device type, role and assign to a device
+  connection: local
+  hosts: docker_netbox_19216820023
+  gather_facts: False
+  collections:
+    - netbox.netbox 
+  tasks:
+    - include_vars: external_vars.yml  
+
+    - name: Create manufacturer within Netbox with only required information
+      netbox_manufacturer:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          name: '{{ device_manufacturer_name }}'
+        state: present    
+
+    - name: Create device type within Netbox with only required information
+      netbox_device_type:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          slug: '{{ device_hw_set_id }}'   # to be used as platform for the device, identifies all these hardware params under netbox_device_type
+          manufacturer: '{{ device_manufacturer_name }}'        
+          model: '{{ device_model }}' 
+          part_number: '{{ device_part_number }}' 
+          u_height: '{{ device_u_height }}' 
+          is_full_depth: '{{ device_is_full_depth }}' 
+          subdevice_role: '{{ device_subdevice_role }}' 
+        state: present
+
+    - name: Create device role within Netbox with only required information
+      netbox_device_role:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          name: '{{ device_role_name }}'
+          color: '{{ device_role_color }}'
+        state: present
+  
+    - name: Create device
+      netbox_device:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          name:  '{{ device_hostname }}' 
+          # device_type: '{{ device_model }}' 
+          device_type: '{{ device_hw_set_id }}'           
+          device_role: '{{ device_role_name }}'
+          # platform: '{{ device_hw_set_id }}' 
+          site: '{{ device_site }}'   # must be created prior (different playbook)
+          face: '{{ device_face }}'
+          rack: '{{ device_rack_name }}'   # must be created prior (different playbook) 
+          position:  '{{ device_position_in_rack }}'
+          tenant: '{{ device_tenant }}'  
+          primary_ip4: '{{ device_primary_ip4 }}'   # must be created prior (different playbook)
+          serial: '{{ device_serial }}'    
+          comments: '{{ device_comments }}'  
+          tags:
+            - '{{ device_tag }}' 
+        state: present
+
+    - name:  Obtain all devices
+      debug: 
+        msg: '{{ item }}'  
+      # debug: 
+      #   msg: >      
+      #     "{{ item.value.name }}"
+
+      loop: "{{ query('netbox.netbox.nb_lookup', 'devices', 
+                    api_endpoint=url_var,
+                    token=token_var) }}"   

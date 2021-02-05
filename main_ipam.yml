@@ -1,0 +1,18 @@
+# ======= How to run w non-root Ansible user: 
+# boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v main_ipam.yml
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v main_ipam.yml -e 'vrf_name="INFRA-OUT" vrf_rd="65002:92062" vrf_description="VRF for repo, DND and NTP access"'
+---
+- name: Add an IPAM item (like IP address), with all dependencies created at playbook runtime
+  hosts: docker_netbox_19216820023
+  gather_facts: False  
+  tasks:
+    - include_vars: external_vars.yml  # where "url_var: http://192.168.200.23:8001/"
+
+- name: 1st, create the VRF
+  import_playbook: create_vrf.yml
+
+- name: 2nd, create the IP address 
+  import_playbook: create_ip_addr.yml 
+
+

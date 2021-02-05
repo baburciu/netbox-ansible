@@ -1,0 +1,38 @@
+# ======= How to run standalone:
+# boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_interface.yml -e 'interface_description="Management port"'
+
+- name: Create interface
+  connection: local
+  hosts: docker_netbox_19216820023
+  gather_facts: False
+  collections:
+    - netbox.netbox 
+  tasks:
+    - include_vars: external_vars.yml  
+
+    - name: Create interface
+      netbox_device_interface:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          device: '{{ interface_device }}'
+          name: '{{ interface_name }}'
+          mac_address: '{{ interface_mac_address }}'
+          enabled: '{{ interface_enabled }}'
+          type: '{{ interface_type }}'
+          mtu: '{{ interface_mtu }}'
+          mgmt_only: '{{ interface_mgmt_only }}'
+          description: '{{ interface_description }}'
+        state: present    
+
+    - name:  Obtain all interfaces
+      debug: 
+        msg: '{{ item }}'  
+      # debug: 
+      #   msg: >      
+      #     "{{ item.value.name }}"
+
+      loop: "{{ query('netbox.netbox.nb_lookup', 'interfaces', 
+                    api_endpoint=url_var,
+                    token=token_var) }}"   

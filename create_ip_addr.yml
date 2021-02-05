@@ -1,0 +1,28 @@
+# ======= How to run standalone:
+# boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_device.yml
+
+- name: Create device manufacturer, device type, role and assign to a device
+  connection: local
+  hosts: docker_netbox_19216820023
+  gather_facts: False
+  collections:
+    - netbox.netbox 
+  tasks:
+    - include_vars: external_vars.yml  
+
+    - name: Create IP address with several specified options
+      netbox_ip_address:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          address: '{{ ip_addr_address }}'  
+          vrf: '{{ ip_addr_vrf }}'  
+          tenant: '{{ ip_addr_tenant }}'  
+          status: '{{ ip_addr_status }}'  
+          role: '{{ ip_addr_role }}'  
+          description: '{{ ip_addr_description }}'  
+          assigned_object:
+            name: '{{ ip_addr_interface_name }}'    # must be created prior (different playbook)
+            device: '{{ ip_addr_interface_device }}'     # must be created prior (different playbook)
+        state: present    

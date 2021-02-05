@@ -1,22 +1,24 @@
 ---
 # external_vars.yml to be used in playbooks called in order by import_playbook
 
+
 url_var: "http://192.168.200.23:8001/"
 token_var: "97dab58500f94c141d63fb78b6406f9b53a119ac"
+
 
 ## ======== variables used for NetBox WebUI Organization tab objects ======== ##
 tag1_name: mgmt
 tag1_description: "Management port"
-tag1_color: 0000FF  # RGB color in hexadecimal
+tag1_color: 0000FF  # RGB color in hexadecimal, use https://htmlcolorcodes.com/
 tag2_name: srv
 tag2_description: Server
 tag2_color: FF00FF
 tag3_name: oiaas
 tag3_description: "Orange IaaS deployment"
 tag3_color: FFA500
-
+#
 region_name: "EMEA"
-
+#
 site_name: Feper-Bucharest
 site_status: Planned
 site_region: "EMEA"
@@ -31,13 +33,13 @@ site_longitude: '26.117824'    # found by trail and error the need to ensure  th
 site_contact_name: Mihai Olteanu
 site_contact_phone: 	0040744441242
 site_contact_email: Mihai.Olteanu@orange.com 
-
+#
 tenant_group_name: IaaS4Telco	
 tenant_name: HuaweiContrailcalif    # found by trail and error that does not support underscore, for VRF to be referenced to its name
 tenant_description: "OIaaS G4R2 w/ Contrail SDN backend"
 tenant_comments: "OIaaS G4R2 w/ Contrail SDN backend"
 tenant_tag: oiaas
-
+#
 rack_group_name: Huawei
 rack_site: Feper-Bucharest
 rack_role_name: "Hyperscale infra"
@@ -49,16 +51,58 @@ rack_outer_width: 605   # per https://www.ibm.com/support/pages/overview-ibm-42u
 rack_outer_depth: 1200
 rack_type: 4-post cabinet    # Choices: 2-post frame, 4-post frame, 4-post cabinet, Wall-mounted frame, Wall-mounted cabinet
 rack_u_height: 42
-rack_width: 23     # The rail-to-rail width, choices: 10, 19, 21, 23
+rack_width: 23     # the rail-to-rail width, choices: 10, 19, 21, 23
 rack_serial: 00000000
 rack_facility_id: 00000000
 rack_comments: "Room E203, Row#4 Rack#1"
 
-##  ======== variables used for NetBox WebUI IPAM tab objects ======== ##
-vrf_name: PUB_API
-vrf_rd: 65000:92062
-vrf_description: "Interconnect VRF between OIaaS FW and IP Fabric Leaf SWs" 
-vrf_tag: oiaas
 
+##  ======== variables used for NetBox WebUI Devices tab objects ======== ##
+device_manufacturer_name: "Huawei Technologies"
+device_model: CE6851-48S6Q-HI
+device_part_number: 02350JAR
+device_u_height: 1
+device_is_full_depth: no    # whether or not the device consumes both front and rear rack faces, yer or no
+device_subdevice_role: parent    # whether the device type is parent, child, or neither
+device_hw_set_id: CE6800-HI    # found by trail and error that it should not be part of model of manufacturer, i.e. CE6851 is not accepted 
+#
+device_role_name: ToR_SW
+device_role_color: 2008DF
+#
+device_hostname: SWH-TOR-R1-01
+device_site: Feper-Bucharest
+device_face: front    # front/rear
+device_primary_ip4:  '192.168.201.24/24'
+device_serial: 2102350JASDMK4000611
+device_rack_name: R1
+device_position_in_rack: 35
+device_tenant: HuaweiContrailcalif
+device_comments: " N/A "
+device_tag: oiaas
+#
+interface_device: SWH-TOR-R1-01
+interface_name: MEth0/0/0
+interface_mac_address: c4b8-b434-41b0
+interface_enabled: true
+interface_type: 1000BASE-T
+interface_mtu: 1500
+interface_mgmt_only: yes      # interface is used only for out-of-band management, yes or no
+interface_description: "Mgmt interface"
+
+
+##  ======== variables used for NetBox WebUI IPAM tab objects ======== ##
+vrf_name: OOB
+vrf_rd: 65001:92062
+vrf_description: "OOB for underlay switches and firewalls and IPMI network of servers" 
+vrf_tag: oiaas
+#
+ip_addr_address: '192.168.201.24/24'
+ip_addr_vrf: OOB
+ip_addr_tenant: HuaweiContrailcalif
+ip_addr_status: Reserved
+ip_addr_role: VIP     # the role of the IP address: Loopback, Secondary, Anycast, VIP, VRRP, HSRP, GLBP, CARP
+ip_addr_description: "Mgmt interface"
+ip_addr_interface_name: MEth0/0/0
+ip_addr_interface_device: SWH-TOR-R1-01 
 
 
