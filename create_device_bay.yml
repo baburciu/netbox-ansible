@@ -1,0 +1,34 @@
+# ======= How to run standalone:
+# boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_device_bay.yml
+
+- name: Create device bay on a previously created parent device and add a child device in it
+  connection: local
+  hosts: docker_netbox_19216820023
+  gather_facts: False
+  collections:
+    - netbox.netbox 
+  tasks:
+    - include_vars: external_vars_blade.yml  
+
+    # - name: Create device bay within Netbox with only required information
+    #   netbox_device_bay:
+    #     netbox_url: '{{ url_var }}'
+    #     netbox_token: '{{ token_var }}'
+    #     data:
+    #       device: '{{ device_bay_chassis }}'       
+    #       name: '{{ device_bay_slot }}'
+    #     state: present
+    #   ignore_errors: True        
+
+    - name: Add device into device bay
+      netbox_device_bay:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          device: '{{ device_bay_chassis }}'    
+          name: '{{ device_bay_slot }}'
+          installed_device: '{{ device_bay_blade }}'
+        state: present 
+      ignore_errors: True
+ 

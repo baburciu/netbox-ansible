@@ -9,7 +9,7 @@
   collections:
     - netbox.netbox 
   tasks:
-    # - include_vars: external_vars.yml  
+    # - include_vars: external_vars_blade.yml  
 
     - name: Create manufacturer within Netbox with only required information
       netbox_manufacturer:
@@ -24,7 +24,7 @@
         netbox_url: '{{ url_var }}'
         netbox_token: '{{ token_var }}'
         data:
-          slug: '{{ device_hw_set_id }}'   # to be used as platform for the device, identifies all these hardware params under netbox_device_type
+          slug: '{{ device_hw_set_id }}'   # to be used as device_type for the device object, identifies all these hardware params under netbox_device_type
           manufacturer: '{{ device_manufacturer_name }}'        
           model: '{{ device_model }}' 
           part_number: '{{ device_part_number }}' 
@@ -42,7 +42,7 @@
           color: '{{ device_role_color }}'
         state: present
   
-    - name: Create device
+    - name: Create device for non-blade server systems 
       netbox_device:
         netbox_url: '{{ url_var }}'
         netbox_token: '{{ token_var }}'
@@ -50,7 +50,6 @@
           name:  '{{ device_hostname }}'  
           device_type: '{{ device_hw_set_id }}'           
           device_role: '{{ device_role_name }}'
-          # platform: '{{ device_hw_set_id }}' 
           site: '{{ device_site }}'   # must be created prior (different playbook)
           face: '{{ device_face }}'
           rack: '{{ device_rack_name }}'   # must be created prior (different playbook) 
@@ -62,6 +61,26 @@
           tags:
             - '{{ device_tag }}' 
         state: present
+      when: device_subdevice_role == 'parent'
+
+    - name: Create device of type blade server
+      netbox_device:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          name:  '{{ device_hostname }}'  
+          device_type: '{{ device_hw_set_id }}'           
+          device_role: '{{ device_role_name }}'
+          site: '{{ device_site }}'   # must be created prior (different playbook)
+          rack: '{{ device_rack_name }}'   # must be created prior (different playbook) 
+          tenant: '{{ device_tenant }}'  
+          # primary_ip4: '{{ device_primary_ip4 }}'   # must be created prior (different playbook)
+          serial: '{{ device_serial }}'    
+          comments: '{{ device_comments }}'  
+          tags:
+            - '{{ device_tag }}' 
+        state: present
+      when: device_subdevice_role == 'child'
 
     - name: Update device with mgmt interface primary IP address
       netbox_device:
@@ -72,13 +91,25 @@
           primary_ip4: '{{ device_primary_ip4 }}'   # must be created prior (different playbook), so we'll ignore errors as long it is not
       ignore_errors: True
 
-    - name:  Obtain all devices
-      debug: 
-        msg: '{{ item }}'  
-      # debug: 
-      #   msg: >      
-      #     "{{ item.value.name }}"
+    - name: Add child device into device bay of parent
+      netbox_device_bay:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          device: '{{ device_bay_chassis }}'    
+          name: '{{ device_bay_slot }}'
+          installed_device: '{{ device_hostname }}'  
+        state: present 
+      ignore_errors: True
+      when: device_subdevice_role == 'child'      
 
-      loop: "{{ query('netbox.netbox.nb_lookup', 'devices', 
-                    api_endpoint=url_var,
-                    token=token_var) }}"   
+    # - name:  Obtain all devices
+    #   debug: 
+    #     msg: '{{ item }}'  
+    #   # debug: 
+    #   #   msg: >      
+    #   #     "{{ item.value.name }}"
+
+    #   loop: "{{ query('netbox.netbox.nb_lookup', 'devices', 
+    #                 api_endpoint=url_var,
+    #                 token=token_var) }}"   

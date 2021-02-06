@@ -22,9 +22,7 @@
           color:  "{{ item.color }}"
         state: present  # Use present or absent for adding/creation or removing/deletion
       loop:
-        - { name: "{{tag1_name}}", description: "{{tag1_description}}", color: "{{tag1_color}}" }
-        - { name: "{{tag2_name}}", description: "{{tag2_description}}", color: "{{tag2_color}}" }     
-        - { name: "{{tag3_name}}", description: "{{tag3_description}}", color: "{{tag3_color}}" }            
+        - { name: "{{tag_name}}", description: "{{tag_description}}", color: "{{tag_color}}" }
 
     - name:  Obtain all tags
       # debug: 

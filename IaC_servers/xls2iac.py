@@ -1,0 +1,87 @@
+# Parsing Feper servers 25-11-2020.xlsx
+# Creating IaC for NetBox servers addition by Ansible automation
+# Bogdan Adrian Burciu 06/02/2021 vers 1
+
+# -------------------------
+# Credits:
+# https://stackoverflow.com/questions/29518833/editing-yaml-file-by-python
+# https://buildmedia.readthedocs.org/media/pdf/yaml/latest/yaml.pdf
+
+import sys
+import ruamel.yaml
+import xlrd
+
+sh = xlrd.open_workbook('./Feper_servers_25-11-2020_plus_rack_name_and_RU_only1.xls').sheet_by_index(0)
+oob_ip = sh.col_values(1, start_rowx=2)
+sn = sh.col_values(2, start_rowx=2)
+model = sh.col_values(3, start_rowx=2)  # <== lists of all values in 4th column D (#3, first being #0) of input .xlsx
+blade_bay = sh.col_values(4, start_rowx=2)
+form_factor = sh.col_values(5, start_rowx=2)
+rack = sh.col_values(6, start_rowx=2)
+rack_ru = sh.col_values(7, start_rowx=2)
+specs_cpu = sh.col_values(8, start_rowx=2)
+specs_cores = sh.col_values(9, start_rowx=2)
+specs_ram_proc = sh.col_values(10, start_rowx=2)
+specs_ram_total = sh.col_values(11, start_rowx=2)
+specs_storage = sh.col_values(12, start_rowx=2)
+specs_nic = sh.col_values(13, start_rowx=2)
+tenant = sh.col_values(14, start_rowx=2)
+
+yaml = ruamel.yaml.YAML()
+# yaml.preserve_quotes = True
+
+for i in range(len(oob_ip)):
+    with open('./external_vars.yml') as fp:
+        elem = yaml.load(fp)
+        elem['rack_name'] = rack[i]
+        elem['rack_comments'] = '--'
+        elem['rack_facility_id'] = hash(sn[i]) % 10**8
+        elem['tenant_name'] = tenant[i]
+        elem['tenant_description'] = tenant[i]
+        elem['device_primary_ip4'] = oob_ip[i]+"/24"
+        elem['device_serial'] = sn[i]
+        elem['device_manufacturer_name'] = model[i].split(' ',1)[0]
+        elem['device_model'] = model[i].split(' ',1)[1]
+        elem['device_hw_set_id'] = "xx"+ model[i].split(' ',1)[0] + model[i].split(' ',1)[1]
+        elem['device_rack_name'] = rack[i]
+        if form_factor[i] == 'blade':
+            elem['device_role_name'] = 'Blade Server'
+            elem['device_role_color'] = 'D9EE22'
+            elem['device_subdevice_role'] = 'child'
+            elem['device_u_height'] = '0'
+            elem['device_bay_blade'] = blade_bay[i].split("-")[0]
+            elem['device_position_in_rack'] = blade_bay[i]+"    # not used by Ansible playbook for child devices"
+            if blade_bay[i].split("-")[1] == 'Chassis 1':
+                elem['device_bay_chassis'] = 'HPE BladeSystem c7000 Enclosure_CZ00CHASSIS1'
+            elif blade_bay[i].split("-")[1] == 'Chassis 2':
+                elem['device_bay_chassis'] = 'HPE BladeSystem c7000 Enclosure_CZ00CHASSIS2'
+        else:
+            elem['device_subdevice_role'] = 'parent'
+            elem['device_position_in_rack'] = int(rack_ru[i])
+            elem['device_u_height'] = form_factor[i].split("U")[0]
+            elem['device_role_name'] = 'Rack Server'
+            elem['device_role_color'] = 'EE2297'
+        elem['device_comments'] = str(specs_cpu[i]+' ; '+specs_ram_proc[i]+' ; '+specs_ram_total[i]+' ; '+specs_storage[i]+' ; '+specs_nic[i])
+        elem['device_hostname'] = model[i]+"_"+sn[i]
+        elem['device_tenant'] = tenant[i]
+        elem['interface_device'] = elem['device_hostname']
+        elem['ip_addr_interface_device'] = elem['device_hostname']
+        elem['ip_addr_address'] = elem['device_primary_ip4']
+        elem['ip_addr_tenant'] = tenant[i]
+        if elem['device_manufacturer_name'] == 'HPE':
+            elem['interface_name'] = 'iLO'
+            elem['ip_addr_interface_name'] = 'iLO'
+        elif elem['device_manufacturer_name'] == 'Huawei':
+            elem['interface_name'] = 'iBMC'
+            elem['ip_addr_interface_name'] = 'iBMC'
+        elif elem['device_manufacturer_name'] == 'Dell':
+            elem['interface_name'] = 'iDRAC'
+            elem['ip_addr_interface_name'] = 'iDRAC'
+    # yaml.dump(elem, sys.stdout)
+    f = open("./external_vars_"+str(sn[i])+".yml", 'wb+')
+    yaml.dump(elem, f)
+    f.close()
+
+
+
+

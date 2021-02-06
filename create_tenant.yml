@@ -28,7 +28,7 @@
           name: "{{ tenant_name }}"
           tenant_group: "{{ tenant_group_name }}"
           description: "{{ tenant_description }}"
-          comments: "{{ tenant_comments }}"
+          # comments: "{{ tenant_comments }}"
           tags:
             - "{{ tenant_tag }}"
         state: present

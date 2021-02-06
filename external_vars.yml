@@ -3,19 +3,13 @@
 
 
 url_var: "http://192.168.200.23:8001/"
-token_var: "97dab58500f94c141d63fb78b6406f9b53a119ac"
+token_var: "32fb8595fb137464557c3595b1d7688166dc2cab"
 
 
 ## ======== variables used for NetBox WebUI Organization tab objects ======== ##
-tag1_name: mgmt
-tag1_description: "Management port"
-tag1_color: 0000FF  # RGB color in hexadecimal, use https://htmlcolorcodes.com/
-tag2_name: srv
-tag2_description: Server
-tag2_color: FF00FF
-tag3_name: oiaas
-tag3_description: "Orange IaaS deployment"
-tag3_color: FFA500
+tag_name: oiaas
+tag_description: "Orange IaaS deployment"
+tag_color: FFA500  # RGB color in hexadecimal, use https://htmlcolorcodes.com/
 #
 region_name: "EMEA"
 #
@@ -31,20 +25,20 @@ site_shipping_address: Blvd Dimitrie Pompeiu 8, Bucharest, 020337
 site_latitude: '44.480367'    # found by trail and error the need to ensure  there are no more than 8 digits in total  
 site_longitude: '26.117824'    # found by trail and error the need to ensure  there are no more than 9 digits in total  
 site_contact_name: Mihai Olteanu
-site_contact_phone: 	0040744441242
+site_contact_phone: 0040744441242
 site_contact_email: Mihai.Olteanu@orange.com 
 #
-tenant_group_name: IaaS4Telco	
+tenant_group_name: IaaS4Telco
 tenant_name: HuaweiContrailcalif    # found by trail and error that does not support underscore, for VRF to be referenced to its name
 tenant_description: "OIaaS G4R2 w/ Contrail SDN backend"
-tenant_comments: "OIaaS G4R2 w/ Contrail SDN backend"
+# tenant_comments: "OIaaS G4R2 w/ Contrail SDN backend"
 tenant_tag: oiaas
 #
 rack_group_name: Huawei
 rack_site: Feper-Bucharest
 rack_role_name: "Hyperscale infra"
 rack_role_color: DF2E08
-rack_name: R1
+rack_name: Huawei_Rack1
 rack_desc_units: no   # rack units will be numbered top-to-bottom, yes or no
 rack_outer_unit: Millimeters   # whether the rack unit is in Millimeters or Inches and is required if outer_width/outer_depth is specified
 rack_outer_width: 605   # per https://www.ibm.com/support/pages/overview-ibm-42u-and-47u-1200-mm-deep-static-and-deep-dynamic-rack
@@ -53,7 +47,7 @@ rack_type: 4-post cabinet    # Choices: 2-post frame, 4-post frame, 4-post cabin
 rack_u_height: 42
 rack_width: 23     # the rail-to-rail width, choices: 10, 19, 21, 23
 rack_serial: 00000000
-rack_facility_id: 00000000
+rack_facility_id: 00000000       # found by trail and error that fields group & facility_id must make a unique set for a rack
 rack_comments: "Room E203, Row#4 Rack#1"
 
 
@@ -61,9 +55,9 @@ rack_comments: "Room E203, Row#4 Rack#1"
 device_manufacturer_name: "Huawei Technologies"
 device_model: CE6851-48S6Q-HI
 device_part_number: 02350JAR
-device_u_height: 1
+device_u_height: 1    # found by trail and error that it needs to be 0 if parent type is "child"
 device_is_full_depth: no    # whether or not the device consumes both front and rear rack faces, yer or no
-device_subdevice_role: parent    # whether the device type is parent, child, or neither
+device_subdevice_role: child    # whether the device type is parent (which has device bays), child (which must be installed within a device bay), or neither
 device_hw_set_id: CE6800-HI    # just a tag for the set of hardware params above; found by trail and error that it should not be part of model of manufacturer, i.e. CE6851 is not accepted 
 #
 device_role_name: ToR_SW
@@ -71,14 +65,18 @@ device_role_color: 2008DF
 #
 device_hostname: SWH-TOR-R1-01
 device_site: Feper-Bucharest
-device_face: front    # front/rear
+device_face: front    # front/rear, found by trail and error that needs not be used if parent type is "child"
 device_primary_ip4:  '192.168.201.24/24'
 device_serial: 2102350JASDMK4000611
-device_rack_name: R1
-device_position_in_rack: 35
+device_rack_name: Huawei_Rack1
+device_position_in_rack: 35    # found by trail and error that needs not be used if parent type is "child"
 device_tenant: HuaweiContrailcalif
 device_comments: " N/A "
 device_tag: oiaas
+#
+device_bay_chassis: Chassis1    # device the device bay will be associated to. The device type must be "parent".
+device_bay_slot: 1
+device_bay_blade:     # device that will be installed into the bay. The device type must be "child" and 0U
 #
 interface_device: SWH-TOR-R1-01
 interface_name: MEth0/0/0

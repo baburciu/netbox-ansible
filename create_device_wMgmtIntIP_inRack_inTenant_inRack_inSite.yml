@@ -1,13 +1,14 @@
 # ======= How to run: 
 # boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
 # boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_device_wMgmtIntIP_inRack_inTenant_inRack_inSite.yml
-# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_device_wMgmtIntIP_inRack_inTenant_inRack_inSite.yml -e 'device_hostname="SWH-TOR-R1-02" device_serial="2102350JAS6TJ8000515" device_position_in_rack=33'
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_device_wMgmtIntIP_inRack_inTenant_inRack_inSite.yml -e 'external_vars="../parse_excel_servers/external_vars_CZ00CHASSIS1.yml"'
 ---
 - name: Add an device with its primary interface IP assigned, in a specific rack, dedicated tenant and site, with all dependencies created at playbook runtime
   hosts: docker_netbox_19216820023
   gather_facts: False  
   tasks:
-    - include_vars: external_vars_NE40E.yml  # where "url_var: http://192.168.200.23:8001/"
+    # - include_vars: external_vars.yml  # where "url_var: http://192.168.200.23:8001/"
+    - include_vars: '{{external_vars}}'    
 
 - name: 1st, create the tags to be used
   import_playbook: create_tag.yml

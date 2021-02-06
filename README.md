@@ -19,6 +19,7 @@ boburciu@WX-5CG020BDT2:~$
 boburciu@WX-5CG020BDT2:~$ ` ansible-galaxy collection install netbox.netbox --collections-path ~/.ansible/collections ` # installing the collection of roles in proper location
 
 ## 1. How to add/remove NetBox WebUI Organization tab objects:
+
 boburciu@WX-5CG020BDT2: ~$ ` cd ~/netbox-ansible-automation ` <br/>
 boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$  <br/>
 boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` cat external_vars.yml `  <br/>
@@ -93,3 +94,90 @@ boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` ansible-playbook -i ./host
 
 ### Results in Netbox WebUI > Racks page:
 ![Netbox ](./images/rack_image.PNG)
+
+
+## 2. How to add all servers with management IPs:
+
+boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` cd ../parse_excel_servers/; python3 xls2iac.py; cd ../netbox-ansible-automation/ ` <br/>
+boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` ls -lt ~/parse_excel_servers/ | grep external_vars_ ` <br/>
+```
+-rw-rw-rw- 1 boburciu boburciu   4589 Feb  7 01:42 external_vars_BQM6Y53.yml
+-rw-rw-rw- 1 boburciu boburciu   4585 Feb  7 01:42 external_vars_CQM6Y53.yml
+-rw-rw-rw- 1 boburciu boburciu   4635 Feb  7 01:42 external_vars_CZ20340JGZ.yml
+-rw-rw-rw- 1 boburciu boburciu   4631 Feb  7 01:42 external_vars_CZJ03404LC.yml
+-rw-rw-rw- 1 boburciu boburciu   4646 Feb  7 01:42 external_vars_CZJ03501PV.yml
+-rw-rw-rw- 1 boburciu boburciu   4651 Feb  7 01:42 external_vars_CZJ03501PT.yml
+-rw-rw-rw- 1 boburciu boburciu   4652 Feb  7 01:42 external_vars_CZJ03501PS.yml
+-rw-rw-rw- 1 boburciu boburciu   4701 Feb  7 01:42 external_vars_2102311XDB10KA000161.yml
+-rw-rw-rw- 1 boburciu boburciu   4702 Feb  7 01:42 external_vars_2102311XDB10KA000151.yml
+-rw-rw-rw- 1 boburciu boburciu   4718 Feb  7 01:42 external_vars_2102311XDB10KA000264.yml
+-rw-rw-rw- 1 boburciu boburciu   4717 Feb  7 01:42 external_vars_2102311XDB10KA000159.yml
+-rw-rw-rw- 1 boburciu boburciu   4726 Feb  7 01:42 external_vars_2102311XDB10KA000162.yml
+-rw-rw-rw- 1 boburciu boburciu   4727 Feb  7 01:42 external_vars_2102311XDB10KA000168.yml
+-rw-rw-rw- 1 boburciu boburciu   4753 Feb  7 01:42 external_vars_2102311XBS10K9000827.yml
+-rw-rw-rw- 1 boburciu boburciu   4753 Feb  7 01:42 external_vars_2102311XBS10K9000872.yml
+-rw-rw-rw- 1 boburciu boburciu   4753 Feb  7 01:42 external_vars_2102311XBS10K9000873.yml
+-rw-rw-rw- 1 boburciu boburciu   4691 Feb  7 01:42 external_vars_2102311XBSN0JA000033.yml
+-rw-rw-rw- 1 boburciu boburciu   4693 Feb  7 01:42 external_vars_2102311XBSN0JA000034.yml
+-rw-rw-rw- 1 boburciu boburciu   4699 Feb  7 01:42 external_vars_2102311XBSN0JA000038.yml
+-rw-rw-rw- 1 boburciu boburciu   4712 Feb  7 01:42 external_vars_2102311XBSN0JA000037.yml
+-rw-rw-rw- 1 boburciu boburciu   4699 Feb  7 01:42 external_vars_2102311XBSN0JA000036.yml
+-rw-rw-rw- 1 boburciu boburciu   4699 Feb  7 01:42 external_vars_2102311XBSN0JA000035.yml
+-rw-rw-rw- 1 boburciu boburciu   4713 Feb  7 01:42 external_vars_2102311XBSN0JA000031.yml
+-rw-rw-rw- 1 boburciu boburciu   4713 Feb  7 01:42 external_vars_2102311XBSN0JA000027.yml
+-rw-rw-rw- 1 boburciu boburciu   4713 Feb  7 01:42 external_vars_2102311XBSN0JA000032.yml
+-rw-rw-rw- 1 boburciu boburciu   4728 Feb  7 01:42 external_vars_2102311XBS10JC000068.yml
+-rw-rw-rw- 1 boburciu boburciu   4698 Feb  7 01:42 external_vars_2102311XBS10JC000070.yml
+-rw-rw-rw- 1 boburciu boburciu   4699 Feb  7 01:42 external_vars_2102311XBSN0JA000030.yml
+-rw-rw-rw- 1 boburciu boburciu   4698 Feb  7 01:42 external_vars_2102311XBSN0JA000028.yml
+-rw-rw-rw- 1 boburciu boburciu   4699 Feb  7 01:42 external_vars_2102311XBSN0JA000029.yml
+-rw-rw-rw- 1 boburciu boburciu   4762 Feb  7 01:42 external_vars_CZ28410LW5.yml
+-rw-rw-rw- 1 boburciu boburciu   4764 Feb  7 01:42 external_vars_CZ28410LW7.yml
+-rw-rw-rw- 1 boburciu boburciu   4762 Feb  7 01:42 external_vars_CZ28410LW6.yml
+-rw-rw-rw- 1 boburciu boburciu   4731 Feb  7 01:42 external_vars_CZJ73516QP.yml
+-rw-rw-rw- 1 boburciu boburciu   4746 Feb  7 01:42 external_vars_CZJ73516QN.yml
+-rw-rw-rw- 1 boburciu boburciu   4813 Feb  7 01:42 external_vars_CZJ70503GN.yml
+-rw-rw-rw- 1 boburciu boburciu   4813 Feb  7 01:42 external_vars_CZJ70503GM.yml
+-rw-rw-rw- 1 boburciu boburciu   4813 Feb  7 01:42 external_vars_CZJ70503GL.yml
+-rw-rw-rw- 1 boburciu boburciu   4798 Feb  7 01:42 external_vars_CZJ701089K.yml
+-rw-rw-rw- 1 boburciu boburciu   4801 Feb  7 01:42 external_vars_CZJ701089M.yml
+-rw-rw-rw- 1 boburciu boburciu   4799 Feb  7 01:42 external_vars_CZJ73516PH.yml
+-rw-rw-rw- 1 boburciu boburciu   4799 Feb  7 01:42 external_vars_CZJ73516PJ.yml
+-rw-rw-rw- 1 boburciu boburciu   4799 Feb  7 01:42 external_vars_CZJ73516PL.yml
+-rw-rw-rw- 1 boburciu boburciu   4799 Feb  7 01:42 external_vars_CZJ73516PK.yml
+-rw-rw-rw- 1 boburciu boburciu   4879 Feb  7 01:42 external_vars_CZ28410LW1.yml
+-rw-rw-rw- 1 boburciu boburciu   4879 Feb  7 01:42 external_vars_CZ28410LW3.yml
+-rw-rw-rw- 1 boburciu boburciu   4879 Feb  7 01:42 external_vars_CZ28410LW4.yml
+-rw-rw-rw- 1 boburciu boburciu   4879 Feb  7 01:42 external_vars_CZ28410LW2.yml
+-rw-rw-rw- 1 boburciu boburciu   4878 Feb  7 01:42 external_vars_CZ28410LW0.yml
+-rw-rw-rw- 1 boburciu boburciu   4854 Feb  7 01:42 external_vars_CZ273609YH.yml
+-rw-rw-rw- 1 boburciu boburciu   4861 Feb  7 01:42 external_vars_CZ273609YJ.yml
+-rw-rw-rw- 1 boburciu boburciu   4866 Feb  7 01:42 external_vars_CZ270203QV.yml
+-rw-rw-rw- 1 boburciu boburciu   4869 Feb  7 01:42 external_vars_CZ270203QR.yml
+-rw-rw-rw- 1 boburciu boburciu   4861 Feb  7 01:42 external_vars_CZ270203QN.yml
+-rw-rw-rw- 1 boburciu boburciu   4861 Feb  7 01:42 external_vars_CZ270203QW.yml
+-rw-rw-rw- 1 boburciu boburciu   4876 Feb  7 01:42 external_vars_CZ270203QS.yml
+-rw-rw-rw- 1 boburciu boburciu   4885 Feb  7 01:42 external_vars_CZ273609YL.yml
+-rw-rw-rw- 1 boburciu boburciu   4876 Feb  7 01:42 external_vars_CZ273609YM.yml
+-rw-rw-rw- 1 boburciu boburciu   4883 Feb  7 01:42 external_vars_CZ273609YK.yml
+-rw-rw-rw- 1 boburciu boburciu   4594 Feb  7 01:42 external_vars_CZ00CHASSIS2.yml
+-rw-rw-rw- 1 boburciu boburciu   4874 Feb  7 01:42 external_vars_CZ3350WDY8.yml
+-rw-rw-rw- 1 boburciu boburciu   4896 Feb  7 01:42 external_vars_CZ20180MMF.yml
+-rw-rw-rw- 1 boburciu boburciu   4896 Feb  7 01:42 external_vars_CZ20180MMD.yml
+-rw-rw-rw- 1 boburciu boburciu   4866 Feb  7 01:42 external_vars_CZ3350WDY2.yml
+-rw-rw-rw- 1 boburciu boburciu   4866 Feb  7 01:42 external_vars_CZ28250494.yml
+-rw-rw-rw- 1 boburciu boburciu   4866 Feb  7 01:42 external_vars_CZ28250493.yml
+-rw-rw-rw- 1 boburciu boburciu   4872 Feb  7 01:42 external_vars_CZ28250491.yml
+-rw-rw-rw- 1 boburciu boburciu   4872 Feb  7 01:42 external_vars_CZ28250492.yml
+-rw-rw-rw- 1 boburciu boburciu   4861 Feb  7 01:42 external_vars_CZ270203QT.yml
+-rw-rw-rw- 1 boburciu boburciu   4860 Feb  7 01:42 external_vars_CZ270203QM.yml
+-rw-rw-rw- 1 boburciu boburciu   4852 Feb  7 01:42 external_vars_CZ270203QX.yml
+-rw-rw-rw- 1 boburciu boburciu   4861 Feb  7 01:42 external_vars_CZ270203QQ.yml
+-rw-rw-rw- 1 boburciu boburciu   4594 Feb  7 01:42 external_vars_CZ00CHASSIS1.yml
+boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$
+```
+boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` for i in `ls -lt ~/parse_excel_servers/ | grep external_vars_ | awk '{print $9}'`; do echo ""; echo ""; echo "***** running playbook for variables in $i *****"; echo ""; echo ""; echo ""; ansible-playbook -i ./hosts create_device_wMgmtIntIP_inRack_inTenant_inRack_inSite.yml -e "external_vars='../parse_excel_servers/$i' -v"; done `  <br/>
+
+
+
+ 
