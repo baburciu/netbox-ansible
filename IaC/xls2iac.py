@@ -6,10 +6,12 @@
 # Credits:
 # https://stackoverflow.com/questions/29518833/editing-yaml-file-by-python
 # https://buildmedia.readthedocs.org/media/pdf/yaml/latest/yaml.pdf
+# https://stackoverflow.com/questions/3583265/compare-result-from-hexdigest-to-a-string
 
 import sys
 import ruamel.yaml
 import xlrd
+import hashlib
 
 sh = xlrd.open_workbook('/home/boburciu/parse_excel_servers/Feper_servers_25-11-2020_plus_rack_name_and_RU.xls').sheet_by_index(0)
 oob_ip = sh.col_values(1, start_rowx=2)
@@ -19,13 +21,14 @@ blade_bay = sh.col_values(4, start_rowx=2)
 form_factor = sh.col_values(5, start_rowx=2)
 rack = sh.col_values(6, start_rowx=2)
 rack_ru = sh.col_values(7, start_rowx=2)
-specs_cpu = sh.col_values(8, start_rowx=2)
-specs_cores = sh.col_values(9, start_rowx=2)
-specs_ram_proc = sh.col_values(10, start_rowx=2)
-specs_ram_total = sh.col_values(11, start_rowx=2)
-specs_storage = sh.col_values(12, start_rowx=2)
-specs_nic = sh.col_values(13, start_rowx=2)
-tenant = sh.col_values(14, start_rowx=2)
+role = sh.col_values(8, start_rowx=2)
+specs_cpu = sh.col_values(9, start_rowx=2)
+specs_cores = sh.col_values(10, start_rowx=2)
+specs_ram_proc = sh.col_values(11, start_rowx=2)
+specs_ram_total = sh.col_values(12, start_rowx=2)
+specs_storage = sh.col_values(13, start_rowx=2)
+specs_nic = sh.col_values(14, start_rowx=2)
+tenant = sh.col_values(15, start_rowx=2)
 
 yaml = ruamel.yaml.YAML()
 # yaml.preserve_quotes = True
@@ -45,7 +48,6 @@ for i in range(len(oob_ip)):
         elem['device_hw_set_id'] = "xx"+ model[i].split(' ',1)[0] + model[i].split(' ',1)[1]
         elem['device_rack_name'] = rack[i]
         if form_factor[i] == 'blade':
-            elem['device_role_name'] = 'Blade Server'
             elem['device_subdevice_role'] = 'child'
             elem['device_u_height'] = '0'
             elem['device_bay_blade'] = blade_bay[i].split("-")[0]
@@ -58,8 +60,8 @@ for i in range(len(oob_ip)):
             elem['device_subdevice_role'] = 'parent'
             elem['device_position_in_rack'] = int(rack_ru[i])
             elem['device_u_height'] = form_factor[i].split("U")[0]
-            elem['device_role_name'] = 'Rack Server'
         # set the device_role_color as first 6 digits of its Hex hash, calculated after encoding and MD5 hashing of device_role_name
+        elem['device_role_name'] = role[i]
         elem['device_role_color'] = (hashlib.md5(elem['device_role_name'].encode())).hexdigest()[0:6]
         elem['device_comments'] = str(specs_cpu[i]+' ; '+specs_ram_proc[i]+' ; '+specs_ram_total[i]+' ; '+specs_storage[i]+' ; '+specs_nic[i])
         elem['device_hostname'] = model[i]+"_"+sn[i]
