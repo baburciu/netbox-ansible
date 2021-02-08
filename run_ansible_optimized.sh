@@ -32,7 +32,7 @@ for x in `./get_iac_unique_var.sh -d $dir_path_iac -e site_name`; do ansible-pla
 for x in `./get_iac_unique_var.sh -d $dir_path_iac -e tenant_name`; do ansible-playbook -i ./hosts -v create_tenant.yml -e "external_vars=$x"; done
 
 # create racks for the unique extra-var values in IaC codebase: 
-for x in `./get_iac_unique_var.sh -d $dir_path_iac -e rack_name`; do ansible-playbook -i ./hosts -v create_rack.yml -e "external_vars=$x"; done
+for x in `./get_iac_unique_var.sh -d $dir_path_iac -e device_rack_name`; do ansible-playbook -i ./hosts -v create_rack.yml -e "external_vars=$x"; done
 
 # create the devices and assign them mgmt interfaces with IP addresses:
-for x in ` ls -lX ~/parse_excel_servers/external_vars*  | awk '{print $9}' `; do echo ""; echo ""; echo "@@@@@ running Device creation playbooks for extra-vars in $x @@@@@"; echo ""; echo ""; echo ""; ansible-playbook -i ./hosts -v add_device_w_mgmt.yml -e "external_vars=$x"; done
+for x in ` ls -lX $dir_path_iac/external_vars*  | awk '{print $9}' `; do echo ""; echo ""; echo "@@@@@ running Device creation playbooks for extra-vars in $x @@@@@"; echo ""; echo ""; echo ""; ansible-playbook -i ./hosts -v add_device_w_mgmt.yml -e "external_vars=$x"; done

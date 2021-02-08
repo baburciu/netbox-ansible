@@ -6,6 +6,9 @@
 # Bogdan Adrian Burciu 08/02/2021 vers 1
 
 # -------------------------
+# How to run: ./get_iac_unique_var.sh -d ~/parse_excel_servers -e device_role_name
+# How to get unique extra-var: for x in `./get_iac_unique_var.sh -d ~/parse_excel_servers -e device_role_name`; do cat $x | grep device_role_name; done
+
 # Credits:
 # https://stackoverflow.com/questions/1494178/how-to-define-hash-tables-in-bash
 # https://www.baeldung.com/linux/use-command-line-arguments-in-bash-script

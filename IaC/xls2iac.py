@@ -1,4 +1,5 @@
 # Parsing Feper servers 25-11-2020.xlsx
+# Parsing Feper servers 25-11-2020.xlsx
 # Creating IaC for NetBox servers addition by Ansible automation
 # Bogdan Adrian Burciu 06/02/2021 vers 1
 
@@ -53,9 +54,9 @@ for i in range(len(oob_ip)):
             elem['device_bay_blade'] = blade_bay[i].split("-")[0]
             elem['device_position_in_rack'] = blade_bay[i]+"    # not used by Ansible playbook for child devices"
             if blade_bay[i].split("-")[1] == 'Chassis 1':
-                elem['device_bay_chassis'] = 'HPE BladeSystem c7000 Enclosure_CZ00CHASSIS1'
+                elem['device_bay_chassis'] = 'c7000_Enclosure_CZ00CHASSIS1'
             elif blade_bay[i].split("-")[1] == 'Chassis 2':
-                elem['device_bay_chassis'] = 'HPE BladeSystem c7000 Enclosure_CZ00CHASSIS2'
+                elem['device_bay_chassis'] = 'c7000_Enclosure_CZ270100G5'
         else:
             elem['device_subdevice_role'] = 'parent'
             elem['device_position_in_rack'] = int(rack_ru[i])
