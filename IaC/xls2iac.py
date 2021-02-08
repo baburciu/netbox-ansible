@@ -46,7 +46,6 @@ for i in range(len(oob_ip)):
         elem['device_rack_name'] = rack[i]
         if form_factor[i] == 'blade':
             elem['device_role_name'] = 'Blade Server'
-            elem['device_role_color'] = 'D9EE22'
             elem['device_subdevice_role'] = 'child'
             elem['device_u_height'] = '0'
             elem['device_bay_blade'] = blade_bay[i].split("-")[0]
@@ -60,7 +59,8 @@ for i in range(len(oob_ip)):
             elem['device_position_in_rack'] = int(rack_ru[i])
             elem['device_u_height'] = form_factor[i].split("U")[0]
             elem['device_role_name'] = 'Rack Server'
-            elem['device_role_color'] = 'EE2297'
+        # set the device_role_color as first 6 digits of its Hex hash, calculated after encoding and MD5 hashing of device_role_name
+        elem['device_role_color'] = (hashlib.md5(elem['device_role_name'].encode())).hexdigest()[0:6]
         elem['device_comments'] = str(specs_cpu[i]+' ; '+specs_ram_proc[i]+' ; '+specs_ram_total[i]+' ; '+specs_storage[i]+' ; '+specs_nic[i])
         elem['device_hostname'] = model[i]+"_"+sn[i]
         elem['device_tenant'] = tenant[i]
