@@ -5,7 +5,9 @@
 ---
 - name: Add an device with its primary interface IP assigned, in a specific rack, dedicated tenant and site, with all dependencies created at playbook runtime
   hosts: docker_netbox_19216820023
-  gather_facts: False  
+  gather_facts: False
+  collections:
+    - netbox.netbox     
   tasks:
     # - include_vars: external_vars.yml  # where "url_var: http://192.168.200.23:8001/"
     - include_vars: '{{external_vars}}'    

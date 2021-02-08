@@ -7,7 +7,7 @@
   hosts: docker_netbox_19216820023
   gather_facts: False  
   tasks:
-    - include_vars: external_vars.yml  # where "url_var: http://192.168.200.23:8001/"
+    # - include_vars: external_vars.yml  # where "url_var: http://192.168.200.23:8001/"
 
 - name: 1st, create the tags
   import_playbook: create_tag.yml

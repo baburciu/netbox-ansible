@@ -1,0 +1,27 @@
+# ======= How to run: 
+# boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v add_device_w_mgmt.yml -e 'external_vars="../parse_excel_servers/external_vars_CZ00CHASSIS1.yml"'
+---
+- name: Add an device with its primary interface IP assigned, in a specific rack, dedicated tenant and site, tagged (all created prior)
+  hosts: docker_netbox_19216820023
+  gather_facts: False  
+  collections:
+    - netbox.netbox   
+  tasks:
+    # - include_vars: external_vars.yml  # where "url_var: http://192.168.200.23:8001/"
+    - include_vars: '{{external_vars}}'
+
+- name: create the device
+  import_playbook: create_device.yml
+
+- name: create the Mgmt interface
+  import_playbook: create_interface.yml
+
+- name: create the VRF
+  import_playbook: create_vrf.yml
+
+- name: create the IP address 
+  import_playbook: create_ip_addr.yml 
+
+- name: update the device by attaching the primary IP address to its Mgmt interface
+  import_playbook: create_device.yml

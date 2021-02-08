@@ -1,6 +1,6 @@
 # ======= How to run standalone:
 # boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
-# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_tenant.yml -e 'tenant_name="G4R2Huawei"'
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_tenant.yml -e 'tenant_name="G4R2Huawei"  external_vars="../parse_excel_servers/external_vars_CZ00CHASSIS1.yml"'
 
 - name: Create Tenant
   connection: local
@@ -9,10 +9,11 @@
   collections:
     - netbox.netbox 
   tasks:
-    # - include_vars: external_vars.yml  
+    # - include_vars: external_vars.yml 
+    - include_vars: '{{external_vars}}'    
  
    # Create first a tenant group and add the afterwards created tenant to it
-    - name: Create tenant with all parameters
+    - name: Create tenant group with all parameters
       netbox_tenant_group:
         netbox_url: "{{ url_var }}"
         netbox_token: "{{ token_var }}"

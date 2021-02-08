@@ -11,7 +11,7 @@ import sys
 import ruamel.yaml
 import xlrd
 
-sh = xlrd.open_workbook('./Feper_servers_25-11-2020_plus_rack_name_and_RU_only1.xls').sheet_by_index(0)
+sh = xlrd.open_workbook('/home/boburciu/parse_excel_servers/Feper_servers_25-11-2020_plus_rack_name_and_RU.xls').sheet_by_index(0)
 oob_ip = sh.col_values(1, start_rowx=2)
 sn = sh.col_values(2, start_rowx=2)
 model = sh.col_values(3, start_rowx=2)  # <== lists of all values in 4th column D (#3, first being #0) of input .xlsx
@@ -31,7 +31,7 @@ yaml = ruamel.yaml.YAML()
 # yaml.preserve_quotes = True
 
 for i in range(len(oob_ip)):
-    with open('./external_vars.yml') as fp:
+    with open('/home/boburciu/netbox-ansible-automation/external_vars.yml') as fp:
         elem = yaml.load(fp)
         elem['rack_name'] = rack[i]
         elem['rack_comments'] = '--'
@@ -78,7 +78,7 @@ for i in range(len(oob_ip)):
             elem['interface_name'] = 'iDRAC'
             elem['ip_addr_interface_name'] = 'iDRAC'
     # yaml.dump(elem, sys.stdout)
-    f = open("./external_vars_"+str(sn[i])+".yml", 'wb+')
+    f = open("/home/boburciu/parse_excel_servers/external_vars_"+str(sn[i])+".yml", 'wb+')
     yaml.dump(elem, f)
     f.close()
 

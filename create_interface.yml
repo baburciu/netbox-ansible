@@ -1,6 +1,7 @@
 # ======= How to run standalone:
 # boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
 # boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_interface.yml -e 'interface_description="Management port"'
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v add_device_w_mgmt.yml -e 'external_vars="../parse_excel_servers/external_vars_CZ00CHASSIS1.yml"'
 
 - name: Create interface
   connection: local
@@ -10,6 +11,7 @@
     - netbox.netbox 
   tasks:
     # - include_vars: external_vars.yml  
+    - include_vars: '{{external_vars}}'    
 
     - name: Create interface
       netbox_device_interface:
@@ -26,13 +28,13 @@
           description: '{{ interface_description }}'
         state: present    
 
-    - name:  Obtain all interfaces
-      debug: 
-        msg: '{{ item }}'  
-      # debug: 
-      #   msg: >      
-      #     "{{ item.value.name }}"
+    # - name:  Obtain all interfaces
+    #   debug: 
+    #     msg: '{{ item }}'  
+    #   # debug: 
+    #   #   msg: >      
+    #   #     "{{ item.value.name }}"
 
-      loop: "{{ query('netbox.netbox.nb_lookup', 'interfaces', 
-                    api_endpoint=url_var,
-                    token=token_var) }}"   
+    #   loop: "{{ query('netbox.netbox.nb_lookup', 'interfaces', 
+    #                 api_endpoint=url_var,
+    #                 token=token_var) }}"   

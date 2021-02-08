@@ -1,7 +1,8 @@
 # ======= How to run w non-root Ansible user: 
 # boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
 # boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_tag.yml -e 'tag1_name="contrail" tag1_description="Juniper Contrail SDN backend"'
-# possibly with --become --ask-become-pass    
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_tag.yml -e 'external_vars="../parse_excel_servers/external_vars_CZ00CHASSIS1.yml"'
+
 
 - name: Create Tag
   connection: local
@@ -11,6 +12,7 @@
     - netbox.netbox 
   tasks:
     # - include_vars: external_vars.yml
+    - include_vars: '{{external_vars}}'    
 
     - name: Create tags
       netbox_tag:
