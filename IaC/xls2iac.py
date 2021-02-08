@@ -63,7 +63,7 @@ for i in range(len(oob_ip)):
         # set the device_role_color as first 6 digits of its Hex hash, calculated after encoding and MD5 hashing of device_role_name
         elem['device_role_name'] = role[i]
         elem['device_role_color'] = (hashlib.md5(elem['device_role_name'].encode())).hexdigest()[0:6]
-        elem['device_comments'] = str(specs_cpu[i]+' ; '+specs_ram_proc[i]+' ; '+specs_ram_total[i]+' ; '+specs_storage[i]+' ; '+specs_nic[i])
+        elem['device_comments'] = str(specs_cpu[i]) + '; ' + str(specs_ram_proc[i]) + '; ' + str(specs_ram_total[i]) + '; ' + str(specs_storage[i]) + '; ' + str(specs_nic[i])
         elem['device_hostname'] = model[i]+"_"+sn[i]
         elem['device_tenant'] = tenant[i]
         elem['interface_device'] = elem['device_hostname']
