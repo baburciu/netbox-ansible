@@ -15,6 +15,7 @@ import xlrd
 import hashlib
 
 sh = xlrd.open_workbook('/home/boburciu/parse_excel_servers/Feper_servers_25-11-2020_plus_rack_name_and_RU.xls').sheet_by_index(0)
+hostname = sh.col_values(0, start_rowx=2)
 oob_ip = sh.col_values(1, start_rowx=2)
 sn = sh.col_values(2, start_rowx=2)
 model = sh.col_values(3, start_rowx=2)  # <== lists of all values in 4th column D (#3, first being #0) of input .xlsx
@@ -65,7 +66,7 @@ for i in range(len(oob_ip)):
         elem['device_role_name'] = role[i]
         elem['device_role_color'] = (hashlib.md5(elem['device_role_name'].encode())).hexdigest()[0:6]
         elem['device_comments'] = str(specs_cpu[i]) + '; ' + str(specs_ram_proc[i]) + '; ' + str(specs_ram_total[i]) + '; ' + str(specs_storage[i]) + '; ' + str(specs_nic[i])
-        elem['device_hostname'] = model[i]+"_"+sn[i]
+        elem['device_hostname'] = hostname[i]
         elem['device_tenant'] = tenant[i]
         elem['interface_device'] = elem['device_hostname']
         elem['ip_addr_interface_device'] = elem['device_hostname']
