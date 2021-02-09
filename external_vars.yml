@@ -17,19 +17,19 @@ site_name: Feper-Bucharest
 site_status: Planned
 site_region: "EMEA"
 site_facility: Hyperscale DC
-site_asn: 8953    # found by trail and error that needs to be integer
+site_asn: 8953    # found by trial and error that needs to be integer
 site_time_zone: Europe/Bucharest
 site_description: ORANGE/TGI/OLN/CISS/ITE DC in Romania
 site_physical_address: Blvd Dimitrie Pompeiu 8, Bucharest, 020337
 site_shipping_address: Blvd Dimitrie Pompeiu 8, Bucharest, 020337
-site_latitude: '44.480367'    # found by trail and error the need to ensure  there are no more than 8 digits in total  
-site_longitude: '26.117824'    # found by trail and error the need to ensure  there are no more than 9 digits in total  
+site_latitude: '44.480367'    # found by trial and error the need to ensure  there are no more than 8 digits in total  
+site_longitude: '26.117824'    # found by trial and error the need to ensure  there are no more than 9 digits in total  
 site_contact_name: Mihai Olteanu
 site_contact_phone: 0040744441242
 site_contact_email: Mihai.Olteanu@orange.com 
 #
 tenant_group_name: IaaS4Telco
-tenant_name: HuaweiContrailcalif    # found by trail and error that does not support underscore, for VRF to be referenced to its name
+tenant_name: HuaweiContrailcalif    # found by trial and error that does not support underscore, for VRF to be referenced to its name
 tenant_description: "OIaaS G4R2 w/ Contrail SDN backend"
 # tenant_comments: "OIaaS G4R2 w/ Contrail SDN backend"
 tenant_tag: oiaas
@@ -47,7 +47,7 @@ rack_type: 4-post cabinet    # Choices: 2-post frame, 4-post frame, 4-post cabin
 rack_u_height: 42
 rack_width: 23     # the rail-to-rail width, choices: 10, 19, 21, 23
 rack_serial: 00000000
-rack_facility_id: 00000000       # found by trail and error that fields group & facility_id must make a unique set for a rack
+rack_facility_id: 00000000       # found by trial and error that fields group & facility_id must make a unique set for a rack
 rack_comments: "Room E203, Row#4 Rack#1"
 
 
@@ -55,21 +55,21 @@ rack_comments: "Room E203, Row#4 Rack#1"
 device_manufacturer_name: "Huawei Technologies"
 device_model: CE6851-48S6Q-HI
 device_part_number: 02350JAR
-device_u_height: 1    # found by trail and error that it needs to be 0 if parent type is "child"
+device_u_height: 1    # found by trial and error that it needs to be 0 if parent type is "child"
 device_is_full_depth: no    # whether or not the device consumes both front and rear rack faces, yer or no
 device_subdevice_role: child    # whether the device type is parent (which has device bays), child (which must be installed within a device bay), or neither
-device_hw_set_id: CE6800-HI    # just a tag for the set of hardware params above; found by trail and error that it should not be part of model of manufacturer, i.e. CE6851 is not accepted 
+device_hw_set_id: CE6800-HI    # just a tag for the set of hardware params above; found by trial and error that it should not be part of model of manufacturer, i.e. CE6851 is not accepted 
 #
 device_role_name: ToR_SW
 device_role_color: 2008DF
 #
 device_hostname: SWH-TOR-R1-01
 device_site: Feper-Bucharest
-device_face: front    # front/rear, found by trail and error that needs not be used if parent type is "child"
+device_face: front    # front/rear, found by trial and error that needs not be used if parent type is "child"
 device_primary_ip4:  '192.168.201.24/24'
 device_serial: 2102350JASDMK4000611
 device_rack_name: Huawei_Rack1
-device_position_in_rack: 35    # found by trail and error that needs not be used if parent type is "child"
+device_position_in_rack: 35    # found by trial and error that needs not be used if parent type is "child"
 device_tenant: HuaweiContrailcalif
 device_comments: " N/A "
 device_tag: oiaas

@@ -25,4 +25,5 @@
           assigned_object:
             name: '{{ ip_addr_interface_name }}'    # must be created prior (different playbook)
             device: '{{ ip_addr_interface_device }}'     # must be created prior (different playbook)
-        state: present    
+        state: present
+      ignore_errors: True            

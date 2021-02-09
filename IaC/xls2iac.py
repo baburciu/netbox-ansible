@@ -24,13 +24,15 @@ form_factor = sh.col_values(5, start_rowx=2)
 rack = sh.col_values(6, start_rowx=2)
 rack_ru = sh.col_values(7, start_rowx=2)
 role = sh.col_values(8, start_rowx=2)
-specs_cpu = sh.col_values(9, start_rowx=2)
-specs_cores = sh.col_values(10, start_rowx=2)
-specs_ram_proc = sh.col_values(11, start_rowx=2)
-specs_ram_total = sh.col_values(12, start_rowx=2)
-specs_storage = sh.col_values(13, start_rowx=2)
-specs_nic = sh.col_values(14, start_rowx=2)
-tenant = sh.col_values(15, start_rowx=2)
+pn = sh.col_values(9, start_rowx=2)
+mgmt_if = sh.col_values(10, start_rowx=2)
+specs_cpu = sh.col_values(11, start_rowx=2)
+specs_cores = sh.col_values(12, start_rowx=2)
+specs_ram_proc = sh.col_values(13, start_rowx=2)
+specs_ram_total = sh.col_values(14, start_rowx=2)
+specs_storage = sh.col_values(15, start_rowx=2)
+specs_nic = sh.col_values(16, start_rowx=2)
+tenant = sh.col_values(17, start_rowx=2)
 
 yaml = ruamel.yaml.YAML()
 # yaml.preserve_quotes = True
@@ -72,15 +74,9 @@ for i in range(len(oob_ip)):
         elem['ip_addr_interface_device'] = elem['device_hostname']
         elem['ip_addr_address'] = elem['device_primary_ip4']
         elem['ip_addr_tenant'] = tenant[i]
-        if elem['device_manufacturer_name'] == 'HPE':
-            elem['interface_name'] = 'iLO'
-            elem['ip_addr_interface_name'] = 'iLO'
-        elif elem['device_manufacturer_name'] == 'Huawei':
-            elem['interface_name'] = 'iBMC'
-            elem['ip_addr_interface_name'] = 'iBMC'
-        elif elem['device_manufacturer_name'] == 'Dell':
-            elem['interface_name'] = 'iDRAC'
-            elem['ip_addr_interface_name'] = 'iDRAC'
+        elem['interface_name'] = mgmt_if[i]
+        elem['ip_addr_interface_name'] = mgmt_if[i]
+        elem['device_part_number'] = pn[i]
     # yaml.dump(elem, sys.stdout)
     f = open("/home/boburciu/parse_excel_servers/external_vars_"+str(sn[i])+".yml", 'wb+')
     yaml.dump(elem, f)
