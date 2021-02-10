@@ -1,7 +1,6 @@
-# netbox-ansible
-[![HitCount](http://hits.dwyl.com/bogdanadrian-burciu/netbox-ansible.svg)](http://hits.dwyl.com/bogdanadrian-burciu/netbox-ansible)
+# netbox-ansible  [![HitCount](http://hits.dwyl.com/bogdanadrian-burciu/netbox-ansible.svg)](http://hits.dwyl.com/bogdanadrian-burciu/netbox-ansible)
 ## Ansible playbooks usage for Netbox automation, based on [Galaxy collection](https://docs.ansible.com/ansible/latest/collections/netbox/netbox/).
-
+[![Inline docs](http://inch-ci.org/github/bogdanadrian-burciu/netbox-ansible.svg?branch=master)](http://inch-ci.org/github/bogdanadrian-burciu/netbox-ansible)
 ## 0. How to install Ansible Galaxy collection to correct path:
 
 boburciu@WX-5CG020BDT2:~$ ` ansible-config list | grep COLLECTIONS_PATHS -C1 ` _# verify default location for the collections, so that the new modules can be read by Ansible cfg_
