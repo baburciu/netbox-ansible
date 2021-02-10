@@ -21,7 +21,8 @@ boburciu@WX-5CG020BDT2:~$ ` ansible-galaxy collection install netbox.netbox --co
 
 ## 1. How to add/remove NetBox WebUI Organization tab objects:
 
-boburciu@WX-5CG020BDT2: ~$ ` cd ~/netbox-ansible-automation ` <br/>
+boburciu@WX-5CG020BDT2: ~$ ` cd ~/netbox-ansible-automation ` 
+<br/>
 boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$  <br/>
 boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` cat external_vars.yml `  <br/>
 ```
