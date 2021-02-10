@@ -99,8 +99,8 @@ boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` ansible-playbook -i ./host
 
 ## 2. How to add all servers with management IPs:
 
-boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` cd ../parse_excel_servers/; python3 xls2iac.py; cd ../netbox-ansible-automation/ ` <br/>
-boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` ls -lt ~/parse_excel_servers/ | grep external_vars_ ` <br/>
+boburciu@WX-5CG020BDT2: /netbox-ansible-automation$ ` cd ../parse_excel_servers/; python3 xls2iac.py; cd ../netbox-ansible-automation/ ` <br/>
+boburciu@WX-5CG020BDT2: /netbox-ansible-automation$ ` ls -lt ~/parse_excel_servers/ | grep external_vars_ ` <br/>
 ```
 -rw-rw-rw- 1 boburciu boburciu   4589 Feb  7 01:42 external_vars_BQM6Y53.yml
 -rw-rw-rw- 1 boburciu boburciu   4585 Feb  7 01:42 external_vars_CQM6Y53.yml
@@ -219,5 +219,7 @@ boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` for i in `ls -lt ~/parse_e
     85  /home/boburciu/parse_excel_servers/external_vars_SWH-TOR-R2-1.yml
     86  /home/boburciu/parse_excel_servers/external_vars_SWH-TOR-R2-2.yml
 ```    
-boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$  ` for x in ` ls -lX /home/boburciu/parse_excel_servers/external_vars*  | awk '{print $9}'  | cat | tail -36  `; do echo ""; echo ""; echo "@@@@@ running Device creation playbooks for extra-vars in $x @@@@@"; echo ""; echo ""; echo ""; ansible-playbook -i ./hosts -v add_device_w_mgmt.yml -e "external_vars=$x"; done  `
+boburciu@WX-5CG020BDT2: /netbox-ansible-automation$  ` for x in ` ls -lX /home/boburciu/parse_excel_servers/external_vars*  | awk '{print $9}'  | cat | tail -36  `; do echo ""; echo ""; echo "@@@@@ running Device creation playbooks for extra-vars in $x @@@@@"; echo ""; echo ""; echo ""; ansible-playbook -i ./hosts -v add_device_w_mgmt.yml -e "external_vars=$x"; done `
 
+
+boburciu@WX-5CG020BDT2: /netbox-ansible-automation$ ` ansible-playbook -i ./hosts -v create_device_wMgmtIntIP_inRack_inTenant_inRack_inSite.yml -e "external_vars=/home/boburciu/parse_excel_servers/external_vars_SRX_2.yml" `
