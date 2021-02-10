@@ -14,7 +14,7 @@ import ruamel.yaml
 import xlrd
 import hashlib
 
-sh = xlrd.open_workbook('/home/boburciu/parse_excel_servers/Feper_servers_25-11-2020_plus_rack_name_and_RU.xls').sheet_by_index(0)
+sh = xlrd.open_workbook('/home/boburciu/parse_excel_servers/Feper_servers_25-11-2020_plus.xls').sheet_by_index(0)
 hostname = sh.col_values(0, start_rowx=2)
 oob_ip = sh.col_values(1, start_rowx=2)
 sn = sh.col_values(2, start_rowx=2)
@@ -78,7 +78,7 @@ for i in range(len(oob_ip)):
         elem['ip_addr_interface_name'] = mgmt_if[i]
         elem['device_part_number'] = pn[i]
     # yaml.dump(elem, sys.stdout)
-    f = open("/home/boburciu/parse_excel_servers/external_vars_"+str(sn[i])+".yml", 'wb+')
+    f = open("/home/boburciu/parse_excel_servers/external_vars_"+str(hostname[i])+".yml", 'wb+')
     yaml.dump(elem, f)
     f.close()
 

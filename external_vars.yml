@@ -3,7 +3,7 @@
 
 
 url_var: "http://192.168.200.23:8001/"
-token_var: "32fb8595fb137464557c3595b1d7688166dc2cab"
+token_var: "849c9ca1827614045acd6c7bf32cc5918c9d60a0"
 
 
 ## ======== variables used for NetBox WebUI Organization tab objects ======== ##
@@ -19,7 +19,7 @@ site_region: "EMEA"
 site_facility: Hyperscale DC
 site_asn: 8953    # found by trial and error that needs to be integer
 site_time_zone: Europe/Bucharest
-site_description: ORANGE/TGI/OLN/CISS/ITE DC in Romania
+site_description: Orange Group DC in Bucharest, Romania
 site_physical_address: Blvd Dimitrie Pompeiu 8, Bucharest, 020337
 site_shipping_address: Blvd Dimitrie Pompeiu 8, Bucharest, 020337
 site_latitude: '44.480367'    # found by trial and error the need to ensure  there are no more than 8 digits in total  
