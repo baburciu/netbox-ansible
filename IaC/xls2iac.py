@@ -1,5 +1,4 @@
-# Parsing Feper servers 25-11-2020.xlsx
-# Parsing Feper servers 25-11-2020.xlsx
+# Parsing Excel files and writing YAML ones based on its cells
 # Creating IaC for NetBox servers addition by Ansible automation
 # Bogdan Adrian Burciu 06/02/2021 vers 1
 
@@ -49,7 +48,7 @@ for i in range(len(oob_ip)):
         elem['device_serial'] = sn[i]
         elem['device_manufacturer_name'] = model[i].split(' ',1)[0]
         elem['device_model'] = model[i].split(' ',1)[1]
-        elem['device_hw_set_id'] = "xx"+ model[i].split(' ',1)[0] + model[i].split(' ',1)[1]
+        elem['device_hw_set_id'] = (hashlib.md5(pn[i].encode())).hexdigest()[0:6]
         elem['device_rack_name'] = rack[i]
         if form_factor[i] == 'blade':
             elem['device_subdevice_role'] = 'child'
@@ -57,9 +56,9 @@ for i in range(len(oob_ip)):
             elem['device_bay_blade'] = blade_bay[i].split("-")[0]
             elem['device_position_in_rack'] = blade_bay[i]
             if blade_bay[i].split("-")[1] == 'Chassis 1':
-                elem['device_bay_chassis'] = 'c7000_Enclosure_CZ00CHASSIS1'
+                elem['device_bay_chassis'] = 'HP_c7000_Chassis1'
             elif blade_bay[i].split("-")[1] == 'Chassis 2':
-                elem['device_bay_chassis'] = 'c7000_Enclosure_CZ270100G5'
+                elem['device_bay_chassis'] = 'HP_c7000_Chassis2'
         else:
             elem['device_subdevice_role'] = 'parent'
             elem['device_position_in_rack'] = int(rack_ru[i])

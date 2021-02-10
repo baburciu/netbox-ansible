@@ -34,7 +34,7 @@ tenant_description: "OIaaS G4R2 w/ Contrail SDN backend"
 # tenant_comments: "OIaaS G4R2 w/ Contrail SDN backend"
 tenant_tag: oiaas
 #
-rack_group_name: Huawei
+rack_group_name: CISS
 rack_site: Feper-Bucharest
 rack_role_name: "Hyperscale infra"
 rack_role_color: DF2E08

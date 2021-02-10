@@ -1,5 +1,5 @@
 # netbox-ansible
-## Ansible playbooks usage for Netbox automation, based on Galaxy collection https://docs.ansible.com/ansible/latest/collections/netbox/netbox/.
+## Ansible playbooks usage for Netbox automation, based on [Galaxy collection](https://docs.ansible.com/ansible/latest/collections/netbox/netbox/).
 
 ## 0. How to install Ansible Galaxy collection to correct path:
 
@@ -178,6 +178,45 @@ boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$
 ```
 boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` for i in `ls -lt ~/parse_excel_servers/ | grep external_vars_ | awk '{print $9}'`; do echo ""; echo ""; echo "***** running playbook for variables in $i *****"; echo ""; echo ""; echo ""; ansible-playbook -i ./hosts create_device_wMgmtIntIP_inRack_inTenant_inRack_inSite.yml -e "external_vars='../parse_excel_servers/$i' -v"; done `  <br/>
 
+### To add only part of IaC list:
+ boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` ls -lX /home/boburciu/parse_excel_servers/external_vars*  | awk '{print $9}'  | cat -n | tail -36 `
+ ```
+    51  /home/boburciu/parse_excel_servers/external_vars_DL360_Gen9_CZJ73516QN.yml
+    52  /home/boburciu/parse_excel_servers/external_vars_DL360_Gen9_CZJ73516QP.yml
+    53  /home/boburciu/parse_excel_servers/external_vars_DL360_gen10_CZJ03404LC.yml
+    54  /home/boburciu/parse_excel_servers/external_vars_DL360_gen10_CZJ03501PS.yml
+    55  /home/boburciu/parse_excel_servers/external_vars_DL360_gen10_CZJ03501PT.yml
+    56  /home/boburciu/parse_excel_servers/external_vars_DL360_gen10_CZJ03501PV.yml
+    57  /home/boburciu/parse_excel_servers/external_vars_DL380_Gen10_CZ28410LW5.yml
+    58  /home/boburciu/parse_excel_servers/external_vars_DL380_Gen10_CZ28410LW6.yml
+    59  /home/boburciu/parse_excel_servers/external_vars_DL380_Gen10_CZ28410LW7.yml
+    60  /home/boburciu/parse_excel_servers/external_vars_DL380_Gen9_CZJ701089K.yml
+    61  /home/boburciu/parse_excel_servers/external_vars_DL380_Gen9_CZJ701089M.yml
+    62  /home/boburciu/parse_excel_servers/external_vars_DL380_Gen9_CZJ70503GL.yml
+    63  /home/boburciu/parse_excel_servers/external_vars_DL380_Gen9_CZJ70503GM.yml
+    64  /home/boburciu/parse_excel_servers/external_vars_DL380_Gen9_CZJ70503GN.yml
+    65  /home/boburciu/parse_excel_servers/external_vars_DL380_Gen9_CZJ73516PH.yml
+    66  /home/boburciu/parse_excel_servers/external_vars_DL380_Gen9_CZJ73516PJ.yml
+    67  /home/boburciu/parse_excel_servers/external_vars_DL380_Gen9_CZJ73516PK.yml
+    68  /home/boburciu/parse_excel_servers/external_vars_DL380_Gen9_CZJ73516PL.yml
+    69  /home/boburciu/parse_excel_servers/external_vars_DL380_gen10_CZ20340JGZ.yml
+    70  /home/boburciu/parse_excel_servers/external_vars_Dell_R640_CQM6Y53.yml
+    71  /home/boburciu/parse_excel_servers/external_vars_Dell_R740_BQM6Y53.yml
+    72  /home/boburciu/parse_excel_servers/external_vars_EX1_SWJ-OOB-R1.yml
+    73  /home/boburciu/parse_excel_servers/external_vars_Fortigate1.yml
+    74  /home/boburciu/parse_excel_servers/external_vars_Fortigate2.yml
+    75  /home/boburciu/parse_excel_servers/external_vars_HP_c7000_Chassis1.yml
+    76  /home/boburciu/parse_excel_servers/external_vars_HP_c7000_Chassis2.yml
+    77  /home/boburciu/parse_excel_servers/external_vars_MX1-RE0.yml
+    78  /home/boburciu/parse_excel_servers/external_vars_MX2-RE0.yml
+    79  /home/boburciu/parse_excel_servers/external_vars_NE40E.yml
+    80  /home/boburciu/parse_excel_servers/external_vars_QFX1.yml
+    81  /home/boburciu/parse_excel_servers/external_vars_QFX2.yml
+    82  /home/boburciu/parse_excel_servers/external_vars_SRX_1.yml
+    83  /home/boburciu/parse_excel_servers/external_vars_SRX_2.yml
+    84  /home/boburciu/parse_excel_servers/external_vars_SWH-OoB-R1.yml
+    85  /home/boburciu/parse_excel_servers/external_vars_SWH-TOR-R2-1.yml
+    86  /home/boburciu/parse_excel_servers/external_vars_SWH-TOR-R2-2.yml
+```    
+boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$  ` for x in ` ls -lX /home/boburciu/parse_excel_servers/external_vars*  | awk '{print $9}'  | cat | tail -36  `; do echo ""; echo ""; echo "@@@@@ running Device creation playbooks for extra-vars in $x @@@@@"; echo ""; echo ""; echo ""; ansible-playbook -i ./hosts -v add_device_w_mgmt.yml -e "external_vars=$x"; done  `
 
-
- 

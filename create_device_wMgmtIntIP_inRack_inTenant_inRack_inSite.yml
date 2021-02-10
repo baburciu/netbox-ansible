@@ -31,17 +31,20 @@
 - name: 5th, create the tenant group and tenant
   import_playbook: create_tenant.yml
 
-- name: 6th, create the device
+- name: 6th, create the device manufacturer, its type/model and role
+  import_playbook: create_device_manufacturer_type_role.yml  
+
+- name: 7th, create the device
   import_playbook: create_device.yml
 
-- name: 7th, create the Mgmt interface
+- name: 8th, create the Mgmt interface
   import_playbook: create_interface.yml
 
-- name: 8th, create the VRF
+- name: 9th, create the VRF
   import_playbook: create_vrf.yml
 
-- name: 9th, create the IP address 
+- name: 10th, create the IP address 
   import_playbook: create_ip_addr.yml 
 
-- name: 10th, update the device by attaching the primary IP address to its Mgmt interface
+- name: 11th, update the device by attaching the primary IP address to its Mgmt interface
   import_playbook: create_device.yml
