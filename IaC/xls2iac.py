@@ -49,7 +49,7 @@ for i in range(len(oob_ip)):
         elem['device_serial'] = sn[i]
         elem['device_manufacturer_name'] = model[i].split(' ',1)[0]
         elem['device_model'] = model[i].split(' ',1)[1]
-        elem['device_hw_set_id'] = "xx"+ model[i].split(' ',1)[0] + model[i].split(' ',1)[1]
+        elem['device_hw_set_id'] = (hashlib.md5(pn[i].encode())).hexdigest()[0:6]
         elem['device_rack_name'] = rack[i]
         if form_factor[i] == 'blade':
             elem['device_subdevice_role'] = 'child'
