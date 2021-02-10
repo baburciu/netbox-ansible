@@ -34,5 +34,17 @@ for x in `./get_iac_unique_var.sh -d $dir_path_iac -e tenant_name`; do echo ""; 
 # create racks for the unique extra-var values in IaC codebase: 
 for x in `./get_iac_unique_var.sh -d $dir_path_iac -e device_rack_name`; do echo ""; echo ""; echo "@@@@@ running Rack creation playbooks for extra-vars in $x @@@@@"; echo ""; echo ""; echo ""; ansible-playbook -i ./hosts -v create_rack.yml -e "external_vars=$x"; done
 
+# create device manufacturers for the unique extra-var values in IaC codebase: 
+for x in `./get_iac_unique_var.sh -d $dir_path_iac -e device_manufacturer_name`; do echo ""; echo ""; echo "@@@@@ running Device manufacturer creation playbooks for extra-vars in $x @@@@@"; echo ""; echo ""; echo ""; ansible-playbook -i ./hosts -v create_device_manufacturer_type_role.yml -e "external_vars=$x"; done
+
+# create device type for the unique extra-var values in IaC codebase: 
+for x in `./get_iac_unique_var.sh -d $dir_path_iac -e device_part_number`; do echo ""; echo ""; echo "@@@@@ running Device type creation playbooks for extra-vars in $x @@@@@"; echo ""; echo ""; echo ""; ansible-playbook -i ./hosts -v create_device_manufacturer_type_role.yml -e "external_vars=$x"; done
+
+# create device role for the unique extra-var values in IaC codebase: 
+for x in `./get_iac_unique_var.sh -d $dir_path_iac -e device_role_name`; do echo ""; echo ""; echo "@@@@@ running Device role creation playbooks for extra-vars in $x @@@@@"; echo ""; echo ""; echo ""; ansible-playbook -i ./hosts -v create_device_manufacturer_type_role.yml -e "external_vars=$x"; done
+
+# create first the Chassis (Blade Switch Enclosure) devices, since those need to referenced by Blade Switches
+for x in ` ls -lX $dir_path_iac/external_vars* | grep Chassis | awk '{print $9}' `; do echo ""; echo ""; echo "@@@@@ running Device creation playbooks for extra-vars in $x @@@@@"; echo ""; echo ""; echo ""; ansible-playbook -i ./hosts -v add_device_w_mgmt.yml -e "external_vars=$x"; done
+
 # create the devices and assign them mgmt interfaces with IP addresses:
 for x in ` ls -lX $dir_path_iac/external_vars*  | awk '{print $9}' `; do echo ""; echo ""; echo "@@@@@ running Device creation playbooks for extra-vars in $x @@@@@"; echo ""; echo ""; echo ""; ansible-playbook -i ./hosts -v add_device_w_mgmt.yml -e "external_vars=$x"; done

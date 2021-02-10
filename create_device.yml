@@ -2,7 +2,7 @@
 # boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
 # boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_device.yml -e 'device_hw_set_id="CE6800-HI"'
 
-- name: Create device manufacturer, device type, role and assign to a device
+- name: Create device (its manufacturer, type & role previously created) and assign to it a mgmt interface w IP address
   connection: local
   hosts: docker_netbox_19216820023
   gather_facts: False
@@ -11,36 +11,36 @@
   tasks:
     # - include_vars: external_vars_blade.yml  
 
-    - name: Create manufacturer within Netbox with only required information
-      netbox_manufacturer:
-        netbox_url: '{{ url_var }}'
-        netbox_token: '{{ token_var }}'
-        data:
-          name: '{{ device_manufacturer_name }}'
-        state: present    
+    # - name: Create manufacturer within Netbox with only required information
+    #   netbox_manufacturer:
+    #     netbox_url: '{{ url_var }}'
+    #     netbox_token: '{{ token_var }}'
+    #     data:
+    #       name: '{{ device_manufacturer_name }}'
+    #     state: present    
 
-    - name: Create device type within Netbox with only required information
-      netbox_device_type:
-        netbox_url: '{{ url_var }}'
-        netbox_token: '{{ token_var }}'
-        data:
-          slug: '{{ device_hw_set_id }}'   # to be used as device_type for the device object, identifies all these hardware params under netbox_device_type
-          manufacturer: '{{ device_manufacturer_name }}'        
-          model: '{{ device_model }}' 
-          part_number: '{{ device_part_number }}' 
-          u_height: '{{ device_u_height }}' 
-          is_full_depth: '{{ device_is_full_depth }}' 
-          subdevice_role: '{{ device_subdevice_role }}' 
-        state: present
+    # - name: Create device type within Netbox with only required information
+    #   netbox_device_type:
+    #     netbox_url: '{{ url_var }}'
+    #     netbox_token: '{{ token_var }}'
+    #     data:
+    #       slug: '{{ device_hw_set_id }}'   # to be used as device_type for the device object, identifies all these hardware params under netbox_device_type
+    #       manufacturer: '{{ device_manufacturer_name }}'        
+    #       model: '{{ device_model }}' 
+    #       part_number: '{{ device_part_number }}' 
+    #       u_height: '{{ device_u_height }}' 
+    #       is_full_depth: '{{ device_is_full_depth }}' 
+    #       subdevice_role: '{{ device_subdevice_role }}' 
+    #     state: present
 
-    - name: Create device role within Netbox with only required information
-      netbox_device_role:
-        netbox_url: '{{ url_var }}'
-        netbox_token: '{{ token_var }}'
-        data:
-          name: '{{ device_role_name }}'
-          color: '{{ device_role_color }}'
-        state: present
+    # - name: Create device role within Netbox with only required information
+    #   netbox_device_role:
+    #     netbox_url: '{{ url_var }}'
+    #     netbox_token: '{{ token_var }}'
+    #     data:
+    #       name: '{{ device_role_name }}'
+    #       color: '{{ device_role_color }}'
+    #     state: present
   
     - name: Create device for non-blade server systems 
       netbox_device:

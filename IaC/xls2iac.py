@@ -55,7 +55,7 @@ for i in range(len(oob_ip)):
             elem['device_subdevice_role'] = 'child'
             elem['device_u_height'] = '0'
             elem['device_bay_blade'] = blade_bay[i].split("-")[0]
-            elem['device_position_in_rack'] = blade_bay[i]+"    # not used by Ansible playbook for child devices"
+            elem['device_position_in_rack'] = blade_bay[i]
             if blade_bay[i].split("-")[1] == 'Chassis 1':
                 elem['device_bay_chassis'] = 'c7000_Enclosure_CZ00CHASSIS1'
             elif blade_bay[i].split("-")[1] == 'Chassis 2':
