@@ -4,7 +4,7 @@
 
 ## 0. How to install Ansible Galaxy collection to correct path:
 
-boburciu@WX-5CG020BDT2:~$ ` ansible-config list | grep COLLECTIONS_PATHS -C1 ` __# verify default location for the collections, so that the new modules can be read by Ansible cfg__
+boburciu@WX-5CG020BDT2:~$ ` ansible-config list | grep COLLECTIONS_PATHS -C1 ` _# verify default location for the collections, so that the new modules can be read by Ansible cfg_
 ```
     Ansible version
 COLLECTIONS_PATHS:
@@ -17,7 +17,7 @@ COLLECTIONS_PATHS:
 boburciu@WX-5CG020BDT2:~$
 boburciu@WX-5CG020BDT2:~$
 ``` 
-boburciu@WX-5CG020BDT2:~$ ` ansible-galaxy collection install netbox.netbox --collections-path ~/.ansible/collections ` __# installing the collection of roles in proper location__
+boburciu@WX-5CG020BDT2:~$ ` ansible-galaxy collection install netbox.netbox --collections-path ~/.ansible/collections ` _# installing the collection of roles in proper location_
 
 ## 1. How to add/remove NetBox WebUI Organization tab objects:
 
