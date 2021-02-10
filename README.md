@@ -1,4 +1,5 @@
 # netbox-ansible
+[![HitCount](http://hits.dwyl.com/bogdanadrian-burciu/netbox-ansible.svg)](http://hits.dwyl.com/bogdanadrian-burciu/netbox-ansible)
 ## Ansible playbooks usage for Netbox automation, based on [Galaxy collection](https://docs.ansible.com/ansible/latest/collections/netbox/netbox/).
 
 ## 0. How to install Ansible Galaxy collection to correct path:
