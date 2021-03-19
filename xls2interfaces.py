@@ -16,8 +16,11 @@ hostname = sh.col_values(0, start_rowx=2)       # hostname of device object alre
 sym_name = sh.col_values(25, start_rowx=2)      # the hostname used in interface descriptions already set for Huawei switches
 
 driver_vrp = napalm.get_network_driver("ce")
-device_list = [["SWH-OoB-R1","192.168.201.23"],["SWH-OoB-R2","192.168.201.27"],
-               ["SWH-TOR-R1","192.168.201.24"],["SWH-TOR-R2","192.168.201.25"]]
+# device_list = [["SWH-OoB-R1","192.168.201.23"],["SWH-OoB-R2","192.168.201.27"],
+#                ["SWH-TOR-R1","192.168.201.24"],["SWH-TOR-R2","192.168.201.25"]]
+
+device_list = [["SWH-TOR-R1","192.168.201.24"],["SWH-TOR-R2","192.168.201.25"]]
+
 network_devices = []
 for device in device_list:
     network_devices.append(
@@ -51,7 +54,7 @@ for device in network_devices:
         else:
             int_mgmt_flag = "False"
 
-        if "NULL" not in int:
+        if "NULL" not in int and "Vlan" not in int:
             print(f"******* Now we'll create NetBox interface {int} for device {device_hostname}")
             r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
                                    playbook='create_interface.yml',
@@ -62,7 +65,8 @@ for device in network_devices:
                                               'interface_type': int_type, 'interface_mtu': device_interfaces[int]['mtu'],
                                               'interface_mgmt_only': int_mgmt_flag,
                                               'interface_description': str(device_interfaces[int]['description']),
-                                              'external_vars': './external_vars.yml'})
+                                              'external_vars': './external_vars.yml',
+                                              'ansible_python_interpreter':'/usr/bin/python3'})
 
             if "link_to" in device_interfaces[int]['description']:
                 # other_end <=> list of ['Server_R2_04', 'mgmt'] from interface description (got via NAPALM driver) parsing
@@ -89,7 +93,8 @@ for device in network_devices:
                                                       'interface_type': int_type, 'interface_mtu': device_interfaces[int]['mtu'],
                                                       'interface_mgmt_only': int_mgmt_flag,
                                                       'interface_description': str('to_'+device_hostname),
-                                                      'external_vars': './external_vars.yml'})
+                                                      'external_vars': './external_vars.yml',
+                                                      'ansible_python_interpreter': '/usr/bin/python3'})
 
                     print(f"******* Now we'll create NetBox cable between {other_end_host}'s {other_end_if} and {device_hostname}'s {int} ")
                     r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
@@ -98,7 +103,10 @@ for device in network_devices:
                                            extravars={'cable_end_a_host': device_hostname, 'cable_end_a_if': int,
                                                       'cable_end_b_host': other_end_host, 'cable_end_b_if': other_end_if,
                                                       'cable_type': cable_type,
-                                                      'external_vars': './external_vars.yml'})
+                                                      'external_vars': './external_vars.yml',
+                                                      'ansible_python_interpreter': '/usr/bin/python3'})
+        device.close()
+        print("Done for {} .".format(device.hostname))
 
 ### How other_end is found:
 #
