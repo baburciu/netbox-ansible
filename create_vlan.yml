@@ -1,0 +1,21 @@
+# ======= How to run standalone:
+# boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_vlan.yml -e 'vlan_id="7" vlan_device="SWH-OoB-R2" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.200.23:8001/" token_var="aca25c1c8ce2c6f205b407cb7352c68cc69cc58b"'
+
+- name: Create VLAN
+  connection: local
+  hosts: docker_netbox_19216820023
+  gather_facts: False
+  collections:
+    - netbox.netbox 
+  tasks:
+    - include_vars: '{{external_vars}}'    
+
+    - name: Create a VLAN with only name as id 
+      netbox_vlan:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          name: '{{ vlan_id }}'
+          vid: '{{ vlan_id }}'
+        state: present    

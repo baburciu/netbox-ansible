@@ -1,0 +1,28 @@
+# ======= How to run standalone:
+# boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_cable.yml  -e 'external_vars="./external_vars.yml"'
+
+- name: Create cable & connect it to two ends
+  connection: local
+  hosts: docker_netbox_19216820023
+  gather_facts: False
+  collections:
+    - netbox.netbox 
+  tasks:
+    - include_vars: '{{external_vars}}'
+
+    - name: Create cable connection
+      netbox_cable:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          termination_a_type: dcim.interface
+          termination_a:
+            device: '{{ cable_end_a_host }}'
+            name: '{{ cable_end_a_if }}'
+          termination_b_type: dcim.interface
+          termination_b:
+            device: '{{ cable_end_b_host }}'
+            name: '{{ cable_end_b_if }}'
+          type: '{{cable_type}}'
+        state: present     
