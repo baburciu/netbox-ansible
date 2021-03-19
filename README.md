@@ -20,10 +20,8 @@ boburciu@WX-5CG020BDT2:~$ ` ansible-galaxy collection install netbox.netbox --co
 
 ## 1. How to add/remove NetBox WebUI Organization tab objects:
 
-boburciu@WX-5CG020BDT2: $  `cd ~/netbox-ansible-automation` 
-<br/>
-boburciu@WX-5CG020BDT2: /netbox-ansible-automation$  <br/>
-boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ `cat external_vars.yml`  <br/>
+boburciu@WX-5CG020BDT2: $  `cd ~/netbox-ansible-automation`  <br/>
+boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ `cat external_vars.yml `  <br/>
 ```
 ---
 # external_vars.yml to be used in playbooks called in order by import_playbook
@@ -31,7 +29,7 @@ boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ `cat external_vars.yml`  <br
 url_var: "http://192.168.200.23:8001/"
 token_var: "97dab58500f94c141d63fb78b6406f9b53a119ac"
 
-## ======== variables used for NetBox WebUI Organization tab objects ======== ##
+ ======== variables used for NetBox WebUI Organization tab objects ======== ##
 tag1_name: mgmt
 tag1_description: "Management port"
 tag1_color: 0000FF  # RGB color in hexadecimal
@@ -81,7 +79,7 @@ rack_serial: 00000000
 rack_facility_id: 00000000
 rack_comments: "Room E203, Row#4 Rack#1"
 
-##  ======== variables used for NetBox WebUI IPAM tab objects ======== ##
+ ======== variables used for NetBox WebUI IPAM tab objects ======== ##
 vrf_name: PUB_API
 vrf_rd: 65000:92062
 vrf_description: "Interconnect VRF between OIaaS FW and IP Fabric Leaf SWs"
@@ -223,3 +221,147 @@ boburciu@WX-5CG020BDT2: /netbox-ansible-automation$  ` for x in ` ls -lX /home/b
 
 
 boburciu@WX-5CG020BDT2: /netbox-ansible-automation$ ` ansible-playbook -i ./hosts -v create_device_wMgmtIntIP_inRack_inTenant_inRack_inSite.yml -e "external_vars=/home/boburciu/parse_excel_servers/external_vars_SRX_2.yml" `
+
+## 3. How to integrate NAPALM with Containerized NetBox, to allow for real-time collecting of facts in NetBox, from its network devices objects, based on [netbox-docker guide](https://github.com/netbox-community/netbox-docker/wiki/NAPALM-Configuration):
+[root@NetboX netbox-docker]# ` vi /root/projects/netbox-docker/env/netbox.env `
+[root@NetboX netbox-docker]# ` cat /root/projects/netbox-docker/env/netbox.env | grep NAPALM `
+```  
+NAPALM_USERNAME=orangeoln
+NAPALM_PASSWORD=l0c@l@dm1n
+NAPALM_TIMEOUT=10
+[root@NetboX netbox-docker]#
+```  
+[root@NetboX netbox-docker]# ` pip3 install napalm `
+[root@NetboX netbox-docker]# ` pip3 install napalm-ce `
+[root@NetboX netbox-docker]# ` docker-compose restart `
+```  
+Restarting netbox-docker_nginx_1         ... done
+Restarting netbox-docker_netbox_1        ... done
+Restarting netbox-docker_netbox-worker_1 ... done
+Restarting netbox-docker_redis-cache_1   ... done
+Restarting netbox-docker_postgres_1      ... done
+Restarting netbox-docker_redis_1         ... done
+[root@NetboX netbox-docker]#
+``` 
+
+### How to check if a NAPALM driver is installed in NetBox
+[root@NetboX netbox-docker]# ` docker-compose run --rm --entrypoint /bin/bash netbox `
+``` 
+Creating netbox-docker_netbox_run ... done
+``` 
+bash-5.0$ ` ./manage.py nbshell `
+``` 
+🧬 loaded config '/etc/netbox/config/configuration.py'
+🧬 loaded config '/etc/netbox/config/configuration.py'
+🧬 loaded config '/etc/netbox/config/extra.py'
+### NetBox interactive shell (d9fceee54b53)
+### Python 3.9.1 | Django 3.1.3 | NetBox 2.10.3
+### lsmodels() will show available models. Use help(<model>) for more info.
+>>> 
+>>>
+>>> import napalm
+>>> driver=napalm.get_network_driver("ce")
+Traceback (most recent call last):
+  File "<console>", line 1, in <module>
+  File "/usr/local/lib/python3.9/site-packages/napalm/base/__init__.py", line 97, in get_network_driver
+    raise ModuleImportError(
+napalm.base.exceptions.ModuleImportError: Cannot import "ce". Is the library installed?
+>>> exit()
+bash-5.0$ exit
+exit
+[root@NetboX netbox-docker]#
+``` 
+
+### How to rebuild image from the _netboxcommunity/netbox:latest_ in Docker Hub, while adding napalm-driver in Dockerfile
+[root@NetboX netbox-docker]# ` vi Dockerfile `
+[root@NetboX netbox-docker]# ` diff Dockerfile Dockerfile.bkp `
+```
+26d25
+<       napalm-ce \
+79c78
+< RUN chmod -R g+w static media
+---
+> RUN mkdir static && chmod -R g+w static media
+[root@NetboX netbox-docker]#
+
+```
+[root@NetboX netbox-docker]# ` mkdir .netbox `
+[root@NetboX netbox-docker]# ` touch .netbox/requirements.txt `
+[root@NetboX netbox-docker]# ` cat .netbox/requirements.txt `
+```
+napalm==3.2.0
+napalm-ce==0.2.0
+ruamel.yaml==0.16.13
+django-auth-ldap==2.3.0
+django-storages[azure,boto3,dropbox,google,libcloud,sftp]==1.11.1
+[root@NetboX netbox-docker]#
+```
+[root@NetboX netbox-docker]# ` docker image build . --tag netbox:napalm --build-arg FROM=netboxcommunity/netbox:latest --build-arg NETBOX_PATH=".netbox" `
+```
+Sending build context to Docker daemon  158.7kB
+Step 1/30 : ARG FROM
+:
+
+Successfully built 3ab20b99381c
+Successfully tagged netbox:napalm
+[root@NetboX netbox-docker]# [root@NetboX netbox-docker]# docker image ls
+REPOSITORY               TAG           IMAGE ID       CREATED          SIZE
+netbox                   napalm        3ab20b99381c   45 seconds ago   336MB
+postgres                 12-alpine     7ec50832fed0   8 weeks ago      159MB
+redis                    6-alpine      933c79ea2511   2 months ago     31.6MB
+netboxcommunity/netbox   latest        8e452c542927   2 months ago     229MB
+nginx                    1.19-alpine   629df02b47c8   3 months ago     22.3MB
+[root@NetboX netbox-docker]#
+```
+[root@NetboX netbox-docker]# ` cp docker-compose.yml docker-compose.yml.bkp `
+[root@NetboX netbox-docker]# ` vi docker-compose.yml `
+[root@NetboX netbox-docker]# ` diff docker-compose.yml docker-compose.yml.bkp `
+```
+4c4
+<     image: netbox:napalm
+---
+>     image: netboxcommunity/netbox:${VERSION-latest}
+[root@NetboX netbox-docker]#
+```
+[root@NetboX netbox-docker]# ` docker-compose ps `
+```
+Name   Command   State   Ports
+------------------------------
+[root@NetboX netbox-docker]#
+```
+[root@NetboX netbox-docker]# ` docker-compose up `
+```
+Creating network "netbox-docker_default" with the default driver
+Creating netbox-docker_redis-cache_1   ... done
+Creating netbox-docker_postgres_1    ... done
+Creating netbox-docker_redis_1       ... done
+Creating netbox-docker_netbox-worker_1 ... done
+Creating netbox-docker_netbox_1        ... done
+Creating netbox-docker_nginx_1         ... done
+Attaching to netbox-docker_postgres_1, netbox-docker_redis_1, netbox-docker_redis-cache_1, netbox-docker_netbox-worker_1, netbox-docker_netbox_1, netbox-docker_nginx_1
+
+```
+[root@NetboX netbox-docker]# ` docker-compose ps `
+```
+            Name                           Command               State                           Ports
+------------------------------------------------------------------------------------------------------------------------------
+netbox-docker_netbox-worker_1   python3 /opt/netbox/netbox ...   Up
+netbox-docker_netbox_1          /opt/netbox/docker-entrypo ...   Up
+netbox-docker_nginx_1           /docker-entrypoint.sh ngin ...   Up      80/tcp,
+                                                                         0.0.0.0:8001->8080/tcp,0.0.0.0:49154->8080/tcp
+netbox-docker_postgres_1        docker-entrypoint.sh postgres    Up      5432/tcp
+netbox-docker_redis-cache_1     docker-entrypoint.sh sh -c ...   Up      6379/tcp
+netbox-docker_redis_1           docker-entrypoint.sh sh -c ...   Up      6379/tcp
+[root@NetboX netbox-docker]# 
+```
+[root@NetboX netbox-docker]# ` docker ps `
+```
+CONTAINER ID   IMAGE                COMMAND                  CREATED         STATUS         PORTS                                                     NAMES
+055cd02cd6a0   nginx:1.19-alpine    "/docker-entrypoint.…"   3 minutes ago   Up 3 minutes   80/tcp, 0.0.0.0:8001->8080/tcp, 0.0.0.0:49154->8080/tcp   netbox-docker_nginx_1
+e541d6a00f8e   netbox:napalm        "/opt/netbox/docker-…"   3 minutes ago   Up 3 minutes                                                             netbox-docker_netbox_1
+441f071d94dd   netbox:napalm        "python3 /opt/netbox…"   3 minutes ago   Up 3 minutes                                                             netbox-docker_netbox-worker_1
+4c3c5d0de41d   redis:6-alpine       "docker-entrypoint.s…"   3 minutes ago   Up 3 minutes   6379/tcp                                                  netbox-docker_redis_1
+8bea76d9a0dd   postgres:12-alpine   "docker-entrypoint.s…"   3 minutes ago   Up 3 minutes   5432/tcp                                                  netbox-docker_postgres_1
+5fff97d26517   redis:6-alpine       "docker-entrypoint.s…"   3 minutes ago   Up 3 minutes   6379/tcp                                                  netbox-docker_redis-cache_1
+[root@NetboX netbox-docker]#
+```

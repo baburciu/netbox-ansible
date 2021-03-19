@@ -76,6 +76,8 @@ for device in network_devices:
             # for each interface collect the configuration by NAPALM and update trunking mode, VLAN and LAG for Huawei interface
             cmd = "display current-configuration interface " + str(int)
             intcfg = device.cli([cmd])[cmd]
+            untagged_vlan_id=None
+            tagged_vlan_list=[]
             # check if assigned to LAG and get it
             if "eth-trunk" in intcfg:
                 lag_name = "Eth-Trunk" + intcfg.split(" eth-trunk ")[1].split("\n", 2)[0]
@@ -96,6 +98,16 @@ for device in network_devices:
                     tagged_vlan_list.extend( intcfg_tagged_vlan_list.split(" to ")[1].rsplit(" ")[1:] )
                 else:
                     tagged_vlan_list = intcfg.split(" port trunk allow-pass vlan ")[1].split("\n", 2)[0]
+            # create the VLANs in NetBox
+            if tagged_vlan_list.append(untagged_vlan_id):
+                for vlan in tagged_vlan_list.append(untagged_vlan_id):
+                    print(f"******* Now we'll create NetBox VLAN object for VID={vlan}")
+                    r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
+                                           playbook='create_vlan.yml',
+                                           inventory='/home/boburciu/netbox-ansible-automation/hosts.yml',
+                                           extravars={'vlan_id': vlan,
+                                                      'external_vars': './external_vars.yml',
+                                                      'ansible_python_interpreter': '/usr/bin/python3'})
 
             # check if the interface description collecting by NAPALM contains a known host in NetBox, if so configure its interface and cable them
             if "link_to" in device_interfaces[int]['description']:
