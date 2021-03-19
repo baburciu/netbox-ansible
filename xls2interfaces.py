@@ -49,25 +49,55 @@ for device in network_devices:
             int_type = "10GBASE-T"
             cable_type = "mmf-om4"
 
+        if "Eth-Trunk" in int:
+            int_type = "LAG"
+
         if "MEth" in int:
             int_mgmt_flag = "True"
         else:
             int_mgmt_flag = "False"
 
         if "NULL" not in int and "Vlan" not in int:
-            print(f"******* Now we'll create NetBox interface {int} for device {device_hostname}")
-            r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
-                                   playbook='create_interface.yml',
-                                   inventory='/home/boburciu/netbox-ansible-automation/hosts.yml',
-                                   extravars={'interface_device': device_hostname, 'interface_name': str(int),
-                                              'interface_mac_address': str(device_interfaces[int]['mac_address']),
-                                              'interface_enabled': str(device_interfaces[int]['is_enabled']),
-                                              'interface_type': int_type, 'interface_mtu': device_interfaces[int]['mtu'],
-                                              'interface_mgmt_only': int_mgmt_flag,
-                                              'interface_description': str(device_interfaces[int]['description']),
-                                              'external_vars': './external_vars.yml',
-                                              'ansible_python_interpreter':'/usr/bin/python3'})
+            if device_hostname in sym_name:
+                this_end_host = hostname[sym_name.index(device_hostname)]
+                print(f"******* Now we'll create NetBox interface {int} for device {this_end_host}")
+                r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
+                                       playbook='create_interface.yml',
+                                       inventory='/home/boburciu/netbox-ansible-automation/hosts.yml',
+                                       extravars={'interface_device': this_end_host, 'interface_name': str(int),
+                                                  'interface_mac_address': str(device_interfaces[int]['mac_address']),
+                                                  'interface_enabled': str(device_interfaces[int]['is_enabled']),
+                                                  'interface_type': int_type, 'interface_mtu': device_interfaces[int]['mtu'],
+                                                  'interface_mgmt_only': int_mgmt_flag,
+                                                  'interface_description': str(device_interfaces[int]['description']),
+                                                  'external_vars': './external_vars.yml',
+                                                  'ansible_python_interpreter':'/usr/bin/python3'})
 
+            # for each interface collect the configuration by NAPALM and update trunking mode, VLAN and LAG for Huawei interface
+            cmd = "display current-configuration interface " + str(int)
+            intcfg = device.cli([cmd])[cmd]
+            # check if assigned to LAG and get it
+            if "eth-trunk" in intcfg:
+                lag_name = "Eth-Trunk" + intcfg.split(" eth-trunk ")[1].split("\n", 2)[0]
+            # check the trunking mode (access, trunk) and get VLAN
+            if "port default vlan" in intcfg:
+                untagged_vlan_id = intcfg.split(" ort default vlan ")[1].split("\n", 2)[0]
+                dot1q_mode = "Access"
+            if "port trunk allow-pass vlan" in intcfg:
+                intcfg_tagged_vlan_list = intcfg.split(" port trunk allow-pass vlan ")[1].split("\n", 2)[0]
+                tagged_vlan_list = []
+                dot1q_mode = "Tagged"
+                if "to" in intcfg_tagged_vlan_list:
+                    # add to the list of passed VLANs the ones prior to VLAN range (x y in "port trunk allow-pass vlan x y z to zz tt uu")
+                    tagged_vlan_list = intcfg_tagged_vlan_list.split(" to ")[0].rsplit(" ")[0:-1]
+                    # for the range, append the elements of it
+                    tagged_vlan_list.extend( list( range( int(intcfg_tagged_vlan_list.split(" to ")[0].rsplit(" ")[-1]), int(intcfg_tagged_vlan_list.split(" to ")[1].rsplit(" ")[0])+1 ) ) )
+                    # add to the list of passed VLANs the ones following the VLAN range (tt uu)
+                    tagged_vlan_list.extend( intcfg_tagged_vlan_list.split(" to ")[1].rsplit(" ")[1:] )
+                else:
+                    tagged_vlan_list = intcfg.split(" port trunk allow-pass vlan ")[1].split("\n", 2)[0]
+
+            # check if the interface description collecting by NAPALM contains a known host in NetBox, if so configure its interface and cable them
             if "link_to" in device_interfaces[int]['description']:
                 # other_end <=> list of ['Server_R2_04', 'mgmt'] from interface description (got via NAPALM driver) parsing
                 other_end = str(device_interfaces[int]['description']).split('link_to_')[1].rsplit("_", 1)
@@ -96,17 +126,17 @@ for device in network_devices:
                                                       'external_vars': './external_vars.yml',
                                                       'ansible_python_interpreter': '/usr/bin/python3'})
 
-                    print(f"******* Now we'll create NetBox cable between {other_end_host}'s {other_end_if} and {device_hostname}'s {int} ")
+                    print(f"******* Now we'll create NetBox cable between {other_end_host}'s {other_end_if} and {this_end_host}'s {int} ")
                     r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
                                            playbook='create_cable.yml',
                                            inventory='/home/boburciu/netbox-ansible-automation/hosts.yml',
-                                           extravars={'cable_end_a_host': device_hostname, 'cable_end_a_if': int,
+                                           extravars={'cable_end_a_host': this_end_host, 'cable_end_a_if': int,
                                                       'cable_end_b_host': other_end_host, 'cable_end_b_if': other_end_if,
                                                       'cable_type': cable_type,
                                                       'external_vars': './external_vars.yml',
                                                       'ansible_python_interpreter': '/usr/bin/python3'})
-        device.close()
-        print("Done for {} .".format(device.hostname))
+    device.close()
+    print("Done for {} .".format(device.hostname))
 
 ### How other_end is found:
 #
@@ -127,3 +157,35 @@ for device in network_devices:
 # ['Server_R2_04', 'mgmt']
 # >>>
 
+### How to collect interface configuration from Huawei VRP interface configuration:
+# >>>
+# >>> for int in device_interfaces.keys():
+# ...   if "NULL" not in int and "Vlan" not in int:
+# ...     cmd = "display current-configuration interface " + str(int)
+# ...     intcfg = device.cli([cmd])[cmd]
+# ...     print(intcfg)
+# ...
+# #
+# interface 10GE1/0/1
+#  description link_to_Server_R1_01_eth0
+#  port link-type trunk
+#  port trunk pvid vlan 100
+#  undo port trunk allow-pass vlan 1
+#  port trunk allow-pass vlan 100 202 to 206 300
+#  device transceiver 10GBASE-COPPER
+# #
+# return
+# #
+# interface 10GE1/0/2
+#  description link_to_Server_R1_01_eth2
+#  port link-type trunk
+#  undo port trunk allow-pass vlan 1
+#  port trunk allow-pass vlan 100 202 to 206 300
+#  device transceiver 10GBASE-COPPER
+# #
+
+### How the Eth-Trunk id is found from Huawei VRP interface configuration:
+# >>> intcfg='#\ninterface 10GE2/0/42\n description Link_to_SWH-TOR-R2-2_10GE2/0/42\n eth-trunk 112\n device transceiver 10GBASE-FIBER\n#\nreturn'
+# >>> intcfg.split("eth-trunk")[1].split("\n",2)[0][1:]
+# '112'
+# >>>
