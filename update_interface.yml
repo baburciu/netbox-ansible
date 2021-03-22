@@ -2,17 +2,15 @@
 # boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
 # boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v update_interface.yml -e 'lag_name="Eth-Trunk3" interface_name="10GE1/0/1" interface_device="SWH-OoB-R2" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.200.23:8001/" token_var="aca25c1c8ce2c6f205b407cb7352c68cc69cc58b"'
 
-- name: Update interface
+- name: Update interface with LAG and VLAN IDs
   connection: local
   hosts: docker_netbox_19216820023
   gather_facts: False
   collections:
     - netbox.netbox 
   tasks:
-    # # - include_vars: external_vars.yml  
     # - include_vars: '{{external_vars}}'    
-
-    - name: Update interface with LAG and VLAN
+    - name: Update interface with LAG ID if exists
       netbox_device_interface:
         netbox_url: '{{ url_var }}'
         netbox_token: '{{ token_var }}'
@@ -20,10 +18,32 @@
           device: '{{ interface_device }}'
           name: '{{ interface_name }}'
           lag:
-            name: '{{ lag_name }}'
+            name: '{{ lag_name }}'                     
+        state: present
+        when: lag_name is defined   
+
+    - name: Update interface with untagged VLAN ID and access mode
+      netbox_device_interface:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          device: '{{ interface_device }}'
+          name: '{{ interface_name }}'
           mode: '{{ dot1q_mode }}'
           untagged_vlan:
-            - name: '{{ untagged_vlan_id }}'
+            - name: '{{ untagged_vlan_id }}'                     
+        state: present
+        when: untagged_vlan_id is defined           
+
+    - name: Update interface with tagged VLAN ID and trunk mode
+      netbox_device_interface:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          device: '{{ interface_device }}'
+          name: '{{ interface_name }}'
+          mode: '{{ dot1q_mode }}'
           tagged_vlans:
             - name: '{{ tagged_vlan_id }}'                      
-        state: present    
+        state: present
+        when: tagged_vlan_id is defined   

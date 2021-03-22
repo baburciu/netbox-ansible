@@ -11,11 +11,12 @@
   tasks:
     - include_vars: '{{external_vars}}'    
 
-    - name: Create a VLAN with only name as id 
+    - name: Create a VLAN with only name as id and the site name
       netbox_vlan:
         netbox_url: '{{ url_var }}'
         netbox_token: '{{ token_var }}'
         data:
           name: '{{ vlan_id }}'
           vid: '{{ vlan_id }}'
+          site: '{{ vlan_site }}'
         state: present    
