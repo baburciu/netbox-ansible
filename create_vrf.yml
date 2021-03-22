@@ -40,7 +40,19 @@
           # tenant: 3          
           description: "{{ vrf_description }}"
           enforce_unique: true   # prevent duplicate prefixes/IP addresses within this VRF, true or false
-          tags:
-            - "{{ vrf_tag }}" 
         state: present   # prevent duplicate prefixes/IP addresses within this VRF, true or false  
       ignore_errors: True            
+
+    - name: Create vrf with all information
+      netbox.netbox.netbox_vrf:
+        netbox_url: '{{ url_var }}'
+        netbox_token: "{{ token_var }}"
+        data:
+          name: "{{ vrf_name }}"
+          rd:  "{{ vrf_rd }}"
+          tenant: "{{ tenant_name }}"
+          tags:
+            - "{{ vrf_tag }}" 
+        state: present
+      ignore_errors: True   
+      when: vrf_tag is defined 
