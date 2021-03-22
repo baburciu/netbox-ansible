@@ -1,10 +1,8 @@
 ---
 # external_vars.yml to be used in playbooks called in order by import_playbook
 
-
 url_var: "http://192.168.200.23:8001/"
-token_var: "849c9ca1827614045acd6c7bf32cc5918c9d60a0"
-
+token_var: "aca25c1c8ce2c6f205b407cb7352c68cc69cc58b"
 
 ## ======== variables used for NetBox WebUI Organization tab objects ======== ##
 tag_name: oiaas
@@ -86,7 +84,12 @@ interface_type: 1000BASE-T
 interface_mtu: 1500
 interface_mgmt_only: yes      # interface is used only for out-of-band management, yes or no
 interface_description: "Mgmt interface"
-
+#
+cable_end_a_host: SWH-OoB-R2
+cable_end_a_if: GE1/0/1
+cable_end_b_host: 2288H_V5_2102311XBSN0JA000034
+cable_end_b_if: iBMC
+cable_type: mmf-om4
 
 ##  ======== variables used for NetBox WebUI IPAM tab objects ======== ##
 vrf_name: OOB
