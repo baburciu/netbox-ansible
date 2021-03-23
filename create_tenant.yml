@@ -31,16 +31,16 @@
           description: "{{ tenant_description }}"
         state: present
 
-    # - name: Create tenant and assign tag and comment, if available
-    #   netbox_tenant:
-    #     netbox_url: "{{ url_var }}"
-    #     netbox_token: "{{ token_var }}"
-    #     data:
-    #       name: "{{ tenant_name }}"
-    #       tenant_group: "{{ tenant_group_name }}"
-    #       description: "{{ tenant_description }}"
-    #       # comments: "{{ tenant_comments }}"
-    #       tags:
-    #         - "{{ tenant_tag }}"
-    #     state: present
-    #     when: tenant_tag is defined  # found by trial and error that "netbox_tenant" module supported parameters include: data, netbox_token, netbox_url, query_params, state, validate_certs"       
+    - name: Create tenant and assign tag and comment, if available
+      netbox_tenant:
+        netbox_url: "{{ url_var }}"
+        netbox_token: "{{ token_var }}"
+        data:
+          name: "{{ tenant_name }}"
+          tenant_group: "{{ tenant_group_name }}"
+          description: "{{ tenant_description }}"
+          # comments: "{{ tenant_comments }}"
+          tags:
+            - "{{ tenant_tag }}"
+        state: present
+      when: tenant_tag is defined

@@ -2,7 +2,7 @@
 # external_vars.yml to be used in playbooks called in order by import_playbook
 
 url_var: "http://192.168.200.23:8001/"
-token_var: "aca25c1c8ce2c6f205b407cb7352c68cc69cc58b"
+token_var: "883c2fc10fc0b8fcadfd92457aa56ab13d9bd4b4"
 
 ## ======== variables used for NetBox WebUI Organization tab objects ======== ##
 tag_name: oiaas
