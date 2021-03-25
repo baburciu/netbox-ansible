@@ -17,8 +17,8 @@ hostname = sh.col_values(0, start_rowx=2)       # hostname of device object alre
 sym_name = sh.col_values(25, start_rowx=2)      # the hostname used in interface descriptions already set for Huawei switches
 
 driver_vrp = napalm.get_network_driver("ce")
-device_list = [["SWH-TOR-R2","192.168.201.25"],["SWH-OoB-R2","192.168.201.27"],
-               ["SWH-TOR-R1","192.168.201.24"],["SWH-OoB-R1","192.168.201.23"]]
+device_list = [["SWH-TOR-R1","192.168.201.24"],["SWH-TOR-R2","192.168.201.25"],
+               ["SWH-OoB-R1","192.168.201.23"],["SWH-OoB-R2","192.168.201.27"]]
 # device_list = [["SWH-TOR-R1","192.168.201.24"],["SWH-TOR-R2","192.168.201.25"]] # <= just for T-Shoot
 
 network_devices = []
@@ -210,7 +210,7 @@ for device in network_devices:
                     r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
                                            playbook='create_cable.yml',
                                            inventory='/home/boburciu/netbox-ansible-automation/hosts.yml',
-                                           extravars={'cable_end_a_host': this_end_host, 'cable_end_a_if': int,
+                                           extravars={'cable_end_a_host': this_end_host, 'cable_end_a_if': iface,
                                                       'cable_end_b_host': other_end_host, 'cable_end_b_if': other_end_if,
                                                       'cable_type': cable_type,
                                                       'external_vars': './external_vars.yml',
