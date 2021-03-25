@@ -1,6 +1,7 @@
 # ======= How to run standalone:
 # boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
 # boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v update_interface.yml -e 'lag_name="Eth-Trunk3" interface_name="10GE1/0/1" interface_device="SWH-OoB-R2" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.200.23:8001/" token_var="883c2fc10fc0b8fcadfd92457aa56ab13d9bd4b4"'
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v update_interface.yml -e 'dot1q_mode="Tagged" tagged_vlan_id="203" interface_name="10GE1/0/1" interface_device="SWH-OoB-R2" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.200.23:8001/" token_var="883c2fc10fc0b8fcadfd92457aa56ab13d9bd4b4"'
 
 - name: Update interface with LAG and VLAN IDs
   connection: local

@@ -20,13 +20,34 @@
         data:
           device: '{{ interface_device }}'
           name: '{{ interface_name }}'
+        state: present    
+
+    - name: Create interface with type (LAG or other), if available
+      netbox_device_interface:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          device: '{{ interface_device }}'
+          name: '{{ interface_name }}'
+          type: '{{ interface_type }}'          
+        state: present  
+      when: interface_type is defined     
+
+    - name: Create interface with all data - when info is available via NAPALM call
+      netbox_device_interface:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          device: '{{ interface_device }}'
+          name: '{{ interface_name }}'
           mac_address: '{{ interface_mac_address }}'
           enabled: '{{ interface_enabled }}'
           type: '{{ interface_type }}'
           mtu: '{{ interface_mtu }}'
           mgmt_only: '{{ interface_mgmt_only }}'
           description: '{{ interface_description }}'
-        state: present    
+        state: present  
+      when: interface_mac_address is defined          
 
     # - name:  Obtain all interfaces
     #   debug: 

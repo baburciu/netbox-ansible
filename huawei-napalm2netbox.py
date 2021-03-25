@@ -82,6 +82,7 @@ for device in network_devices:
         if "NULL" not in iface and "Vlan" not in iface:
             if device_hostname in sym_name:
                 this_end_host = hostname[sym_name.index(device_hostname)]
+                # NetBox: create the interface
                 print(f"******* Now we'll create NetBox interface {iface} for device {this_end_host}")
                 r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
                                        playbook='create_interface.yml',
@@ -104,6 +105,18 @@ for device in network_devices:
             # check if assigned to LAG and get it, then update interface in NetBox
             if "eth-trunk" in ifcfg:
                 lag_name = "Eth-Trunk" + ifcfg.split(" eth-trunk ")[1].split("\n", 2)[0]
+
+                # NetBox: first create the LAG interface, to exclude erros with LAG not found, even though it will overwritten later
+                # by the main loop over interfaces returned by NAPALM
+                print(f"******* Now we'll create NetBox interface {lag_name} for device {this_end_host}")
+                r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
+                                       playbook='create_interface.yml',
+                                       inventory='/home/boburciu/netbox-ansible-automation/hosts.yml',
+                                       extravars={'interface_device': this_end_host, 'interface_name': str(lag_name),
+                                                  'interface_type': 'LAG',
+                                                  'external_vars': './external_vars.yml',
+                                                  'ansible_python_interpreter':'/usr/bin/python3'})
+                # NetBox: now assign interface to LAG
                 print(f"******* Now we'll assign NetBox interface {iface} for device {this_end_host} to the LAG {lag_name}")
                 r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
                                        playbook='update_interface.yml',
@@ -125,6 +138,8 @@ for device in network_devices:
             if "port default vlan" in ifcfg:
                 untagged_vlan_id = ifcfg.split(" port default vlan ")[1].split("\n", 2)[0]
                 dot1q_mode = "Access"
+                # NetBox: update the interface found in access mode
+                print(f"******* Now we'll update NetBox interface {str(int)} as access port in VLAN {untagged_vlan_id}")
                 r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
                                        playbook='update_interface.yml',
                                        inventory='/home/boburciu/netbox-ansible-automation/hosts.yml',
@@ -149,12 +164,14 @@ for device in network_devices:
                     tagged_vlan_list = (ifcfg.split(" port trunk allow-pass vlan ")[1].split("\n", 2)[0] ).split(" ")
 
                 for tagged_vlan_id in tagged_vlan_list:
+                    # NetBox: update the interface found in trunk mode
+                    print(f"******* Now we'll update NetBox interface {str(int)} as trunk port which passes VLAN {str(tagged_vlan_id)}")
                     r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
                                            playbook='update_interface.yml',
                                            inventory='/home/boburciu/netbox-ansible-automation/hosts.yml',
                                            extravars={'interface_device': this_end_host, 'interface_name': str(int),
                                                       'dot1q_mode': dot1q_mode,
-                                                      'tagged_vlan_id': tagged_vlan_id,
+                                                      'tagged_vlan_id': str(tagged_vlan_id),
                                                       'external_vars': './external_vars.yml',
                                                       'ansible_python_interpreter':'/usr/bin/python3'})
 
@@ -197,6 +214,7 @@ for device in network_devices:
                                                       'cable_type': cable_type,
                                                       'external_vars': './external_vars.yml',
                                                       'ansible_python_interpreter': '/usr/bin/python3'})
+
     device.close()
     print("Done for {} .".format(device.hostname))
 
