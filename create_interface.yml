@@ -1,7 +1,7 @@
 # ======= How to run standalone:
 # boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
 # boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_interface.yml -e 'interface_description="Management port"'
-# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v add_device_w_mgmt.yml -e 'external_vars="../parse_excel_servers/external_vars_CZ00CHASSIS1.yml"'
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_interface.yml -e 'interface_name="10GE1/0/1" interface_device="SWH-TOR-R1-1" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3"'
 
 - name: Create interface
   connection: local
@@ -20,19 +20,9 @@
         data:
           device: '{{ interface_device }}'
           name: '{{ interface_name }}'
+          type: '{{ interface_type }}'   # mandatory param          
         state: present    
-
-    - name: Create interface with type (LAG or other), if available
-      netbox_device_interface:
-        netbox_url: '{{ url_var }}'
-        netbox_token: '{{ token_var }}'
-        data:
-          device: '{{ interface_device }}'
-          name: '{{ interface_name }}'
-          type: '{{ interface_type }}'          
-        state: present  
-      when: interface_type is defined     
-
+ 
     - name: Create interface with all data - when info is available via NAPALM call
       netbox_device_interface:
         netbox_url: '{{ url_var }}'
