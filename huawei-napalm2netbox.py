@@ -42,6 +42,7 @@ for device in network_devices:
     device_hostname = device.get_facts()['hostname']
 
     # create all the VLANs for a Huawei device in NetBox
+    # first fetch the cmd output and parse it to a list
     cmd = "display vlan summary"
     vlancfg = device.cli([cmd])[cmd]
     device_vlan_list = []
@@ -53,7 +54,7 @@ for device in network_devices:
 
     device_vlan_list.extend(vlancfg_vlan_list[len(vlancfg_vlan_list)-1].split())
     for vlan in device_vlan_list:
-        print(f"******* Now we'll create NetBox VLAN object for VID={vlan}")
+        print(f"******* Now we'll create NetBox VLAN object for VID={vlan}, based on device {device_hostname}'s VLAN list")
         r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
                                playbook='create_vlan.yml',
                                inventory='/home/boburciu/netbox-ansible-automation/hosts.yml',
@@ -61,7 +62,7 @@ for device in network_devices:
                                           'external_vars': './external_vars.yml',
                                           'ansible_python_interpreter': '/usr/bin/python3'})
     # open again Napalm connection, in case it timesout while creating VLAN objects in NetBox
-    device.open()
+    # device.open()
 
     for iface in device_interfaces.keys():
         if device_interfaces[iface]['speed'] == 1000:
@@ -87,7 +88,7 @@ for device in network_devices:
                 r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
                                        playbook='create_interface.yml',
                                        inventory='/home/boburciu/netbox-ansible-automation/hosts.yml',
-                                       extravars={'interface_device': this_end_host, 'interface_name': str(int),
+                                       extravars={'interface_device': this_end_host, 'interface_name': str(iface),
                                                   'interface_mac_address': str(device_interfaces[iface]['mac_address']),
                                                   'interface_enabled': str(device_interfaces[iface]['is_enabled']),
                                                   'interface_type': int_type, 'interface_mtu': device_interfaces[iface]['mtu'],
@@ -121,7 +122,7 @@ for device in network_devices:
                 r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
                                        playbook='update_interface.yml',
                                        inventory='/home/boburciu/netbox-ansible-automation/hosts.yml',
-                                       extravars={'interface_device': this_end_host, 'interface_name': str(int),
+                                       extravars={'interface_device': this_end_host, 'interface_name': str(iface),
                                                   'lag_name': lag_name,
                                                   'external_vars': './external_vars.yml',
                                                   'ansible_python_interpreter':'/usr/bin/python3'})
@@ -139,11 +140,11 @@ for device in network_devices:
                 untagged_vlan_id = ifcfg.split(" port default vlan ")[1].split("\n", 2)[0]
                 dot1q_mode = "Access"
                 # NetBox: update the interface found in access mode
-                print(f"******* Now we'll update NetBox interface {str(int)} as access port in VLAN {untagged_vlan_id}")
+                print(f"******* Now we'll update NetBox interface {str(iface)} as access port in VLAN {untagged_vlan_id}")
                 r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
                                        playbook='update_interface.yml',
                                        inventory='/home/boburciu/netbox-ansible-automation/hosts.yml',
-                                       extravars={'interface_device': this_end_host, 'interface_name': str(int),
+                                       extravars={'interface_device': this_end_host, 'interface_name': str(iface),
                                                   'dot1q_mode': dot1q_mode,
                                                   'untagged_vlan_id': untagged_vlan_id,
                                                   'external_vars': './external_vars.yml',
@@ -165,11 +166,11 @@ for device in network_devices:
 
                 for tagged_vlan_id in tagged_vlan_list:
                     # NetBox: update the interface found in trunk mode
-                    print(f"******* Now we'll update NetBox interface {str(int)} as trunk port which passes VLAN {str(tagged_vlan_id)}")
+                    print(f"******* Now we'll update NetBox interface {str(iface)} as trunk port which passes VLAN {str(tagged_vlan_id)}")
                     r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
                                            playbook='update_interface.yml',
                                            inventory='/home/boburciu/netbox-ansible-automation/hosts.yml',
-                                           extravars={'interface_device': this_end_host, 'interface_name': str(int),
+                                           extravars={'interface_device': this_end_host, 'interface_name': str(iface),
                                                       'dot1q_mode': dot1q_mode,
                                                       'tagged_vlan_id': str(tagged_vlan_id),
                                                       'external_vars': './external_vars.yml',
@@ -241,7 +242,7 @@ for device in network_devices:
 # >>>
 # >>> for iface in device_interfaces.keys():
 # ...   if "NULL" not in iface and "Vlan" not in iface:
-# ...     cmd = "display current-configuration interface " + str(int)
+# ...     cmd = "display current-configuration interface " + str(iface)
 # ...     ifcfg = device.cli([cmd])[cmd]
 # ...     print(ifcfg)
 # ...
