@@ -175,22 +175,22 @@ for device in network_devices:
                                                   'external_vars': './external_vars.yml',
                                                   'ansible_python_interpreter': '/usr/bin/python3'})
 
-                # !***
-                # Had to remove section for now and replace with above, where we only set allowed VLAN the first one in device config,
-                # due to improper config on ToR SWs, where interfaces are configured with "port trunk allow-pass vlan 100 to 2030",
-                # while the range of all these VLANs is not created on the SW, so they don't exist in NetBox
-                for tagged_vlan_id in tagged_vlan_list:
-                    # NetBox: update the interface found in trunk mode
-                    print(f"******* Now we'll update NetBox interface {str(iface)} as trunk port which passes VLAN {str(tagged_vlan_id)}")
-                    r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
-                                           playbook='update_interface.yml',
-                                           inventory='/home/boburciu/netbox-ansible-automation/hosts.yml',
-                                           extravars={'interface_device': this_end_host, 'interface_name': str(iface),
-                                                      'dot1q_mode': dot1q_mode,
-                                                      'tagged_vlan_id': str(tagged_vlan_id),
-                                                      'external_vars': './external_vars.yml',
-                                                      'ansible_python_interpreter':'/usr/bin/python3'})
-                # ***!
+                # # !***
+                # # Had to remove section for now and replace with above, where we only set allowed VLAN the first one in device config,
+                # # due to improper config on ToR SWs, where interfaces are configured with "port trunk allow-pass vlan 100 to 2030",
+                # # while the range of all these VLANs is not created on the SW, so they don't exist in NetBox
+                # for tagged_vlan_id in tagged_vlan_list:
+                #     # NetBox: update the interface found in trunk mode
+                #     print(f"******* Now we'll update NetBox interface {str(iface)} as trunk port which passes VLAN {str(tagged_vlan_id)}")
+                #     r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
+                #                            playbook='update_interface.yml',
+                #                            inventory='/home/boburciu/netbox-ansible-automation/hosts.yml',
+                #                            extravars={'interface_device': this_end_host, 'interface_name': str(iface),
+                #                                       'dot1q_mode': dot1q_mode,
+                #                                       'tagged_vlan_id': str(tagged_vlan_id),
+                #                                       'external_vars': './external_vars.yml',
+                #                                       'ansible_python_interpreter':'/usr/bin/python3'})
+                # # ***!
 
             # check if the interface description collecting by NAPALM contains a known host in NetBox, if so configure its interface and cable them
             if "link_to" in device_interfaces[iface]['description']:
