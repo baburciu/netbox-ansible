@@ -60,13 +60,3 @@
 #            - Test_Ansible NE40E
         state: present
 
----
-- name: Add rke user to docker group, 3rd
-  hosts: ubuntu-rke
-  #remote_user: ubuntu
-  tasks:
-  - name: adding existing user rke to docker group
-    user:
-      name: "{{ rke_user}}"
-      groups: docker
-      append: yes

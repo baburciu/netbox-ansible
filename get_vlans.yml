@@ -1,0 +1,22 @@
+---
+# ======= How to run standalone:
+# boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v get_vlans.yml -e 'external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.200.23:8001/" token_var="883c2fc10fc0b8fcadfd92457aa56ab13d9bd4b4"'
+
+- name: Get all VLANs
+  connection: local
+  hosts: docker_netbox_19216820023
+  gather_facts: False
+  collections:
+    - netbox.netbox 
+  tasks:
+    - include_vars: '{{external_vars}}'   
+
+    - name: Obtain list of VLANs from Netbox
+      debug:
+        msg: >
+          "Device {{ item.value.name }} (ID: {{ item.key }}) was"
+#           manufactured by {{ item.value.device_type.manufacturer.name }}"
+      loop: "{{ query('netbox.netbox.nb_lookup', 'vlans',
+                      api_endpoint='http://192.168.200.23:8001/',
+                      token='883c2fc10fc0b8fcadfd92457aa56ab13d9bd4b4') }}"

@@ -17,9 +17,9 @@ hostname = sh.col_values(0, start_rowx=2)       # hostname of device object alre
 sym_name = sh.col_values(25, start_rowx=2)      # the hostname used in interface descriptions already set for Huawei switches
 
 driver_vrp = napalm.get_network_driver("ce")
-device_list = [["SWH-TOR-R1","192.168.201.24"],["SWH-TOR-R2","192.168.201.25"],
-               ["SWH-OoB-R1","192.168.201.23"],["SWH-OoB-R2","192.168.201.27"]]
-# device_list = [["SWH-TOR-R1","192.168.201.24"],["SWH-TOR-R2","192.168.201.25"]] # <= just for T-Shoot
+# device_list = [["SWH-TOR-R1","192.168.201.24"],["SWH-TOR-R2","192.168.201.25"],
+#                ["SWH-OoB-R1","192.168.201.23"],["SWH-OoB-R2","192.168.201.27"]]
+device_list = [["SWH-OoB-R1","192.168.201.23"],["SWH-OoB-R2","192.168.201.27"]] # <= just for T-Shoot
 
 network_devices = []
 for device in device_list:
@@ -165,7 +165,7 @@ for device in network_devices:
                     tagged_vlan_list = (ifcfg.split(" port trunk allow-pass vlan ")[1].split("\n", 2)[0] ).split(" ")
 
                 # NetBox: update the interface found in trunk mode and only permit the first VLAN from it's configured passed ones
-                print(f"******* Now we'll update NetBox interface {str(iface)} as trunk port which passes VLAN {str(tagged_vlan_id)}")
+                print(f"******* Now we'll update NetBox interface {str(iface)} as trunk port which passes VLAN {str(tagged_vlan_list[0])}")
                 r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/',
                                        playbook='update_interface.yml',
                                        inventory='/home/boburciu/netbox-ansible-automation/hosts.yml',
@@ -217,7 +217,7 @@ for device in network_devices:
                                                       'interface_enabled': 'yes',
                                                       'interface_type': int_type, 'interface_mtu': device_interfaces[iface]['mtu'],
                                                       'interface_mgmt_only': int_mgmt_flag,
-                                                      'interface_description': str('to_'+device_hostname),
+                                                      'interface_description': str('link_to_'+this_end_host+'_'+iface),
                                                       'external_vars': './external_vars.yml',
                                                       'ansible_python_interpreter': '/usr/bin/python3'})
 
