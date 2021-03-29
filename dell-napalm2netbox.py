@@ -17,7 +17,7 @@ hostname = sh.col_values(0, start_rowx=1)       # hostname of device object alre
 sym_name = sh.col_values(18, start_rowx=1)      # the hostname used in interface descriptions already set for switches and SW hostname returned by NAPALM
 
 driver_dellos = napalm.get_network_driver("dellos10")
-device_list = [["SW-WE19-TOR1-B4-NEO","192.168.70.4"],["SW-WE19-TOR2-B4-NEO","192.168.70.3"]]
+device_list = [["SW-WE19-TOR2-B4-NEO","192.168.70.3"],["SW-WE19-TOR1-B4-NEO","192.168.70.4"]]
 
 network_devices = []
 for device in device_list:
@@ -29,7 +29,6 @@ for device in device_list:
         )
     )
 
-# the MAC addresses for the 25G NICs of the PowerEdge servers, collected oob by Ansible
 dell_server_25g_nics={
 "Dell_Compute-1": {
             "NIC1-P1": "40:A6:B7:43:A1:90",
@@ -180,6 +179,7 @@ for device in network_devices:
 
     print("Getting device interfaces")
     device_interfaces = device.get_interfaces()
+    # Trial & Error Obs: as opposed to Huawei, Dell switches do not return MTU in get_interfaces()
 
     print("Getting device facts to extract its hostname")
     device_hostname = device.get_facts()['hostname']
@@ -204,13 +204,13 @@ for device in network_devices:
 
     for iface in device_interfaces.keys():
         if device_interfaces[iface]['speed'] == 25000000000:
-            int_type = "SFP28"
+            int_type = "SFP28 (25GE)"
             cable_type = "mmf-om4"
         elif device_interfaces[iface]['speed'] == 100000000000:
-            int_type = "QSFP28"
+            int_type = "QSFP28 (100GE)"
             cable_type = "smf-os2"
         elif device_interfaces[iface]['speed'] == 200000000000:
-            int_type = "QSFP56"
+            int_type = "QSFP56 (200GE)"
             cable_type = "aoc" # Active Optical Cabling
 
         # check if interface name is Po, mgmt, null or vlan
@@ -234,7 +234,7 @@ for device in network_devices:
                                        extravars={'interface_device': this_end_host, 'interface_name': str(iface),
                                                   'interface_mac_address': str(device_interfaces[iface]['mac_address']),
                                                   'interface_enabled': str(device_interfaces[iface]['is_enabled']),
-                                                  'interface_type': int_type, 'interface_mtu': device_interfaces[iface]['mtu'],
+                                                  'interface_type': int_type, 'interface_mtu': 9216,
                                                   'interface_mgmt_only': int_mgmt_flag,
                                                   'interface_description': str(device_interfaces[iface]['description']),
                                                   'external_vars': './external_vars.yml',
@@ -302,25 +302,34 @@ for device in network_devices:
                     else:
                         tagged_vlan_list.extend( ifcfg_tagged_vlan_range )
 
-                for tagged_vlan_id in tagged_vlan_list:
-                    # NetBox: update the interface found in trunk mode
-                    print(f"******* Now we'll update NetBox interface {str(iface)} as trunk port which passes VLAN {str(tagged_vlan_id)}")
-                    r = ansible_runner.run(private_data_dir='/home/ubuntu/netbox-ansible/',
-                                           playbook='update_interface.yml',
-                                           inventory='/home/ubuntu/netbox-ansible/hosts.yml',
-                                           extravars={'interface_device': this_end_host, 'interface_name': str(iface),
-                                                      'dot1q_mode': dot1q_mode,
-                                                      'tagged_vlan_id': str(tagged_vlan_id),
-                                                      'external_vars': './external_vars.yml',
-                                                      'ansible_python_interpreter':'/usr/bin/python3'})
-
+                # since update_interface.yml playbook can only receive as extra-var a list without space after comma, we need to change it
+                # from tagged_vlan_list=['1', '5', 6, 7, '8', 205] to '1,5,6,7,8,205' and create the list in playbook
+                tagged_vlan_list = ','.join( list( map(str, tagged_vlan_list) ) )
+                # NetBox: update the interface found in trunk mode
+                print(f"******* Now we'll update NetBox interface {str(iface)} as trunk port which passes VLANs {tagged_vlan_list}")
+                r = ansible_runner.run(private_data_dir='/home/ubuntu/netbox-ansible/',
+                                       playbook='update_interface.yml',
+                                       inventory='/home/ubuntu/netbox-ansible/hosts.yml',
+                                       extravars={'interface_device': this_end_host, 'interface_name': str(iface),
+                                                  'dot1q_mode': dot1q_mode,
+                                                  'tagged_vlan_id': tagged_vlan_list,
+                                                  'external_vars': './external_vars.yml',
+                                                  'ansible_python_interpreter': '/usr/bin/python3'})
+                
             # check if the interface description collecting by NAPALM contains a known host in NetBox, if so configure its interface and cable them
             if "Dell" in device_interfaces[iface]['description']:
                 # other_end <=> list of ['Dell_Compute-4', 'NIC1-P1--MAVENIR', 'USE'] from interface description (got via NAPALM driver) parsing
-                other_end = descr.rsplit("_", descr.count("_")-1 )
+                # or other_end can be ['Dell_Compute-6', 'Bond', '0'], when the SW interface is Po connecting to server Bond
+                other_end = device_interfaces[iface]['description'].rsplit("_", device_interfaces[iface]['description'].count("_")-1 )
                 if other_end[0] in sym_name:
                     other_end_host = hostname[sym_name.index(other_end[0])]
-                    other_end_if = other_end[1][0:7]
+                    if "Bond" in device_interfaces[iface]['description']:   # description Dell_Compute-7_Bond_0
+                        # increase the Bond number so that it starts from 1, same as NICs
+                        other_end_if = other_end[1] + str(int(other_end[2]) + 1)
+                    else:
+                        other_end_if = other_end[1][0:7]
+                        # names of 25G NICs of the PowerEdge servers, collected oob by Ansible, start from NIC1, not NIC0 like in the switch interface descriptions
+                        other_end_if = other_end_if[0:3] + str(int(other_end_if[3]) + 1) + other_end_if[4:7]
 
                     print(f"******* Now we'll create NetBox interface {other_end_if} for device {other_end_host}")
                     r = ansible_runner.run(private_data_dir='/home/ubuntu/netbox-ansible/',
@@ -329,7 +338,7 @@ for device in network_devices:
                                            extravars={'interface_device': other_end_host, 'interface_name': other_end_if,
                                                       'interface_mac_address': dell_server_25g_nics[other_end_host][other_end_if],
                                                       'interface_enabled': 'yes',
-                                                      'interface_type': int_type, 'interface_mtu': device_interfaces[iface]['mtu'],
+                                                      'interface_type': int_type, 'interface_mtu': 9216,
                                                       'interface_mgmt_only': "False",
                                                       'interface_description': str(this_end_host+'_'+iface),
                                                       'external_vars': './external_vars.yml',

@@ -1,7 +1,8 @@
 # ======= How to run standalone:
 # boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
 # boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v update_interface.yml -e 'lag_name="Eth-Trunk3" interface_name="10GE1/0/1" interface_device="SWH-OoB-R2" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.200.23:8001/" token_var="883c2fc10fc0b8fcadfd92457aa56ab13d9bd4b4"'
-# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v update_interface.yml -e 'dot1q_mode="Tagged" tagged_vlan_id="203" interface_name="10GE1/0/1" interface_device="SWH-OoB-R2" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.200.23:8001/" token_var="883c2fc10fc0b8fcadfd92457aa56ab13d9bd4b4"'
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v update_interface.yml -e 'dot1q_mode="Tagged" tagged_vlan_id="204,206,480" interface_name="10GE1/0/1" interface_device="SWH-OoB-R2" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.200.23:8001/" token_var="fe08a748abf3eb828203536f35e411fc8fbf8f9c"' -vv
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v update_interface.yml -e 'dot1q_mode="Tagged (All)" tagged_vlan_id=["204","206","480"] interface_name="10GE1/0/1" interface_device="SWH-OoB-R2" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.200.23:8001/" token_var="fe08a748abf3eb828203536f35e411fc8fbf8f9c"' -vv
 # boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v update_interface.yml -e 'dot1q_mode="Access" untagged_vlan_id="202" interface_name="GE1/0/8" interface_device="SWH-OoB-R1" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.200.23:8001/" token_var="883c2fc10fc0b8fcadfd92457aa56ab13d9bd4b4"'
 
 - name: Update interface with LAG and VLAN IDs
@@ -36,8 +37,19 @@
           untagged_vlan:
             name: '{{ untagged_vlan_id }}'                     
         state: present
-      when: untagged_vlan_id is defined           
+      when: untagged_vlan_id is defined             
 
+    - name: Get list without space after comma from Python list
+      set_fact:
+        tagged_vlan_list: "{{ tagged_vlan_list | default([]) | union([item]) }}"
+      loop: '{{ tagged_vlan_id.split(",")  }}'
+      when: tagged_vlan_id is defined
+
+    - name: Show the list of VLANs to be passed by trunk port
+      debug:
+        msg: '{{ tagged_vlan_list }}'
+      when: tagged_vlan_id is defined
+      
     - name: Update interface with tagged VLAN ID and trunk mode
       netbox_device_interface:
         netbox_url: '{{ url_var }}'
@@ -46,7 +58,7 @@
           device: '{{ interface_device }}'
           name: '{{ interface_name }}'
           mode: '{{ dot1q_mode }}'
-          tagged_vlans:
-            - name: '{{ tagged_vlan_id }}'                      
+          tagged_vlans: '{{ tagged_vlan_list }}'
         state: present
-      when: tagged_vlan_id is defined   
+      when: tagged_vlan_id is defined 
+
