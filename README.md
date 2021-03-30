@@ -49,13 +49,13 @@ site_facility: Hyperscale DC
 site_asn: 8953    # found by trail and error that needs to be integer
 site_time_zone: Europe/Bucharest
 site_description: ORANGE/TGI/OLN/CISS/ITE DC in Romania
-site_physical_address: Blvd Dimitrie Pompeiu 8, Bucharest, 020337
-site_shipping_address: Blvd Dimitrie Pompeiu 8, Bucharest, 020337
-site_latitude: '44.480367'    # found by trail and error the need to ensure  there are no more than 8 digits in total
-site_longitude: '26.117824'    # found by trail and error the need to ensure  there are no more than 9 digits in total
-site_contact_name: Mihai Olteanu
-site_contact_phone:     0040744441242
-site_contact_email: Mihai.Olteanu@orange.com
+site_physical_address: Blvd Dimitrie Pompeiu 8, Bucharest
+site_shipping_address: Blvd Dimitrie Pompeiu 8, Bucharest
+site_latitude: '45.480367'    # found by trail and error the need to ensure  there are no more than 8 digits in total
+site_longitude: '27.117824'    # found by trail and error the need to ensure  there are no more than 9 digits in total
+site_contact_name: Millidge Doig
+site_contact_phone:     0040744444444
+site_contact_email: Millidge.Doig@orange.com
 
 tenant_group_name: IaaS4Telco
 tenant_name: HuaweiContrailcalif    # found by trail and error that does not support underscore, for VRF to be referenced to its name
