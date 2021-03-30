@@ -99,7 +99,7 @@ vrf_tag: oiaas
 #
 ip_addr_address: '192.168.201.24/24'
 ip_addr_vrf: OOB
-ip_addr_tenant: HuaweiContrailcalif
+ip_addr_tenant: Underlay
 ip_addr_status: Reserved
 ip_addr_role: VIP     # the role of the IP address: Loopback, Secondary, Anycast, VIP, VRRP, HSRP, GLBP, CARP
 ip_addr_description: "Mgmt interface"

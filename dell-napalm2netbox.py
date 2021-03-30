@@ -11,13 +11,14 @@
 import xlrd
 import napalm
 import ansible_runner
+import hashlib
 
 sh = xlrd.open_workbook('/home/ubuntu/NEO_Alpha_IaC/NEO_servers_4_NetBox_IaC.xls').sheet_by_index(0)
 hostname = sh.col_values(0, start_rowx=1)       # hostname of device object already in NetBox
 sym_name = sh.col_values(18, start_rowx=1)      # the hostname used in interface descriptions already set for switches and SW hostname returned by NAPALM
 
 driver_dellos = napalm.get_network_driver("dellos10")
-device_list = [["SW-WE19-TOR2-B4-NEO","192.168.70.3"],["SW-WE19-TOR1-B4-NEO","192.168.70.4"]]
+device_list = [["SW-WE19-TOR1-B4-NEO","192.168.70.4"],["SW-WE19-TOR2-B4-NEO","192.168.70.3"]]
 
 network_devices = []
 for device in device_list:
@@ -222,8 +223,8 @@ for device in network_devices:
         else:
             int_mgmt_flag = "False"
 
-        # only for non-mgmt phy interaces:
-        if "null" not in iface and "vlan" not in iface:
+        # only for non-mgmt phy interaces and LAGs different than port-channel1000 (which is always the one for VLT peer-link):
+        if "null" not in iface and "vlan" not in iface and "port-channel1000" not in iface:
             if device_hostname in sym_name:
                 this_end_host = hostname[sym_name.index(device_hostname)]
                 # NetBox: create the interface
@@ -326,6 +327,8 @@ for device in network_devices:
                     if "Bond" in device_interfaces[iface]['description']:   # description Dell_Compute-7_Bond_0
                         # increase the Bond number so that it starts from 1, same as NICs
                         other_end_if = other_end[1] + str(int(other_end[2]) + 1)
+                        # generate a MAC for the Bond, since none is available in fixed var dell_server_25g_nics
+                        dell_server_25g_nics[other_end_host][other_end_if] = "40:A6:B7:00:00:" + str((hashlib.md5(other_end_host.encode())).hexdigest()[0:2])
                     else:
                         other_end_if = other_end[1][0:7]
                         # names of 25G NICs of the PowerEdge servers, collected oob by Ansible, start from NIC1, not NIC0 like in the switch interface descriptions

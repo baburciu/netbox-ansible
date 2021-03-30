@@ -27,7 +27,7 @@
     #     msg: "{{tenant_id.results[0].item.value.id}}"
     #     msg: "{{tenant_id.results[0].item.key | int }}"         
 
-    - name: Create vrf with all information
+    - name: Create VRF with all information
       netbox.netbox.netbox_vrf:
         netbox_url: '{{ url_var }}'
         netbox_token: "{{ token_var }}"
@@ -36,14 +36,13 @@
           rd:  "{{ vrf_rd }}"
           tenant: "{{ tenant_name }}"
           # tenant: "{{tenant_id.results[0].item.value.id | int }}"
-          # tenant: "{{ tenant_name | int }}"
-          # tenant: 3          
+          # tenant: "{{ tenant_name | int }}"       
           description: "{{ vrf_description }}"
           enforce_unique: true   # prevent duplicate prefixes/IP addresses within this VRF, true or false
         state: present   # prevent duplicate prefixes/IP addresses within this VRF, true or false  
       ignore_errors: True            
 
-    - name: Create vrf with all information
+    - name: Assign tag to VRF, when available
       netbox.netbox.netbox_vrf:
         netbox_url: '{{ url_var }}'
         netbox_token: "{{ token_var }}"

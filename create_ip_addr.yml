@@ -1,8 +1,11 @@
 # ======= How to run standalone:
 # boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
-# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_device.yml
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_ip_addr.yml -e 'ip_addr_address="192.168.1.1" ip_addr_tenant="Underlay" ip_addr_status="Active" ip_addr_description="test" ip_addr_interface_name="GE1/0/15" ip_addr_interface_device="SWH-OoB-R1" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.200.23:8001/" token_var="fe08a748abf3eb828203536f35e411fc8fbf8f9c"'
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_ip_addr.yml -e 'ip_addr_vrf="OOB" ip_addr_address="192.168.1.1" ip_addr_tenant="Underlay" ip_addr_status="Active" ip_addr_description="test" ip_addr_interface_name="GE1/0/15" ip_addr_interface_device="SWH-OoB-R1" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.200.23:8001/" token_var="fe08a748abf3eb828203536f35e411fc8fbf8f9c"'
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_ip_addr.yml -e 'ip_addr_role="Anycast" ip_addr_address="192.168.1.1" ip_addr_tenant="Underlay" ip_addr_status="active" ip_addr_description="test" ip_addr_interface_name="GE1/0/15" ip_addr_interface_device="SWH-OoB-R1" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.200.23:8001/" token_var="fe08a748abf3eb828203536f35e411fc8fbf8f9c"'
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_ip_addr.yml -e 'ip_addr_address="192.168.1.1" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.200.23:8001/" token_var="fe08a748abf3eb828203536f35e411fc8fbf8f9c"'
 
-- name: Create device manufacturer, device type, role and assign to a device
+- name: Create IP address
   connection: local
   hosts: docker_netbox_19216820023
   gather_facts: False
@@ -11,19 +14,42 @@
   tasks:
     # - include_vars: external_vars.yml  
 
-    - name: Create IP address with several specified options
+    - name: Create IP address in Global RIB, with several specified options
       netbox_ip_address:
         netbox_url: '{{ url_var }}'
         netbox_token: '{{ token_var }}'
         data:
-          address: '{{ ip_addr_address }}'  
-          vrf: '{{ ip_addr_vrf }}'  
+          address: '{{ ip_addr_address }}'   
           tenant: '{{ ip_addr_tenant }}'  
           status: '{{ ip_addr_status }}'  
-          role: '{{ ip_addr_role }}'  
           description: '{{ ip_addr_description }}'  
           assigned_object:
             name: '{{ ip_addr_interface_name }}'    # must be created prior (different playbook)
             device: '{{ ip_addr_interface_device }}'     # must be created prior (different playbook)
         state: present
-      ignore_errors: True            
+      ignore_errors: True
+      when: ip_addr_vrf is not defined                  
+
+    - name: Create IP address assigned to VRF, when this is defined
+      netbox_ip_address:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          address: '{{ ip_addr_address }}'  
+          vrf: '{{ ip_addr_vrf }}' 
+          tenant: '{{ ip_addr_tenant }}'  
+          status: '{{ ip_addr_status }}'  
+          description: '{{ ip_addr_description }}'  
+          assigned_object:
+            name: '{{ ip_addr_interface_name }}'    # must be created prior (different playbook)
+            device: '{{ ip_addr_interface_device }}'     # must be created prior (different playbook)          
+      when: ip_addr_vrf is defined
+
+    - name: Assign IP address to a role
+      netbox_ip_address:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          address: '{{ ip_addr_address }}'  
+          role: '{{ ip_addr_role }}'  
+      when: ip_addr_role is defined      
