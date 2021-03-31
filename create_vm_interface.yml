@@ -12,7 +12,7 @@
     - include_vars: '{{external_vars}}'   
 
     - name: Create interface for VM
-      netbox_cluster_type:
+      netbox_vm_interface:
         netbox_url: '{{ url_var }}'
         netbox_token: '{{ token_var }}'
         data:
