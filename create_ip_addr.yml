@@ -12,7 +12,7 @@
   collections:
     - netbox.netbox 
   tasks:
-    # - include_vars: external_vars.yml  
+    - include_vars: '{{external_vars}}' 
 
     - name: Create IP address in Global RIB, with several specified options
       netbox_ip_address:

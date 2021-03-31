@@ -21,8 +21,6 @@
           tenant: "{{ tenant_name }}"
           vlan:
             name: "{{ vlan_id }}"
-            # site: "{{ site_name }}"
-            # tenant: "{{ tenant_name }}"
           status: Reserved
           description: "{{ prefix_description }}"
           is_pool: true
