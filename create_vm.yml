@@ -1,0 +1,52 @@
+# ======= How to run standalone:
+# boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_vm.yml -e 'vm_cluster="NEO-LCM" vm_cluster_type="qemu" device_hostname="Dell_Control-3" vm_name="NetBox" vm_vcpu="4" vm_ram="32" vm_disk="54" vm_tenant="NEO KaaS Control" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.200.23:8001/" token_var="fe08a748abf3eb828203536f35e411fc8fbf8f9c"'
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_vm.yml -e 'vm_cluster="NEO-LCM" vm_cluster_type="qemu" device_hostname="Dell_Control-3" vm_name="NetBox" vm_vcpu="4" vm_ram="32" vm_disk="54" vm_tenant="NEO KaaS Control" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.71.75:8000/" token_var="de38a1d961808a33a0271d1149df0da0b41d03d0"'
+
+- name: Create VM (on a server cluster of a certain type)
+  connection: local
+  hosts: docker_netbox_19216820023
+  gather_facts: False
+  collections:
+    - netbox.netbox 
+  tasks:
+    - include_vars: '{{external_vars}}'   
+
+    - name: Create cluster type
+      netbox_cluster_type:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          name: '{{ vm_cluster_type }}'
+        state: present
+
+    - name: Create cluster
+      netbox_cluster:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          name: '{{ vm_cluster }}'
+          cluster_type: '{{ vm_cluster_type }}'
+        state: present
+
+    - name: Update existing device to be part of cluster
+      netbox_device:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          name: '{{ device_hostname }}'  
+          cluster: '{{ vm_cluster }}'
+        state: present
+
+    - name: Create VM with vcpus, memory and disk in a tenant
+      netbox_virtual_machine:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          name: '{{ vm_name }}'
+          cluster: '{{ vm_cluster }}'
+          vcpus: '{{ vm_vcpu }}'  # integer 
+          memory: '{{ vm_ram }}'  # integer MB
+          disk: '{{ vm_disk }}'   # integer GB
+          tenant: '{{ vm_tenant }}'
+        state: present
