@@ -223,17 +223,17 @@ boburciu@WX-5CG020BDT2: /netbox-ansible-automation$  ` for x in ` ls -lX /home/b
 boburciu@WX-5CG020BDT2: /netbox-ansible-automation$ ` ansible-playbook -i ./hosts -v create_device_wMgmtIntIP_inRack_inTenant_inRack_inSite.yml -e "external_vars=/home/boburciu/parse_excel_servers/external_vars_SRX_2.yml" `
 
 ## 3. How to integrate NAPALM with Containerized NetBox, to allow for real-time collecting of facts in NetBox, from its network devices objects, based on [netbox-docker guide](https://github.com/netbox-community/netbox-docker/wiki/NAPALM-Configuration):
-[root@NetboX netbox-docker]# ` vi /root/projects/netbox-docker/env/netbox.env `
-[root@NetboX netbox-docker]# ` cat /root/projects/netbox-docker/env/netbox.env | grep NAPALM `
+[root@NetboX netbox-docker]# ` vi /root/projects/netbox-docker/env/netbox.env ` <br/>
+[root@NetboX netbox-docker]# ` cat /root/projects/netbox-docker/env/netbox.env | grep NAPALM ` <br/>
 ```  
 NAPALM_USERNAME=orangeoln
 NAPALM_PASSWORD=l0c@l@dm1n
 NAPALM_TIMEOUT=10
 [root@NetboX netbox-docker]#
 ```  
-[root@NetboX netbox-docker]# ` pip3 install napalm `
-[root@NetboX netbox-docker]# ` pip3 install napalm-ce `
-[root@NetboX netbox-docker]# ` docker-compose restart `
+[root@NetboX netbox-docker]# ` pip3 install napalm ` <br/>
+[root@NetboX netbox-docker]# ` pip3 install napalm-ce ` <br/>
+[root@NetboX netbox-docker]# ` docker-compose restart ` <br/>
 ```  
 Restarting netbox-docker_nginx_1         ... done
 Restarting netbox-docker_netbox_1        ... done
@@ -273,8 +273,8 @@ exit
 ``` 
 
 ### How to rebuild image from the _netboxcommunity/netbox:latest_ in Docker Hub, while adding napalm-driver in Dockerfile
-[root@NetboX netbox-docker]# ` vi Dockerfile `
-[root@NetboX netbox-docker]# ` diff Dockerfile Dockerfile.bkp `
+[root@NetboX netbox-docker]# ` vi Dockerfile ` <br/>
+[root@NetboX netbox-docker]# ` diff Dockerfile Dockerfile.bkp ` <br/>
 ```
 26d25
 <       napalm-ce \
@@ -285,9 +285,9 @@ exit
 [root@NetboX netbox-docker]#
 
 ```
-[root@NetboX netbox-docker]# ` mkdir .netbox `
-[root@NetboX netbox-docker]# ` touch .netbox/requirements.txt `
-[root@NetboX netbox-docker]# ` cat .netbox/requirements.txt `
+[root@NetboX netbox-docker]# ` mkdir .netbox ` <br/>
+[root@NetboX netbox-docker]# ` touch .netbox/requirements.txt ` <br/>
+[root@NetboX netbox-docker]# ` cat .netbox/requirements.txt ` <br/>
 ```
 napalm==3.2.0
 napalm-ce==0.2.0
@@ -313,9 +313,9 @@ netboxcommunity/netbox   latest        8e452c542927   2 months ago     229MB
 nginx                    1.19-alpine   629df02b47c8   3 months ago     22.3MB
 [root@NetboX netbox-docker]#
 ```
-[root@NetboX netbox-docker]# ` cp docker-compose.yml docker-compose.yml.bkp `
-[root@NetboX netbox-docker]# ` vi docker-compose.yml `
-[root@NetboX netbox-docker]# ` diff docker-compose.yml docker-compose.yml.bkp `
+[root@NetboX netbox-docker]# ` cp docker-compose.yml docker-compose.yml.bkp ` <br/>
+[root@NetboX netbox-docker]# ` vi docker-compose.yml ` <br/>
+[root@NetboX netbox-docker]# ` diff docker-compose.yml docker-compose.yml.bkp ` <br/>
 ```
 4c4
 <     image: netbox:napalm
