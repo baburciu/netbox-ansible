@@ -1,0 +1,21 @@
+# ======= How to run standalone:
+# boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_vm_interface.yml -e 'vm_name="NetBox" vmi_name="vlan276" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.71.75:8000/" token_var="de38a1d961808a33a0271d1149df0da0b41d03d0"'
+
+- name: Create VMI
+  connection: local
+  hosts: docker_netbox_19216820023
+  gather_facts: False
+  collections:
+    - netbox.netbox 
+  tasks:
+    - include_vars: '{{external_vars}}'   
+
+    - name: Create interface for VM
+      netbox_cluster_type:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          virtual_machine: '{{ vm_name }}'
+          name: '{{ vmi_name }}'
+        state: present

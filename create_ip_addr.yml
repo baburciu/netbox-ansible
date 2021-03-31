@@ -5,6 +5,8 @@
 # boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_ip_addr.yml -e 'ip_addr_role="Anycast" ip_addr_address="192.168.1.1" ip_addr_tenant="Underlay" ip_addr_status="active" ip_addr_description="test" ip_addr_interface_name="GE1/0/15" ip_addr_interface_device="SWH-OoB-R1" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.200.23:8001/" token_var="fe08a748abf3eb828203536f35e411fc8fbf8f9c"'
 # boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_ip_addr.yml -e 'ip_addr_address="192.168.1.1" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.200.23:8001/" token_var="fe08a748abf3eb828203536f35e411fc8fbf8f9c"'
 
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_ip_addr.yml -e 'ip_addr_address="192.168.71.69/24" ip_addr_tenant="Underlay" ip_addr_status="Active" ip_addr_description="test VMI adress" ip_addr_interface_name="vlan276" ip_addr_interface_vm="Nexus_ONAP" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.71.75:8000/" token_var="de38a1d961808a33a0271d1149df0da0b41d03d0"'
+
 - name: Create IP address
   connection: local
   hosts: docker_netbox_19216820023
@@ -14,7 +16,7 @@
   tasks:
     - include_vars: '{{external_vars}}' 
 
-    - name: Create IP address in Global RIB, with several specified options
+    - name: Create device IP address in Global RIB, with several specified options
       netbox_ip_address:
         netbox_url: '{{ url_var }}'
         netbox_token: '{{ token_var }}'
@@ -28,9 +30,9 @@
             device: '{{ ip_addr_interface_device }}'     # must be created prior (different playbook)
         state: present
       ignore_errors: True
-      when: ip_addr_vrf is not defined                  
+      when: ip_addr_vrf is not defined and ip_addr_interface_device is defined                 
 
-    - name: Create IP address assigned to VRF, when this is defined
+    - name: Create device IP address assigned to VRF, when this is defined
       netbox_ip_address:
         netbox_url: '{{ url_var }}'
         netbox_token: '{{ token_var }}'
@@ -43,7 +45,38 @@
           assigned_object:
             name: '{{ ip_addr_interface_name }}'    # must be created prior (different playbook)
             device: '{{ ip_addr_interface_device }}'     # must be created prior (different playbook)          
-      when: ip_addr_vrf is defined
+      when: ip_addr_vrf is defined and ip_addr_interface_device is defined
+
+    - name: Create VM IP address in Global RIB, with several specified options
+      netbox_ip_address:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          address: '{{ ip_addr_address }}'   
+          tenant: '{{ ip_addr_tenant }}'  
+          status: '{{ ip_addr_status }}'  
+          description: '{{ ip_addr_description }}'  
+          assigned_object:
+            name: '{{ ip_addr_interface_name }}'    # must be created prior (different playbook)
+            virtual_machine: '{{ ip_addr_interface_vm }}'     # must be created prior (different playbook)
+        state: present
+      ignore_errors: True
+      when: ip_addr_vrf is not defined and ip_addr_interface_vm is defined                 
+
+    - name: Create VM IP address assigned to VRF, when this is defined
+      netbox_ip_address:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          address: '{{ ip_addr_address }}'  
+          vrf: '{{ ip_addr_vrf }}' 
+          tenant: '{{ ip_addr_tenant }}'  
+          status: '{{ ip_addr_status }}'  
+          description: '{{ ip_addr_description }}'  
+          assigned_object:
+            name: '{{ ip_addr_interface_name }}'    # must be created prior (different playbook)
+            virtual_machine: '{{ ip_addr_interface_vm }}'     # must be created prior (different playbook)          
+      when: ip_addr_vrf is defined and ip_addr_interface_vm is defined
 
     - name: Assign IP address to a role
       netbox_ip_address:

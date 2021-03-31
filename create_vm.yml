@@ -1,7 +1,7 @@
 # ======= How to run standalone:
 # boburciu@WX-5CG020BDT2: ~$ cd ~/netbox-ansible-automation
-# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_vm.yml -e 'vm_cluster="NEO-LCM" vm_cluster_type="qemu" device_hostname="Dell_Control-3" vm_name="NetBox" vm_vcpu="4" vm_ram="32" vm_disk="54" vm_tenant="NEO KaaS Control" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.200.23:8001/" token_var="fe08a748abf3eb828203536f35e411fc8fbf8f9c"'
-# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_vm.yml -e 'vm_cluster="NEO-LCM" vm_cluster_type="qemu" device_hostname="Dell_Control-3" vm_name="NetBox" vm_vcpu="4" vm_ram="32" vm_disk="54" vm_tenant="NEO KaaS Control" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.71.75:8000/" token_var="de38a1d961808a33a0271d1149df0da0b41d03d0"'
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_vm.yml -e 'vm_cluster="NEO-LCM" vm_cluster_type="qemu" vm_host="Dell_Control-3" vm_name="NetBox" vm_vcpu="4" vm_ram="32" vm_disk="54" vm_tenant="NEO KaaS Control" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.200.23:8001/" token_var="fe08a748abf3eb828203536f35e411fc8fbf8f9c"'
+# boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ansible-playbook -i ./hosts -v create_vm.yml -e 'vm_cluster="NEO-LCM" vm_cluster_type="qemu" vm_host="Dell_Control-3" vm_name="NetBox" vm_vcpu="4" vm_ram="32" vm_disk="54" vm_tenant="NEO KaaS Control" external_vars="./external_vars.yml" ansible_python_interpreter="/usr/bin/python3" url_var="http://192.168.71.75:8000/" token_var="de38a1d961808a33a0271d1149df0da0b41d03d0"'
 
 - name: Create VM (on a server cluster of a certain type)
   connection: local
@@ -34,7 +34,7 @@
         netbox_url: '{{ url_var }}'
         netbox_token: '{{ token_var }}'
         data:
-          name: '{{ device_hostname }}'  
+          name: '{{ vm_host }}'  
           cluster: '{{ vm_cluster }}'
         state: present
 

@@ -19,6 +19,11 @@ assigned_tenant = sh.col_values(5, start_rowx=1)
 prefix = sh.col_values(6, start_rowx=1)
 prefix_description = sh.col_values(7, start_rowx=1)
 assigned_device_vlans_mac = sh.col_values(8, start_rowx=1)
+vm_host = sh.col_values(9, start_rowx=1)
+vm_vcpu = sh.col_values(10, start_rowx=1)
+vm_ram = sh.col_values(11, start_rowx=1)
+vm_disk = sh.col_values(12, start_rowx=1)
+vm_tenant = sh.col_values(13, start_rowx=1)
 
 for i in range(len(ip_addr)):
     if "nope" not in prefix[i]:
@@ -33,6 +38,18 @@ for i in range(len(ip_addr)):
                                           'external_vars': './external_vars.yml',
                                           'ansible_python_interpreter': '/usr/bin/python3'})
 
+    if "nope" not in vm_host[i]:
+        # NetBox: create the VM
+        print(f"******* Now we'll create NetBox VM object {assigned_device[i]}, hosted by {vm_host[i]}")
+        r = ansible_runner.run(private_data_dir='/home/ubuntu/netbox-ansible/',
+                               playbook='create_vm.yml',
+                               inventory='/home/ubuntu/netbox-ansible/hosts.yml',
+                               extravars={'vm_cluster_type': 'libvirt', 'vm_cluster': vm_host[i],
+                                          'vm_host': vm_host[i], 'vm_name': assigned_device[i],
+                                          'vm_vcpu': int(vm_vcpu[i]), 'vm_ram': int(vm_ram[i]),
+                                          'vm_disk': int(vm_disk[i]), 'vm_tenant': vm_tenant[i],
+                                          'external_vars': './external_vars.yml',
+                                          'ansible_python_interpreter': '/usr/bin/python3'})
 
     if "vlan" in assigned_interface[i]:
         int_type = "Virtual"
