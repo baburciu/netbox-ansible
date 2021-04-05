@@ -169,7 +169,9 @@ boburciu@WX-5CG020BDT2: /netbox-ansible-automation$ ` ansible-playbook -i ./host
 ![Netbox ](./images/rack_image.PNG)
 
 
-## 3. To configure data-plane interfaces of phy device, we can use NAPALM py library to connect to NOS devices (ToR switches) and parse live their configuration and using _ansible-runner_ py library, call Ansible playbooks to update devices (with LAG ID, trunk/access mode, VLANs) by a py3 script - in dir __NAPALM/__
+## 3. Add phy interfaces
+
+### To configure data-plane interfaces of phy device, we can use NAPALM py library to connect to NOS devices (ToR switches) and parse live their configuration and using _ansible-runner_ py library, call Ansible playbooks to update devices (with LAG ID, trunk/access mode, VLANs) by a py3 script - in dir __NAPALM/__
 
 boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` ls -lt NAPALM/ `
 ``` 
@@ -181,7 +183,9 @@ total 68
 boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$
 ``` 
 
-## 4. To configure VMs and IP prefixes and addresses for virtual interfaces (VM interfaces and VLANifs), we can use the py3 script getting input from an .xls file - in dir __IPplan/__
+## 4. Add VMs and IP plan
+
+### To configure VMs and IP prefixes and addresses for virtual interfaces (VM interfaces and VLANifs), we can use the py3 script getting input from an .xls file - in dir __IPplan/__
 boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` ls -lt IPplan/ `
 ```
 total 380
