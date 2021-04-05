@@ -18,7 +18,7 @@ hostname = sh.col_values(0, start_rowx=1)       # hostname of device object alre
 sym_name = sh.col_values(18, start_rowx=1)      # the hostname used in interface descriptions already set for switches and SW hostname returned by NAPALM
 
 driver_dellos = napalm.get_network_driver("dellos10")
-device_list = [["SW-WE19-TOR1-B4-NEO","192.168.70.4"],["SW-WE19-TOR2-B4-NEO","192.168.70.3"]]
+device_list = [["SW-WE19-TOR1-B4-NEO","192.168.X.4"],["SW-WE19-TOR2-B4-NEO","192.168.X.3"]]
 
 network_devices = []
 for device in device_list:
@@ -26,7 +26,7 @@ for device in device_list:
         driver_dellos(
             hostname=device[1],
             username="admin",
-            password="admin"
+            password="secrete_here"
         )
     )
 
@@ -405,7 +405,7 @@ for device in network_devices:
 ### How to get the list of VLANs from the "show running-configuration | grep vlan | grep interface" output in Dell OS10:
 # >>> import napalm
 # >>> driver=napalm.get_network_driver("dellos10")
-# >>> device=driver(hostname="192.168.70.4", username="admin", password="admin")
+# >>> device=driver(hostname="192.168.X.4", username="admin", password="admin")
 # >>> device.open()
 # >>> cmd = "show running-configuration | grep vlan | grep interface"
 # >>> cfg = device.cli([cmd])[cmd]

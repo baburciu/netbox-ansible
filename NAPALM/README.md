@@ -61,7 +61,7 @@ Automate all the things!!!
 
  ### - We'll use NAPALM [community driver for the Huawei CloudEngine Switch] (https://github.com/napalm-automation-community/napalm-ce):
  (napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` pip3 install napalm-ce `
- (napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` napalm --user orangeoln --password l0c@l@dm1n --vendor ce 192.168.201.24  call get_interfaces `
+ (napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` napalm --user orangeoln --password secret_here --vendor ce 192.168.X.Y  call get_interfaces `
 ``` 
 {
     "10GE1/0/1": {
@@ -116,7 +116,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 ```
 >>> ` import napalm `
 >>> ` driver=napalm.get_network_driver("ce") `
->>> ` device=driver(hostname="192.168.201.24", username="orangeoln", password="l0c@l@dm1n") `
+>>> ` device=driver(hostname="192.168.X.Y", username="orangeoln", password="secret_here") `
 >>> ` device.open() `
 >>> ` device.get_facts() `
 ```
@@ -161,10 +161,10 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>>
 ```
  ### - Using (with methods from [doc](https://ansible-runner.readthedocs.io/en/latest/source/ansible_runner.html#ansible_runner.runner_config.RunnerConfig))
->>> ` import ansible_runner `
+>>> ` import ansible_runner `  <br/>
 
  ### - Playbook path is relative to _private_data_dir_ value
->>> ` ansible_runner.utils.isinventory('/home/boburciu/netbox-ansible-automation/hosts.yml') `
+>>> ` ansible_runner.utils.isinventory('/home/boburciu/netbox-ansible-automation/hosts.yml') `  <br/>
 ```
 True
 >>>
@@ -258,8 +258,10 @@ docker_netbox_19216820023  : ok=2    changed=1    unreachable=0    failed=0    s
 
 ## 3. Using [Mitogen for Ansible](https://mitogen.networkgenomics.com/ansible_detailed.html) to decrease Ansible execution time is currently supported only for Ansible 2.9:
 
-boburciu@WX-5CG020BDT2:~$ ` python3 -m venv envs/ansible2.9 `
-boburciu@WX-5CG020BDT2:~$ ` source envs/ansible2.9/bin/activate `
+boburciu@WX-5CG020BDT2:~$ ` python3 -m venv envs/ansible2.9 ` <br/>
+
+boburciu@WX-5CG020BDT2:~$ ` source envs/ansible2.9/bin/activate ` <br/>
+```
 (ansible2.9) boburciu@WX-5CG020BDT2:~$ ansible --version
 ansible 2.10.3
   config file = /etc/ansible/ansible.cfg
@@ -268,7 +270,8 @@ ansible 2.10.3
   executable location = /home/boburciu/.local/bin/ansible
   python version = 3.6.9 (default, Jan 26 2021, 15:33:00) [GCC 8.4.0]
 (ansible2.9) boburciu@WX-5CG020BDT2:~$
-(ansible2.9) boburciu@WX-5CG020BDT2:~$ ` pip install --upgrade pip `
+```
+(ansible2.9) boburciu@WX-5CG020BDT2:~$ ` pip install --upgrade pip ` <br/>
 Cache entry deserialization failed, entry ignored
 Collecting pip
   Using cached https://files.pythonhosted.org/packages/fe/ef/60d7ba03b5c442309ef42e7d69959f73aacccd0d86008362a681c4698e83/pip-21.0.1-py3-none-any.whl
@@ -277,13 +280,13 @@ Installing collected packages: pip
     Uninstalling pip-9.0.1:
       Successfully uninstalled pip-9.0.1
 Successfully installed pip-21.0.1
-(ansible2.9) boburciu@WX-5CG020BDT2:~$ ` pip3 install ansible==2.9.19rc1 `
+(ansible2.9) boburciu@WX-5CG020BDT2:~$ ` pip3 install ansible==2.9.19rc1 ` <br/>
 Collecting ansible==2.9.19rc1
   Using cached ansible-2.9.19rc1.tar.gz (14.3 MB)
 
 
  ### - To measure execution time for Ansible one needs to add ` callback_whitelist = profile_tasks ` in ` [default] ` section in your _ansible.cfg_:
-```
+```bash
 boburciu@WX-5CG020BDT2:~$ cat /etc/ansible/ansible.cfg -n | grep callback_whitelist
     83  #callback_whitelist = timer, mail
 boburciu@WX-5CG020BDT2:~$ vi +83 /etc/ansible/ansible.cfg
@@ -297,7 +300,7 @@ boburciu@WX-5CG020BDT2:~$
 ```
 
  ### - Download and extract _mitogen-0.2.9.tar.gz_
-```
+```bash
  boburciu@WX-5CG020BDT2:~$ mv /mnt/c/Users/bogdan.burciu/Downloads/mitogen-0.2.9.tar.gz .
 boburciu@WX-5CG020BDT2:~$ ls -lt
 total 288
@@ -333,8 +336,9 @@ __init__.py             mitogen_free.py         mitogen_linear.py
 mitogen.py              mitogen_host_pinned.py
 boburciu@WX-5CG020BDT2:~$
 ```
+
  ### - Modify _ansible.cfg_ params for _strategy_plugins_ and _strategy_ to *mitogen_linear*:
-```
+```bash
 [defaults]
 strategy_plugins = /path/to/mitogen-0.2.9/ansible_mitogen/plugins/strategy
 strategy = mitogen_linear

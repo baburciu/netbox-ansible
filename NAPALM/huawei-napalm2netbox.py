@@ -17,17 +17,17 @@ hostname = sh.col_values(0, start_rowx=2)       # hostname of device object alre
 sym_name = sh.col_values(25, start_rowx=2)      # the hostname used in interface descriptions already set for Huawei switches
 
 driver_vrp = napalm.get_network_driver("ce")
-# device_list = [["SWH-TOR-R1","192.168.201.24"],["SWH-TOR-R2","192.168.201.25"],
-#                ["SWH-OoB-R1","192.168.201.23"],["SWH-OoB-R2","192.168.201.27"]]
-device_list = [["SWH-OoB-R1","192.168.201.23"],["SWH-OoB-R2","192.168.201.27"]] # <= just for T-Shoot
+# device_list = [["SWH-TOR-R1","192.168.Y.24"],["SWH-TOR-R2","192.168.Y.25"],
+#                ["SWH-OoB-R1","192.168.Y.23"],["SWH-OoB-R2","192.168.Y.27"]]
+device_list = [["SWH-OoB-R1","192.168.Y.23"],["SWH-OoB-R2","192.168.Y.27"]] # <= just for T-Shoot
 
 network_devices = []
 for device in device_list:
     network_devices.append(
         driver_vrp(
             hostname=device[1],
-            username="orangeoln",
-            password="l0c@l@dm1n"
+            username="user",
+            password="secret_here"
         )
     )
 

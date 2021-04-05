@@ -1,6 +1,6 @@
 import napalm
 driver=napalm.get_network_driver("dellos10")
-device=driver(hostname="192.168.70.4", username="admin", password="admin")
+device=driver(hostname="192.168.70.4", username="admin", password="secret_here")
 device.open()
 cmd = "show running-configuration | grep vlan | grep interface"
 vlancfg = device.cli([cmd])[cmd]
@@ -17,7 +17,7 @@ ifcfg = device.cli([cmd])[cmd]
 -------------------
 import napalm
 driver=napalm.get_network_driver("ce")
-device=driver(hostname="192.168.201.24", username="orangeoln", password="l0c@l@dm1n")
+device=driver(hostname="192.168.201.24", username="orangeoln", password="secret_here")
 device.open()
 cmd = "display current-configuration interface 10GE1/0/1"
 ifcfg = device.cli([cmd])[cmd]

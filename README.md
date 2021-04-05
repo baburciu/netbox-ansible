@@ -1,4 +1,5 @@
 # netbox-ansible  [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fbogdanadrian-burciu%2Fnetbox-ansible&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=views+%28today+%2F+total%29&edge_flat=false)](https://hits.seeyoufarm.com)
+
 ## Ansible playbooks usage for Netbox automation, based on [Galaxy collection](https://docs.ansible.com/ansible/latest/collections/netbox/netbox/).
 [![Inline docs](http://inch-ci.org/github/bogdanadrian-burciu/netbox-ansible.svg?branch=master)](http://inch-ci.org/github/bogdanadrian-burciu/netbox-ansible)
 ## 0. How to install Ansible Galaxy collection to correct path:
@@ -18,8 +19,10 @@ boburciu@WX-5CG020BDT2:~$
 ``` 
 boburciu@WX-5CG020BDT2:~$ ` ansible-galaxy collection install netbox.netbox --collections-path ~/.ansible/collections ` _# installing the collection of roles in proper location_
 
-## 1. How the NetBox objects are expressed as IaC:
 
+## 1. How the NetBox objects are expressed as IaC, using the py script in dir _IaC_ to create phy devices with mgmt IP, mgmt interface, rack position, site and more
+
+### Each device is expressed in terms of some extra-vars sent to Ansible playbooks as input:
 boburciu@WX-5CG020BDT2: $  `cd ~/netbox-ansible-automation`  <br/>
 boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ `cat external_vars.yml ` <br/>
 ```# external_vars.yml to be used in playbooks called in order by import_playbook
@@ -129,13 +132,12 @@ ip_addr_description: Mgmt interface
 ip_addr_interface_name: ' '
 ip_addr_interface_device: ' '
 ```
+
+### Taking info from an .xls file, the py script creates and populates yaml files with the values of a template overriten
 boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` python3 IaC/xls2iac.py `
 
-### Results in Netbox WebUI > Racks page:
-![Netbox ](./images/rack_image.PNG)
 
-
-## 2. How to add all physical appliances with management IPs:
+## 2. How to add all physical appliances with management IPs
 
 boburciu@WX-5CG020BDT2: /netbox-ansible-automation$ ` cd ../parse_excel_servers/; python3 xls2iac.py; cd ../netbox-ansible-automation/ ` <br/>
 boburciu@WX-5CG020BDT2: /netbox-ansible-automation$ ` ls -lt ~/parse_excel_servers/ | grep external_vars_ ` <br/>
@@ -147,7 +149,7 @@ boburciu@WX-5CG020BDT2: /netbox-ansible-automation$ ` ls -lt ~/parse_excel_serve
 :
 boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$
 ```
-### Add in NetBox calling external_vars.yml files as extra-var:
+### Add in NetBox, by calling external_vars.yml files as extra-var:
 boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` for i in `ls -lt ~/parse_excel_servers/ | grep external_vars_ | awk '{print $9}'`; do echo ""; echo ""; echo "***** running playbook for variables in $i *****"; echo ""; echo ""; echo ""; ansible-playbook -i ./hosts create_device_wMgmtIntIP_inRack_inTenant_inRack_inSite.yml -e "external_vars='../parse_excel_servers/$i' -v"; done `  <br/>
 
 ### To add only part of IaC list:
@@ -163,8 +165,13 @@ boburciu@WX-5CG020BDT2: /netbox-ansible-automation$  ` for x in ` ls -lX /home/b
 #### add specific phyisical device in NetBox with mgmt IP address:
 boburciu@WX-5CG020BDT2: /netbox-ansible-automation$ ` ansible-playbook -i ./hosts -v create_device_wMgmtIntIP_inRack_inTenant_inRack_inSite.yml -e "external_vars=/home/boburciu/parse_excel_servers/external_vars_******.yml" `
 
+### Results in Netbox WebUI > Racks page:
+![Netbox ](./images/rack_image.PNG)
 
-## 3. How to integrate NAPALM with Containerized NetBox, to allow for real-time collecting of facts in NetBox, from its network devices objects, based on [netbox-docker guide](https://github.com/netbox-community/netbox-docker/wiki/NAPALM-Configuration):
+
+## 3. How to integrate NAPALM with Containerized NetBox, to allow for real-time collecting of facts in NetBox, from its network devices objects, based on [netbox-docker guide](https://github.com/netbox-community/netbox-docker/wiki/NAPALM-Configuration)
+
+### How to configure the NetBox with credentials for the Network OS devices it will NAPALM calls to:
 [root@NetboX netbox-docker]# ` vi /root/projects/netbox-docker/env/netbox.env ` <br/>
 [root@NetboX netbox-docker]# ` cat /root/projects/netbox-docker/env/netbox.env | grep NAPALM ` <br/>
 ```  
@@ -186,7 +193,14 @@ Restarting netbox-docker_redis_1         ... done
 [root@NetboX netbox-docker]#
 ``` 
 
-### How to check if a NAPALM driver is installed in NetBox
+### How to assign NAPALM driver to a NetBox device:
+
+#### 1. Create a platform where the driver section is filled with "junos" for the default Juniper NAPALM driver or "ce" for the _napalm-ce_ driver for Huawei devices
+
+#### 2. Edit device and assign platform
+
+
+### How to check if a NAPALM driver is installed in NetBox:
 [root@NetboX netbox-docker]# ` docker-compose run --rm --entrypoint /bin/bash netbox `
 ``` 
 Creating netbox-docker_netbox_run ... done
@@ -214,7 +228,7 @@ exit
 [root@NetboX netbox-docker]#
 ``` 
 
-### How to rebuild image from the _netboxcommunity/netbox:latest_ in Docker Hub, while adding napalm-driver in Dockerfile
+### How to rebuild image from the _netboxcommunity/netbox:latest_ in Docker Hub, while adding napalm-driver in Dockerfile:
 [root@NetboX netbox-docker]# ` vi Dockerfile ` <br/>
 [root@NetboX netbox-docker]# ` diff Dockerfile Dockerfile.bkp ` <br/>
 ```
@@ -308,9 +322,9 @@ e541d6a00f8e   netbox:napalm        "/opt/netbox/docker-…"   3 minutes ago   U
 [root@NetboX netbox-docker]#
 ```
 
-## 4. How to backup the PostgreSQL database of NetBox and the uploaded files (like images) and to restore, per [netbox-docker official wiki](https://github.com/netbox-community/netbox-docker/wiki/Troubleshooting#database-operations):
+## 4. How to backup the PostgreSQL database of NetBox and the uploaded files (like images) and to restore, per [netbox-docker official wiki](https://github.com/netbox-community/netbox-docker/wiki/Troubleshooting#database-operations)
 
-### DB Operations
+### DB Operations:
 
 Access the database:
 
@@ -334,7 +348,7 @@ docker-compose stop netbox netbox-worker
 gunzip -c db_dump.sql.gz | docker-compose exec -T postgres sh -c 'psql -U $POSTGRES_USER $POSTGRES_DB'
 ```
 
-### File Operations
+### File Operations:
 
 Backup of the _media_ directory, which contains uploaded images.
 
