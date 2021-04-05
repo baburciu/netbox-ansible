@@ -1,0 +1,106 @@
+# external_vars.yml to be used in playbooks called in order by import_playbook
+
+url_var: http://192.168.200.23:8001/
+token_var: ***********************
+
+## ======== variables used for NetBox WebUI Organization tab objects ======== ##
+tag_name: ' '   
+tag_description: ' '   
+tag_color: FFA500  # RGB color in hexadecimal, use https://htmlcolorcodes.com/
+#
+region_name: ' '   
+#
+site_name: ' '   
+site_status: Planned
+site_region: EMEA
+site_facility: Hyperscale DC
+site_asn: ' '       # found by trial and error that needs to be integer
+site_time_zone: ' '   
+site_description: ' '   
+site_physical_address: ' '   
+site_shipping_address: ' '   
+site_latitude: ' '    # found by trial and error the need to ensure  there are no more than 8 digits in total  
+site_longitude: ' '   # found by trial and error the need to ensure  there are no more than 9 digits in total  
+site_contact_name: ' '   
+site_contact_phone: ' '   
+site_contact_email: ' '   
+#
+tenant_group_name: ' '   
+tenant_name: ' '                    # found by trial and error that does not support underscore, for VRF to be referenced to its name
+tenant_description: ' '
+# tenant_comments: "SDN backend"
+tenant_tag: oiaas
+#
+rack_group_name: ' '    
+rack_site: ' '   
+rack_role_name: Hyperscale infra
+rack_role_color: DF2E08
+rack_name: ' '
+rack_desc_units: no   # rack units will be numbered top-to-bottom, yes or no
+rack_outer_unit: Millimeters   # whether the rack unit is in Millimeters or Inches and is required if outer_width/outer_depth is specified
+rack_outer_width: 605   # per https://www.ibm.com/support/pages/overview-ibm-42u-and-47u-1200-mm-deep-static-and-deep-dynamic-rack
+rack_outer_depth: 1200
+rack_type: 4-post cabinet    # Choices: 2-post frame, 4-post frame, 4-post cabinet, Wall-mounted frame, Wall-mounted cabinet
+rack_u_height: 42
+rack_width: 23     # the rail-to-rail width, choices: 10, 19, 21, 23
+rack_serial: 00000000
+rack_facility_id: ' '            # found by trial and error that fields group & facility_id must make a unique set for a rack
+rack_comments: ' '
+
+
+##  ======== variables used for NetBox WebUI Devices tab objects ======== ##
+device_manufacturer_name: ' '
+device_model: ' '
+device_part_number: ' '
+device_u_height: ' '  # found by trial and error that it needs to be 0 if parent type is "child"
+device_is_full_depth: no    # whether or not the device consumes both front and rear rack faces, yer or no
+device_subdevice_role: ' '      # whether the device type is parent (which has device bays), child (which must be installed within a device bay), or neither
+device_hw_set_id: ' '          # just a tag for the set of hardware params above; found by trial and error that it should not be part of model of manufacturer, i.e. CE6851 is not accepted 
+#
+device_role_name: ' '
+device_role_color: ' '
+#
+device_hostname: ' '
+device_site: ' '   
+device_face: front    # front/rear, found by trial and error that needs not be used if parent type is "child"
+device_primary_ip4: ' '
+device_serial: ' '
+device_rack_name: ' '
+device_position_in_rack: ' '   # found by trial and error that needs not be used if parent type is "child"
+device_tenant: ' '
+device_comments: ' '
+device_tag: ' '   
+#
+device_bay_chassis: Chassis1    # device the device bay will be associated to. The device type must be "parent".
+device_bay_slot: 1
+device_bay_blade: ' ' # device that will be installed into the bay. The device type must be "child" and 0U
+#
+interface_device: ' '
+interface_name: ' '
+interface_mac_address: ' '   
+interface_enabled: true
+interface_type: 1000BASE-T
+interface_mtu: 1500
+interface_mgmt_only: yes      # interface is used only for out-of-band management, yes or no
+interface_description: Mgmt interface
+#
+cable_end_a_host: SWH-OoB-R2
+cable_end_a_if: GE1/0/1
+cable_end_b_host: ' '   
+cable_end_b_if: iBMC
+cable_type: mmf-om4
+
+##  ======== variables used for NetBox WebUI IPAM tab objects ======== ##
+vrf_name: OOB
+vrf_rd: ' '   
+vrf_description: OOB for underlay switches and firewalls and IPMI network of servers
+vrf_tag: oiaas
+#
+ip_addr_address: ' '
+ip_addr_vrf: OOB
+ip_addr_tenant: ' '
+ip_addr_status: Reserved
+ip_addr_role: VIP     # the role of the IP address: Loopback, Secondary, Anycast, VIP, VRRP, HSRP, GLBP, CARP
+ip_addr_description: Mgmt interface
+ip_addr_interface_name: ' '
+ip_addr_interface_device: ' '
