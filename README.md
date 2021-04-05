@@ -134,7 +134,18 @@ ip_addr_interface_device: ' '
 ```
 
 ### Taking info from an .xls file, the py script creates and populates yaml files with the values of a template overriten
-boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` python3 IaC/xls2iac.py `
+
+boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` python3 IaC/xls2iac.py ` 
+
+boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` ls -lt IaC/ `
+```
+total 28
+-rw-rw-rw- 1 boburciu boburciu 10253 Apr  5 21:08 'Physical appliances 4 IaC.xlsx'
+-rw-rw-rw- 1 boburciu boburciu  4077 Feb 10 18:44  xls2iac.py
+-rwxrw-rw- 1 boburciu boburciu  4238 Feb 10 10:31  run_ansible_optimized.sh
+-rwxrw-rw- 1 boburciu boburciu  1576 Feb  8 21:22  get_iac_unique_var.sh
+boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$
+```
 
 
 ## 2. How to add all physical appliances with management IPs
@@ -151,6 +162,9 @@ boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$
 ```
 ### Add in NetBox, by calling external_vars.yml files as extra-var:
 boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` for i in `ls -lt ~/parse_excel_servers/ | grep external_vars_ | awk '{print $9}'`; do echo ""; echo ""; echo "***** running playbook for variables in $i *****"; echo ""; echo ""; echo ""; ansible-playbook -i ./hosts create_device_wMgmtIntIP_inRack_inTenant_inRack_inSite.yml -e "external_vars='../parse_excel_servers/$i' -v"; done `  <br/>
+
+### Or use a bash script to optimize Ansible creation:
+` ./IaC/run_ansible_optimized.sh -d ~/parse_excel_servers/ `
 
 ### To add only part of IaC list:
 #### range of devices:
