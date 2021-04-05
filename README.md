@@ -169,7 +169,28 @@ boburciu@WX-5CG020BDT2: /netbox-ansible-automation$ ` ansible-playbook -i ./host
 ![Netbox ](./images/rack_image.PNG)
 
 
-## 3. How to integrate NAPALM with Containerized NetBox, to allow for real-time collecting of facts in NetBox, from its network devices objects, based on [netbox-docker guide](https://github.com/netbox-community/netbox-docker/wiki/NAPALM-Configuration)
+## 3. To configure data-plane interfaces of phy device, we can use NAPALM py library to connect to NOS devices (ToR switches) and parse live their configuration and using _ansible-runner_ py library, call Ansible playbooks to update devices (with LAG ID, trunk/access mode, VLANs) by a py3 script - in dir __NAPALM/__
+
+boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` ls -lt NAPALM/ `
+``` 
+total 68
+-rw-rw-rw- 1 boburciu boburciu  3542 Apr  5 21:27 napalm_calls_4_py_shell.py
+-rw-rw-rw- 1 boburciu boburciu 20291 Apr  5 21:26 huawei-napalm2netbox.py
+-rw-rw-rw- 1 boburciu boburciu 23519 Apr  5 21:25 dell-napalm2netbox.py
+-rwxrwxrwx 1 boburciu boburciu 20395 Apr  5 21:23 README.md
+boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$
+``` 
+
+## 4. To configure VMs and IP prefixes and addresses for virtual interfaces (VM interfaces and VLANifs), we can use the py3 script getting input from an .xls file - in dir __IPplan/__
+boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` ls -lt IPplan/ `
+```
+total 380
+-rw-rw-rw- 1 boburciu boburciu   9552 Apr  5 21:51 ip-plan2netbox.py
+-rw-rw-rw- 1 boburciu boburciu 376320 Apr  5 21:47 IP_plan_4_NetBox.xls
+boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$
+```
+
+## 5. How to integrate NAPALM with Containerized NetBox, to allow for real-time collecting of facts in NetBox, from its network devices objects, based on [netbox-docker guide](https://github.com/netbox-community/netbox-docker/wiki/NAPALM-Configuration)
 
 ### How to configure the NetBox with credentials for the Network OS devices it will NAPALM calls to:
 [root@NetboX netbox-docker]# ` vi /root/projects/netbox-docker/env/netbox.env ` <br/>
