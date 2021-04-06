@@ -18,10 +18,10 @@ boburciu@WX-5CG020BDT2:~$ ` source envs/napalm-huawei/bin/activate `
 (napalm-huawei) boburciu@WX-5CG020BDT2:~$
 ```
 
- ### - Install Napalm:
-(napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` pip install --upgrade pip `
-(napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` pip3 install napalm `
-(napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` napalm --help `
+ ### - Install Napalm: 
+(napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` pip install --upgrade pip ` <br/>
+(napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` pip3 install napalm ` <br/>
+(napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` napalm --help ` <br/>
 ```
 usage: napalm [-h] [--user USER] [--password PASSWORD] --vendor VENDOR
               [--optional_args OPTIONAL_ARGS] [--debug]
@@ -60,8 +60,8 @@ Automate all the things!!!
  ### - new Napalm drivers will be hosted under the [napalm-automation-community](https://github.com/napalm-automation-community) on GitHub
 
  ### - We'll use NAPALM [community driver for the Huawei CloudEngine Switch] (https://github.com/napalm-automation-community/napalm-ce):
- (napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` pip3 install napalm-ce `
- (napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` napalm --user orangeoln --password secret_here --vendor ce 192.168.X.Y  call get_interfaces `
+ (napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` pip3 install napalm-ce ` <br/>
+ (napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` napalm --user orangeoln --password secret_here --vendor ce 192.168.X.Y  call get_interfaces ` <br/>
 ``` 
 {
     "10GE1/0/1": {
@@ -114,11 +114,11 @@ Python 3.6.9 (default, Jan 26 2021, 15:33:00)
 [GCC 8.4.0] on linux
 Type "help", "copyright", "credits" or "license" for more information.
 ```
->>> ` import napalm `
->>> ` driver=napalm.get_network_driver("ce") `
->>> ` device=driver(hostname="192.168.X.Y", username="orangeoln", password="secret_here") `
->>> ` device.open() `
->>> ` device.get_facts() `
+>>> ` import napalm ` <br/>
+>>> ` driver=napalm.get_network_driver("ce") ` <br/>
+>>> ` device=driver(hostname="192.168.X.Y", username="orangeoln", password="secret_here") ` <br/>
+>>> ` device.open() ` <br/>
+>>> ` device.get_facts() ` <br/>
 ```
 {'uptime': 17780100, 'vendor': 'Huawei', 'os_version': 'V200R002C50SPC800', 'serial_number': 'C                                      E6851HI', 'model': 'CE6851-48S6Q-HI', 'hostname': 'SWH-TOR-R1', 'fqdn': 'Unknown', 'interface_l                                      ist': ['10GE1/0/1', '10GE1/0/2', '10GE1/0/3', '10GE1/0/4', '10GE1/0/5', '10GE1/0/6', '10GE1/0/7                                      ', '10GE1/0/8', '10GE1/0/9', '10GE1/0/10', '10GE1/0/11', '10GE1/0/12', '10GE1/0/13', '10GE1/0/1                                      5', '10GE1/0/16', '10GE1/0/17', '10GE1/0/18', '10GE1/0/19', '10GE1/0/20', '10GE1/0/21', '10GE1/                                      0/22', '10GE1/0/23', '10GE1/0/24', '10GE1/0/25', '10GE1/0/27', '10GE1/0/28', '10GE1/0/30', '10G                                      E1/0/31', '10GE1/0/34', '10GE1/0/35', '10GE1/0/36', '10GE1/0/39', '10GE1/0/43', '10GE1/0/44', '                                      10GE1/0/45', '10GE1/0/46', '10GE2/0/1', '10GE2/0/2', '10GE2/0/3', '10GE2/0/4', '10GE2/0/5', '10                                      GE2/0/6', '10GE2/0/7', '10GE2/0/8', '10GE2/0/9', '10GE2/0/10', '10GE2/0/11', '10GE2/0/12', '10G                                      E2/0/13', '10GE2/0/15', '10GE2/0/16', '10GE2/0/17', '10GE2/0/18', '10GE2/0/19', '10GE2/0/20', '                                      10GE2/0/21', '10GE2/0/22', '10GE2/0/23', '10GE2/0/24', '10GE2/0/25', '10GE2/0/27', '10GE2/0/28'                                      , '10GE2/0/30', '10GE2/0/31', '10GE2/0/34', '10GE2/0/35', '10GE2/0/36', '10GE2/0/39', '10GE2/0/                                      40', '10GE2/0/43', '10GE2/0/44', '10GE2/0/45', '10GE2/0/46', '40GE1/0/4', '40GE1/0/5', '40GE1/0                                      /6', '40GE2/0/4', '40GE2/0/5', '40GE2/0/6', 'Eth-Trunk1', '10GE1/0/41', '10GE1/0/42', '10GE2/0/                                      41', '10GE2/0/42', 'Eth-Trunk2', '10GE1/0/47', '10GE1/0/48', '10GE2/0/47', '10GE2/0/48', 'Eth-T                                      runk3', 'Eth-Trunk4', 'Eth-Trunk7', 'Eth-Trunk10', 'Eth-Trunk13', 'Eth-Trunk14', '10GE1/0/14',                                       '10GE2/0/14', 'Eth-Trunk16', 'Eth-Trunk19', 'Eth-Trunk22', 'Eth-Trunk25', 'Eth-Trunk26', '10GE1                                      /0/26', '10GE2/0/26', 'Eth-Trunk27', 'Eth-Trunk28', 'Eth-Trunk29', '10GE1/0/29', '10GE2/0/29',                                       'Eth-Trunk30', 'Eth-Trunk31', 'Eth-Trunk32', '10GE1/0/32', '10GE2/0/32', 'Eth-Trunk33', '10GE1/                                      0/33', '10GE2/0/33', 'Eth-Trunk34', 'Eth-Trunk37', '10GE1/0/37', '10GE2/0/37', 'Eth-Trunk38', '                                      10GE1/0/38', '10GE2/0/38', 'Eth-Trunk40', '40GE1/0/3', '40GE2/0/3', 'Eth-Trunk44', '10GE1/0/40'                                      , 'Eth-Trunk101', 'MEth0/0/0', 'NULL0', 'Stack-Port1/1', '40GE1/0/1', '40GE1/0/2', 'Stack-Port2                                      /1', '40GE2/0/1', '40GE2/0/2', 'Vlanif5', 'Vlanif8', 'Vlanif1100', 'Vlanif1400', 'Vlanif4001']}
 >>>
@@ -130,12 +130,9 @@ Type "help", "copyright", "credits" or "license" for more information.
 'SWH-TOR-R1'
 >>>
 ```
->>> ` ifs = device.get_interfaces() `
-```
->>>
-```
->>> ` for int in ifs.keys(): `
-... `    print(f"{int} <=> {ifs[int]['description']} <=> {ifs[int]['mtu']}") `
+>>> ` ifs = device.get_interfaces() `  <br/>
+>>> ` for int in ifs.keys(): `  <br/>
+... `    print(f"{int} <=> {ifs[int]['description']} <=> {ifs[int]['mtu']}") `  <br/>
 ```
 10GE1/0/1 <=> link_to_Server_R1_01_eth0 <=> 9216
 10GE1/0/2 <=> link_to_Server_R1_01_eth2 <=> 9216
