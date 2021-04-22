@@ -50,3 +50,13 @@
           disk: '{{ vm_disk }}'   # integer GB
           tenant: '{{ vm_tenant }}'
         state: present
+
+    - name: Update VM with mgmt interface primary IP address
+      netbox_virtual_machine:
+        netbox_url: '{{ url_var }}'
+        netbox_token: '{{ token_var }}'
+        data:
+          name:  '{{ vm_name }}'
+          primary_ip4: '{{ vm_primary_ip4 }}'   # must be created prior (different playbook), so we'll ignore errors as long it is not
+      ignore_errors: True
+      when: vm_primary_ip4 is defined
