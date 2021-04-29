@@ -3,7 +3,7 @@
 
 last_name=(BURCIU	BURCIU)
 first_name=(Bogdan	Bogdan)	
-mail=(Bogdan.Burciu@orange.com	Bogdan.Burciu@orange.com)
+mail=(Bogdan.Burciu@company.com	Bogdan.Burciu@company.com)
 
 for i in "${!last_name[@]}"; do
     ln=${last_name[$i]}
