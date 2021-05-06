@@ -361,7 +361,7 @@ e541d6a00f8e   netbox:napalm        "/opt/netbox/docker-…"   3 minutes ago   U
 [root@NetboX netbox-docker]#
 ```
 
-## 4. How to backup the PostgreSQL database of NetBox and the uploaded files (like images) and to restore, per [netbox-docker official wiki](https://github.com/netbox-community/netbox-docker/wiki/Troubleshooting#database-operations)
+## 6. How to backup the PostgreSQL database of NetBox and the uploaded files (like images) and to restore, per [netbox-docker official wiki](https://github.com/netbox-community/netbox-docker/wiki/Troubleshooting#database-operations)
 
 ### DB Operations:
 
@@ -403,4 +403,64 @@ Restore of the _media_ directory:
 docker-compose exec -T netbox tar x -jvf - -C /opt/netbox/netbox/media < media-backup.tar.bz2 
 ```
 
+## 7. How to get NetBox access over HTTPS, by placing a Reverse-Proxy in front of it, like [Caddy](https://hub.docker.com/_/caddy?tab=description), per [netbox-docker guide](https://github.com/netbox-community/netbox-docker/wiki/TLS)
 
+### create a server certificate (like from Vault PKI) with SANs: DNS Name=netbox.dnszone, IP Address=192.168.x.x, IP Address=127.0.0.1
+ubuntu@netbox-vm:~/vault$ ` sudo mv vault_netbox_key_1.key ../netbox-docker/vault_netbox_key_ipsan.key ` <br/>
+ubuntu@netbox-vm:~/vault$ ` sudo mv vault_netbox_cert_1.crt ../netbox-docker/vault_netbox_cert_ipsan.crt ` <br/>
+
+### configure the [Caddy](https://hub.docker.com/_/caddy?tab=description) Reverse Proxy
+ubuntu@netbox-vm:~/netbox-docker$ ` cat Caddyfile `
+```
+# ./Caddyfile
+{
+        default_sni 192.168.x.x       # will use this IP as TLS SNI for all ClientHello s that come without one (like when IP address is used in URL instead of hostname); Caddy needs to see SNI, otherwise it returns TLS Alert
+}
+
+ netbox.dnszone, localhost, 192.168.x.x, 127.0.0.1 {
+    reverse_proxy netbox:8080
+    encode gzip zstd
+    file_server
+    tls /etc/ssl/private/cert_ipsan.crt /etc/ssl/private/key_ipsan.key
+    # or:
+    # tls /etc/ssl/private/cert.pem
+
+    log {
+      level error
+    }
+}
+```
+ubuntu@netbox-vm:~/netbox-docker$ ` cat docker-compose.override.yml `
+```
+services:
+  tls:
+    image: caddy:2-alpine
+    depends_on:
+      - netbox
+    volumes:
+      - /home/ubuntu/netbox-docker/vault_netbox_cert_ipsan.crt:/etc/ssl/private/cert_ipsan.crt:ro,z
+      - /home/ubuntu/netbox-docker/vault_netbox_key_ipsan.key:/etc/ssl/private/key_ipsan.key:ro,z
+      - /home/ubuntu/netbox-docker/Caddyfile:/etc/caddy/Caddyfile:ro
+    ports:
+      - 80:80   # Allows for http redirection
+      - 443:443
+```
+ubuntu@netbox-vm:~/netbox-docker$ ` sudo docker-compose down ` <br/>
+ubuntu@netbox-vm:~/netbox-docker$ ` sudo docker-compose up& ` <br/>
+
+### to troubleshoot check Caddy RP container logs:
+ubuntu@netbox-vm:~/netbox-docker$ ` sudo docker-compose logs tls `
+```
+Attaching to netbox-docker_tls_1
+:
+tls_1            | {"level":"info","ts":1620325857.0710692,"logger":"http","msg":"skipping automatic certificate management because one or more matching certificates are already loaded","domain":"netbox.dnszone","server_name":"srv0"}
+tls_1            | {"level":"info","ts":1620325857.0712597,"logger":"http","msg":"skipping automatic certificate management because one or more matching certificates are already loaded","domain":"192.168.x.x","server_name":"srv0"}
+tls_1            | {"level":"info","ts":1620325857.0714242,"logger":"http","msg":"skipping automatic certificate management because one or more matching certificates are already loaded","domain":"127.0.0.1","server_name":"srv0"}
+tls_1            | {"level":"info","ts":1620325857.0714638,"logger":"http","msg":"enabling automatic HTTP->HTTPS redirects","server_name":"srv0"}
+:
+ubuntu@netbox-vm:~/netbox-docker$
+```
+
+### how to connect to NetBox (with HTTP to HTTPS forwarding):
+   #### open SSH tunnel and forward 192.168.x.x:443 to localhost:xyz (` ssh -i ~/.ssh/id_rsa user@bastion -L xyz:192.168.x.x:443`), then use https://localhost:xyz/ or https://127.0.0.1:xyz/ in browser
+   #### OR open dynamic SOCKS5 tunnel (` ssh -i ~/.ssh/id_rsa user@bastion -D zyx `) and set SOCKS5 proxy 127.0.0.1:zyx and pass DNS through it in browser (Mozilla Firefox), then use https://netbox.tooling.neo/ or https://192.168.x.x/ in browser
