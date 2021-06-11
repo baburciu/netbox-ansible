@@ -13,7 +13,7 @@ import ruamel.yaml
 import xlrd
 import hashlib
 
-sh = xlrd.open_workbook('/home/boburciu/parse_excel_servers/Feper_servers_25-11-2020_plus.xls').sheet_by_index(0)
+sh = xlrd.open_workbook('/home/boburciu/parse_excel_servers/Physical appliances 4 IaC.xls').sheet_by_index(0)
 hostname = sh.col_values(0, start_rowx=2)
 oob_ip = sh.col_values(1, start_rowx=2)
 sn = sh.col_values(2, start_rowx=2)
