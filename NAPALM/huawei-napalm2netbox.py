@@ -12,7 +12,7 @@ import xlrd
 import napalm
 import ansible_runner
 
-sh = xlrd.open_workbook('/home/boburciu/netbox-ansible-automation/Feper_servers_4_NetBox_IaC.xls').sheet_by_index(0)
+sh = xlrd.open_workbook('/home/boburciu/netbox-ansible-automation/Physical appliances 4 IaC.xls').sheet_by_index(0)
 hostname = sh.col_values(0, start_rowx=2)       # hostname of device object already in NetBox
 sym_name = sh.col_values(25, start_rowx=2)      # the hostname used in interface descriptions already set for Huawei switches
 
