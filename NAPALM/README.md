@@ -359,6 +359,8 @@ boburciu@Ubuntu1804-WSL$
 ```
 
 
+
+
 ## [Napalm] usage example - configuring descriptions on Juniper JunOS QFX device:
 boburciu@Ubuntu1804-WSL$ ` cd ~/NAPALM/junos/ `
 ```
