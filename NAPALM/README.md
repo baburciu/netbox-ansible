@@ -1,27 +1,26 @@
-# Using [Napalm](https://napalm.readthedocs.io/en/latest/index.html) to collect info from Huawei CE switches and NE router, following [this article](https://codingnetworks.blog/napalm-network-automation-python-working-with-huawei-vrp/) and using Ansible-Runner to run Ansible playbooks directly from Python
+## Using [Napalm](https://napalm.readthedocs.io/en/latest/index.html) to collect info from Huawei CE switches and NE router, following [this article](https://codingnetworks.blog/napalm-network-automation-python-working-with-huawei-vrp/) and using Ansible-Runner to run Ansible playbooks directly from Python
 
-## 0. First steps:
+### 0. First steps:
 
- ### - Install Python3 venv (on Ubuntu):
-boburciu@WX-5CG020BDT2:~$ ` sudo apt-get install python3-venv `
-   
- ### - Creating Python venv: 
-boburciu@WX-5CG020BDT2:~$ ` python3 -m venv envs/napalm-huawei `
+ #### - Install Python3 venv (on Ubuntu):
+boburciu@Ubuntu1804-WSL$ ` sudo apt-get install python3-venv `
+
+ #### - Creating Python venv: 
+boburciu@Ubuntu1804-WSL$ ` python3 -m venv envs/napalm-huawei `
 ```
-boburciu@WX-5CG020BDT2:~$ ls -lt
+boburciu@Ubuntu1804-WSL$ ls -lt
 total 0
 drwxr-xr-x. 3 root root 20 Mar  3 15:34 envs
 ```
-boburciu@WX-5CG020BDT2:~$ ` source envs/napalm-huawei/bin/activate `
+boburciu@Ubuntu1804-WSL$ ` source envs/napalm-huawei/bin/activate `
 ```
-(napalm-huawei) boburciu@WX-5CG020BDT2:~$
-(napalm-huawei) boburciu@WX-5CG020BDT2:~$
+(napalm-huawei) boburciu@Ubuntu1804-WSL$
 ```
 
- ### - Install Napalm: 
-(napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` pip install --upgrade pip ` <br/>
-(napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` pip3 install napalm ` <br/>
-(napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` napalm --help ` <br/>
+ #### - Install Napalm: 
+(napalm-huawei) boburciu@Ubuntu1804-WSL$ ` pip install --upgrade pip ` <br/>
+(napalm-huawei) boburciu@Ubuntu1804-WSL$ ` pip3 install napalm ` <br/>
+(napalm-huawei) boburciu@Ubuntu1804-WSL$ ` napalm --help ` <br/>
 ```
 usage: napalm [-h] [--user USER] [--password PASSWORD] --vendor VENDOR
               [--optional_args OPTIONAL_ARGS] [--debug]
@@ -54,14 +53,14 @@ actions:
     validate            Validate configuration/state
 
 Automate all the things!!!
-(napalm-huawei) boburciu@WX-5CG020BDT2:~$
+(napalm-huawei) boburciu@Ubuntu1804-WSL$
 ```
 
- ### - new Napalm drivers will be hosted under the [napalm-automation-community](https://github.com/napalm-automation-community) on GitHub
+ #### - New Napalm drivers will be hosted under the [napalm-automation-community](https://github.com/napalm-automation-community) on GitHub
 
- ### - We'll use NAPALM [community driver for the Huawei CloudEngine Switch] (https://github.com/napalm-automation-community/napalm-ce):
- (napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` pip3 install napalm-ce ` <br/>
- (napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` napalm --user orangeoln --password secret_here --vendor ce 192.168.X.Y  call get_interfaces ` <br/>
+ #### - We'll use NAPALM [community driver for the Huawei CloudEngine Switch] (https://github.com/napalm-automation-community/napalm-ce):
+ (napalm-huawei) boburciu@Ubuntu1804-WSL$ ` pip3 install napalm-ce ` <br/>
+ (napalm-huawei) boburciu@Ubuntu1804-WSL$ ` napalm --user orangeoln --password secret_here --vendor ce 192.168.X.Y  call get_interfaces ` <br/>
 ``` 
 {
     "10GE1/0/1": {
@@ -104,11 +103,11 @@ Automate all the things!!!
         "mtu": 1500
     }
 }
-(napalm-huawei) boburciu@WX-5CG020BDT2:~$
+(napalm-huawei) boburciu@Ubuntu1804-WSL$
 ```
 
 ## 1. Using NAPALM Python library in python3 shell:
- (napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` python3 `
+ (napalm-huawei) boburciu@Ubuntu1804-WSL$ ` python3 `
 ``` 
 Python 3.6.9 (default, Jan 26 2021, 15:33:00)
 [GCC 8.4.0] on linux
@@ -143,24 +142,24 @@ Type "help", "copyright", "credits" or "license" for more information.
 10GE1/0/7 <=> link_to_Server_R1_03_eth0 <=> 9216
 ```
 
-## 2. Using Ansible-Runner to call Ansible playbook in Py script:
- ### - Installing
-(napalm-huawei) boburciu@WX-5CG020BDT2:~$ ` pip3 install ansible-runner `
+### 2. Using Ansible-Runner to call Ansible playbook in Py script:
+ #### - Installing
+(napalm-huawei) boburciu@Ubuntu1804-WSL$ ` pip3 install ansible-runner `
 ```
-(napalm-huawei) boburciu@WX-5CG020BDT2:~$ pwd
+(napalm-huawei) boburciu@Ubuntu1804-WSL$ pwd
 /home/boburciu
-(napalm-huawei) boburciu@WX-5CG020BDT2:~$
+(napalm-huawei) boburciu@Ubuntu1804-WSL$
 
-boburciu@WX-5CG020BDT2:~$ python3
+boburciu@Ubuntu1804-WSL$ python3
 Python 3.6.9 (default, Jan 26 2021, 15:33:00)
 [GCC 8.4.0] on linux
 Type "help", "copyright", "credits" or "license" for more information.
 >>>
 ```
- ### - Using (with methods from [doc](https://ansible-runner.readthedocs.io/en/latest/source/ansible_runner.html#ansible_runner.runner_config.RunnerConfig))
+ #### - Using (with methods from [doc](https://ansible-runner.readthedocs.io/en/latest/source/ansible_runner.html#ansible_runner.runner_config.RunnerConfig))
 >>> ` import ansible_runner `  <br/>
 
- ### - Playbook path is relative to _private_data_dir_ value
+ #### - Playbook path is relative to _private_data_dir_ value
 >>> ` ansible_runner.utils.isinventory('/home/boburciu/netbox-ansible-automation/hosts.yml') `  <br/>
 ```
 True
@@ -180,8 +179,8 @@ docker_netbox_19216820023  : ok=1    changed=0    unreachable=0    failed=0    s
 >>>
 ```
 
- ### - Per [Ansible Runner doc](https://ansible-runner.readthedocs.io/en/latest/source/ansible_runner.html#ansible_runner.runner_config.RunnerConfig), you can either send a dict to _extravars_ param of _ansible_runner.run()_ method or have the extra-var key:value pairs in _env/extravars_ in _private_data_dir_
-boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` cat env/extravars `
+ #### - Per [Ansible Runner doc](https://ansible-runner.readthedocs.io/en/latest/source/ansible_runner.html#ansible_runner.runner_config.RunnerConfig), you can either send a dict to _extravars_ param of _ansible_runner.run()_ method or have the extra-var key:value pairs in _env/extravars_ in _private_data_dir_
+boburciu@Ubuntu1804-WSL/netbox-ansible-automation$ ` cat env/extravars `
 ```
 #"/home/boburciu/netbox-ansible-automation/external_vars.yml"
 url_var: "http://192.168.200.23:8001/"
@@ -191,9 +190,9 @@ vrf_rd: 65001:92063
 vrf_description: "Test for underlay switches and firewalls and IPMI network of servers"
 vrf_tag: oiaas
 tenant_name: Underlay
-boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ pwd
+boburciu@Ubuntu1804-WSL/netbox-ansible-automation$ pwd
 /home/boburciu/netbox-ansible-automation
-boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$
+boburciu@Ubuntu1804-WSL/netbox-ansible-automation$
 ```
 >>> ` r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/', playbook='create_vrf.yml', inventory='/home/boburciu/netbox-ansible-automation/hosts.yml') `
 ```
@@ -210,7 +209,7 @@ docker_netbox_19216820023  : ok=1    changed=1    unreachable=0    failed=0    s
 ![Netbox change](./images/vrf_by_ansiblerunner.PNG)
 
 
- ### - Need to send all extra-var params as dictionary elements in _extravars_ argument of the _ansible_runner.run()_ method and also have _env/extravars_ in _private_data_dir_ formatted as dictionary (the 'external_vars':'./external_vars.yml' is not sent to playbook import, don't know why)
+ #### - Need to send all extra-var params as dictionary elements in _extravars_ argument of the _ansible_runner.run()_ method and also have _env/extravars_ in _private_data_dir_ formatted as dictionary (the 'external_vars':'./external_vars.yml' is not sent to playbook import, don't know why)
 >>> ` r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/', playbook='create_vrf.yml', inventory='/home/boburciu/netbox-ansible-automation/hosts.yml', extravars={'vrf_name': 'ByAnsibleRunner-inlineArg', 'vrf_rd': '65001:92065', 'vrf_description': 'Test', 'vrf_tag': 'oiaas', 'tenant_name': 'Underlay', 'external_vars':'./external_vars.yml'}) `
 ```
 PLAY [Create VRF] **************************************************************
@@ -224,7 +223,7 @@ docker_netbox_19216820023  : ok=1    changed=1    unreachable=0    failed=0    s
 >>>
 ```
 
- ### - Call to create interface in NetBox, running playbook from Py shell:
+ #### - Call to create interface in NetBox, running playbook from Py shell:
 >>> ` r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/', playbook='create_interface.yml', inventory='/home/boburciu/netbox-ansible-automation/hosts.yml', extravars={'interface_device':'SWH-OoB-R2', 'interface_name':'GE1/0/1', 'interface_mac_address':'48:F8:DB:D4:AB:11', 'interface_enabled':'yes', 'interface_type': "1000BASE-T", 'interface_mtu': 9216, 'interface_mgmt_only': 'false', 'interface_description':'link_to_Server_R2_01_mgmt','external_vars':'./external_vars.yml'}) `
 ```
 PLAY [Create interface] ********************************************************
@@ -241,7 +240,7 @@ docker_netbox_19216820023  : ok=2    changed=1    unreachable=0    failed=0    s
 >>>
 ```
 
- ### - Call to create cable connection in NetBox, running playbook from Py shell (with verbosity level):
+ #### - Call to create cable connection in NetBox, running playbook from Py shell (with verbosity level):
 >>> ` r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/', playbook='create_cable.yml', inventory='/home/boburciu/netbox-ansible-automation/hosts.yml', extravars={'cable_end_a_host':'SWH-OoB-R2', 'cable_end_a_if': 'GE1/0/1', 'cable_end_b_host': '2288H_V5_2102311XBSN0JA000034', 'cable_end_b_if': 'iBMC', 'cable_type':'mmf-om3', 'external_vars':'./external_vars.yml'}, verbosity=1) `
 ```
 TASK [Create cable connection] *************************************************
@@ -253,22 +252,22 @@ docker_netbox_19216820023  : ok=2    changed=1    unreachable=0    failed=0    s
 >>>
 ```
 
-## 3. Using [Mitogen for Ansible](https://mitogen.networkgenomics.com/ansible_detailed.html) to decrease Ansible execution time is currently supported only for Ansible 2.9:
+### 3. Using [Mitogen for Ansible](https://mitogen.networkgenomics.com/ansible_detailed.html) to decrease Ansible execution time is currently supported only for Ansible 2.9:
 
-boburciu@WX-5CG020BDT2:~$ ` python3 -m venv envs/ansible2.9 ` <br/>
+boburciu@Ubuntu1804-WSL$ ` python3 -m venv envs/ansible2.9 ` <br/>
 
-boburciu@WX-5CG020BDT2:~$ ` source envs/ansible2.9/bin/activate ` <br/>
+boburciu@Ubuntu1804-WSL$ ` source envs/ansible2.9/bin/activate ` <br/>
 ```
-(ansible2.9) boburciu@WX-5CG020BDT2:~$ ansible --version
+(ansible2.9) boburciu@Ubuntu1804-WSL$ ansible --version
 ansible 2.10.3
   config file = /etc/ansible/ansible.cfg
   configured module search path = ['/home/boburciu/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
   ansible python module location = /home/boburciu/.local/lib/python3.6/site-packages/ansible
   executable location = /home/boburciu/.local/bin/ansible
   python version = 3.6.9 (default, Jan 26 2021, 15:33:00) [GCC 8.4.0]
-(ansible2.9) boburciu@WX-5CG020BDT2:~$
+(ansible2.9) boburciu@Ubuntu1804-WSL$
 ```
-(ansible2.9) boburciu@WX-5CG020BDT2:~$ ` pip install --upgrade pip ` <br/>
+(ansible2.9) boburciu@Ubuntu1804-WSL$ ` pip install --upgrade pip ` <br/>
 Cache entry deserialization failed, entry ignored
 Collecting pip
   Using cached https://files.pythonhosted.org/packages/fe/ef/60d7ba03b5c442309ef42e7d69959f73aacccd0d86008362a681c4698e83/pip-21.0.1-py3-none-any.whl
@@ -277,29 +276,29 @@ Installing collected packages: pip
     Uninstalling pip-9.0.1:
       Successfully uninstalled pip-9.0.1
 Successfully installed pip-21.0.1
-(ansible2.9) boburciu@WX-5CG020BDT2:~$ ` pip3 install ansible==2.9.19rc1 ` <br/>
+(ansible2.9) boburciu@Ubuntu1804-WSL$ ` pip3 install ansible==2.9.19rc1 ` <br/>
 Collecting ansible==2.9.19rc1
   Using cached ansible-2.9.19rc1.tar.gz (14.3 MB)
 
 
- ### - To measure execution time for Ansible one needs to add ` callback_whitelist = profile_tasks ` in ` [default] ` section in your _ansible.cfg_:
+ #### - To measure execution time for Ansible one needs to add ` callback_whitelist = profile_tasks ` in ` [default] ` section in your _ansible.cfg_:
 ```bash
-boburciu@WX-5CG020BDT2:~$ cat /etc/ansible/ansible.cfg -n | grep callback_whitelist
+boburciu@Ubuntu1804-WSL$ cat /etc/ansible/ansible.cfg -n | grep callback_whitelist
     83  #callback_whitelist = timer, mail
-boburciu@WX-5CG020BDT2:~$ vi +83 /etc/ansible/ansible.cfg
-boburciu@WX-5CG020BDT2:~$
-boburciu@WX-5CG020BDT2:~$ sudo vi +83 /etc/ansible/ansible.cfg
+boburciu@Ubuntu1804-WSL$ vi +83 /etc/ansible/ansible.cfg
+boburciu@Ubuntu1804-WSL$
+boburciu@Ubuntu1804-WSL$ sudo vi +83 /etc/ansible/ansible.cfg
 [sudo] password for boburciu:
-boburciu@WX-5CG020BDT2:~$ cat /etc/ansible/ansible.cfg -n | grep callback_whitelist
+boburciu@Ubuntu1804-WSL$ cat /etc/ansible/ansible.cfg -n | grep callback_whitelist
     83  #callback_whitelist = timer, mail
     84  callback_whitelist = ansible.posix.profile_tasks
-boburciu@WX-5CG020BDT2:~$
+boburciu@Ubuntu1804-WSL$
 ```
 
- ### - Download and extract _mitogen-0.2.9.tar.gz_
+ #### - Download and extract _mitogen-0.2.9.tar.gz_
 ```bash
- boburciu@WX-5CG020BDT2:~$ mv /mnt/c/Users/bogdan.burciu/Downloads/mitogen-0.2.9.tar.gz .
-boburciu@WX-5CG020BDT2:~$ ls -lt
+ boburciu@Ubuntu1804-WSL$ mv /mnt/c/Users/bogdan.burciu/Downloads/mitogen-0.2.9.tar.gz .
+boburciu@Ubuntu1804-WSL$ ls -lt
 total 288
 -rwxrwxrwx 1 boburciu boburciu 210868 Mar 11 15:55 mitogen-0.2.9.tar.gz
 drwxrwxrwx 1 boburciu boburciu   4096 Mar 11 13:41 netbox-ansible-automation
@@ -312,8 +311,8 @@ drwxrwxrwx 1 boburciu boburciu   4096 Feb 10 18:28 parse_excel_servers
 drwxrwxrwx 1 boburciu boburciu   4096 Feb  6 13:25 dell-ansible-automation
 drwxrwxrwx 1 boburciu boburciu   4096 Aug 26  2020 bin
 -rw-rw-rw- 1 boburciu boburciu      0 Aug 25  2020 set
-boburciu@WX-5CG020BDT2:~$ tar -xf mitogen-0.2.9.tar.gz
-boburciu@WX-5CG020BDT2:~$ ls -lt
+boburciu@Ubuntu1804-WSL$ tar -xf mitogen-0.2.9.tar.gz
+boburciu@Ubuntu1804-WSL$ ls -lt
 total 288
 -rwxrwxrwx 1 boburciu boburciu 210868 Mar 11 15:55 mitogen-0.2.9.tar.gz
 drwxrwxrwx 1 boburciu boburciu   4096 Mar 11 13:41 netbox-ansible-automation
@@ -327,36 +326,124 @@ drwxrwxrwx 1 boburciu boburciu   4096 Feb  6 13:25 dell-ansible-automation
 drwxrwxrwx 1 boburciu boburciu   4096 Aug 26  2020 bin
 -rw-rw-rw- 1 boburciu boburciu      0 Aug 25  2020 set
 drwxr-xr-x 1 boburciu boburciu   4096 Nov  2  2019 mitogen-0.2.9
-boburciu@WX-5CG020BDT2:~$ 
-boburciu@WX-5CG020BDT2:~$ cat mitogen-0.2.9/ansible_mitogen/plugins/strategy/
+boburciu@Ubuntu1804-WSL$ 
+boburciu@Ubuntu1804-WSL$ cat mitogen-0.2.9/ansible_mitogen/plugins/strategy/
 __init__.py             mitogen_free.py         mitogen_linear.py
 mitogen.py              mitogen_host_pinned.py
-boburciu@WX-5CG020BDT2:~$
+boburciu@Ubuntu1804-WSL$
 ```
 
- ### - Modify _ansible.cfg_ params for _strategy_plugins_ and _strategy_ to *mitogen_linear*:
+ #### - Modify _ansible.cfg_ params for _strategy_plugins_ and _strategy_ to *mitogen_linear*:
 ```bash
 [defaults]
 strategy_plugins = /path/to/mitogen-0.2.9/ansible_mitogen/plugins/strategy
 strategy = mitogen_linear
 ```
 ```
-boburciu@WX-5CG020BDT2:~$
-boburciu@WX-5CG020BDT2:~$ cat /etc/ansible/ansible.cfg -n | grep strategy_plugins
+boburciu@Ubuntu1804-WSL$
+boburciu@Ubuntu1804-WSL$ cat /etc/ansible/ansible.cfg -n | grep strategy_plugins
    203  #strategy_plugins   = /usr/share/ansible/plugins/strategy
-boburciu@WX-5CG020BDT2:~$
-boburciu@WX-5CG020BDT2:~$ cat /etc/ansible/ansible.cfg -n | grep strategy
+boburciu@Ubuntu1804-WSL$
+boburciu@Ubuntu1804-WSL$ cat /etc/ansible/ansible.cfg -n | grep strategy
    203  #strategy_plugins   = /usr/share/ansible/plugins/strategy
    206  # by default, ansible will use the 'linear' strategy but you may want to try
    208  #strategy = free
-boburciu@WX-5CG020BDT2:~$
-boburciu@WX-5CG020BDT2:~$ sudo vi +203 /etc/ansible/ansible.cfg
+boburciu@Ubuntu1804-WSL$
+boburciu@Ubuntu1804-WSL$ sudo vi +203 /etc/ansible/ansible.cfg
 [sudo] password for boburciu:
-boburciu@WX-5CG020BDT2:~$ 
-boburciu@WX-5CG020BDT2:~$ sed -n 203p /etc/ansible/ansible.cfg
+boburciu@Ubuntu1804-WSL$ 
+boburciu@Ubuntu1804-WSL$ sed -n 203p /etc/ansible/ansible.cfg
 strategy_plugins   = ~/mitogen-0.2.9/ansible_mitogen/plugins/strategy
-boburciu@WX-5CG020BDT2:~$
-boburciu@WX-5CG020BDT2:~$ sed -n 208p /etc/ansible/ansible.cfg
+boburciu@Ubuntu1804-WSL$
+boburciu@Ubuntu1804-WSL$ sed -n 208p /etc/ansible/ansible.cfg
 strategy = mitogen_linear
-boburciu@WX-5CG020BDT2:~$
+boburciu@Ubuntu1804-WSL$
+```
+
+
+### 4. NAPALM usage example - configuring descriptions on Juniper JunOS QFX device:
+boburciu@Ubuntu1804-WSL$ ` cd ~/NAPALM/junos/ `
+```
+boburciu@Ubuntu1804-WSL/NAPALM/junos$ ls -lt
+total 0
+-rw-rw-rw- 1 boburciu boburciu   92 Jun 14 14:52 junos.cfg
+drwxrwxrwx 1 boburciu boburciu 4096 Jun 14 10:49 envs
+boburciu@Ubuntu1804-WSL/NAPALM/junos$
+boburciu@Ubuntu1804-WSL/NAPALM/junos$ cat junos.cfg
+set interfaces ge-0/0/0 description TESTING-1
+set interfaces ge-0/0/1 description TESTING-2
+boburciu@Ubuntu1804-WSL/NAPALM/junos$
+```
+boburciu@Ubuntu1804-WSL/NAPALM/junos$ ` python3 -m venv envs/napalm-junos `
+boburciu@Ubuntu1804-WSL/NAPALM/junos$ ` source envs/napalm-junos/bin/activate `
+(napalm-junos) boburciu@Ubuntu1804-WSL/NAPALM/junos$ ` napalm --user root --password secret_here --vendor junos X.X.X.X call get_interfaces `
+```
+{
+    "ge-0/0/0": {
+        "is_up": true,
+        "is_enabled": true,
+        "description": "",
+        "last_flapped": 1627199.0,
+        "mac_address": "AC:78:D1:B4:22:E4",
+        "speed": 1000,
+        "mtu": 1514
+    },
+:
+:	
+    "lo0.16385": {
+        "is_up": true,
+        "is_enabled": true,
+        "description": "",
+        "last_flapped": -1.0,
+        "mac_address": "None",
+        "speed": -1,
+        "mtu": 0
+    }
+}
+```
+(napalm-junos) boburciu@Ubuntu1804-WSL/NAPALM/junos$ ` python3 `
+```
+Python 3.6.9 (default, Jan 26 2021, 15:33:00)
+[GCC 8.4.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import napalm
+>>> driver=napalm.get_network_driver("junos")
+>>> device=driver(hostname="172.27.53.10", username="root", password="Ose12345!")
+>>> device.open()
+>>> cmd = "show system uptime"
+>>> output = device.cli([cmd])[cmd]
+>>> print(output)
+
+localre:
+--------------------------------------------------------------------------
+Current time: 2021-06-14 19:41:52 UTC
+Time Source:  LOCAL CLOCK
+System booted: 2021-05-26 18:50:22 UTC (2w5d 00:51 ago)
+Protocols started: 2021-05-26 18:51:42 UTC (2w5d 00:50 ago)
+Last configured: 2021-06-10 19:54:00 UTC (3d 23:47 ago) by root
+ 7:41PM  up 19 days, 52 mins, 5 users, load averages: 0.19, 0.23, 0.20
+
+>>>
+```
+```
+>>> import napalm
+>>> driver=napalm.get_network_driver("junos")
+>>> device=driver(hostname="172.27.53.10", username="root", password="Ose12345!")
+>>> device.open()
+>>>
+>>> with open('/home/boburciu/NAPALM/junos/junos.cfg','r') as f:
+...   print(f.read())
+...
+set interfaces ge-0/0/0 description TESTING-1
+set interfaces ge-0/0/1 description TESTING-2
+
+>>>
+>>> device.load_merge_candidate(filename='/home/boburciu/NAPALM/junos/junos.cfg')
+>>> print(device.compare_config())
+[edit interfaces ge-0/0/0]
++   description TESTING-1;
+[edit interfaces ge-0/0/1]
++   description TESTING-2;
+>>>
+>>> device.commit_config() # or device.discard_config() if changes are not fine
 ```
