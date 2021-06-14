@@ -106,7 +106,7 @@ Automate all the things!!!
 (napalm-huawei) boburciu@Ubuntu1804-WSL$
 ```
 
-## 1. Using NAPALM Python library in python3 shell:
+### 1. Using NAPALM Python library in python3 shell:
  (napalm-huawei) boburciu@Ubuntu1804-WSL$ ` python3 `
 ``` 
 Python 3.6.9 (default, Jan 26 2021, 15:33:00)
@@ -206,8 +206,6 @@ docker_netbox_19216820023  : ok=1    changed=1    unreachable=0    failed=0    s
 
 >>>
 ```
-![Netbox change](./images/vrf_by_ansiblerunner.PNG)
-
 
  #### - Need to send all extra-var params as dictionary elements in _extravars_ argument of the _ansible_runner.run()_ method and also have _env/extravars_ in _private_data_dir_ formatted as dictionary (the 'external_vars':'./external_vars.yml' is not sent to playbook import, don't know why)
 >>> ` r = ansible_runner.run(private_data_dir='/home/boburciu/netbox-ansible-automation/', playbook='create_vrf.yml', inventory='/home/boburciu/netbox-ansible-automation/hosts.yml', extravars={'vrf_name': 'ByAnsibleRunner-inlineArg', 'vrf_rd': '65001:92065', 'vrf_description': 'Test', 'vrf_tag': 'oiaas', 'tenant_name': 'Underlay', 'external_vars':'./external_vars.yml'}) `
@@ -361,7 +359,7 @@ boburciu@Ubuntu1804-WSL$
 ```
 
 
-### 4. NAPALM usage example - configuring descriptions on Juniper JunOS QFX device:
+## [Napalm] usage example - configuring descriptions on Juniper JunOS QFX device:
 boburciu@Ubuntu1804-WSL$ ` cd ~/NAPALM/junos/ `
 ```
 boburciu@Ubuntu1804-WSL/NAPALM/junos$ ls -lt
