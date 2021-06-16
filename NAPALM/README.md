@@ -374,9 +374,9 @@ set interfaces ge-0/0/0 description TESTING-1
 set interfaces ge-0/0/1 description TESTING-2
 boburciu@Ubuntu1804-WSL/NAPALM/junos$
 ```
-boburciu@Ubuntu1804-WSL/NAPALM/junos$ ` python3 -m venv envs/napalm-junos `
-boburciu@Ubuntu1804-WSL/NAPALM/junos$ ` source envs/napalm-junos/bin/activate `
-(napalm-junos) boburciu@Ubuntu1804-WSL/NAPALM/junos$ ` napalm --user root --password secret_here --vendor junos X.X.X.X call get_interfaces `
+boburciu@Ubuntu1804-WSL/NAPALM/junos$ ` python3 -m venv envs/napalm-junos `  <br/>
+boburciu@Ubuntu1804-WSL/NAPALM/junos$ ` source envs/napalm-junos/bin/activate ` <br/>
+(napalm-junos) boburciu@Ubuntu1804-WSL/NAPALM/junos$ ` napalm --user root --password secret_here --vendor junos X.X.X.X call get_interfaces ` <br/>
 ```
 {
     "ge-0/0/0": {
