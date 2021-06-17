@@ -1,30 +1,32 @@
+NAPALM 
+========
+
+``NAPALM (Network Automation and Programmability Abstraction Layer with Multivendor support)`` —  a Python library that implements a set of functions to interact with different network device Operating Systems using a unified API.
 
 Table of Contents
-=================
+-----------------
 
-      * [Using <a href="https://napalm.readthedocs.io/en/latest/index.html" rel="nofollow">Napalm</a> to collect info from Huawei CE switches and NE router, following <a href="https://codingnetworks.blog/napalm-network-automation-python-working-with-huawei-vrp/" rel="nofollow">this article</a> and using Ansible-Runner to run Ansible playbooks directly from Python](#using-napalm-to-collect-info-from-huawei-ce-switches-and-ne-router-following-this-article-and-using-ansible-runner-to-run-ansible-playbooks-directly-from-python)
-         * [0. First steps:](#0-first-steps)
-            * [- Install Python3 venv (on Ubuntu):](#--install-python3-venv-on-ubuntu)
-            * [- Creating Python venv:](#--creating-python-venv)
-            * [- Install Napalm:](#--install-napalm)
-            * [- New Napalm drivers will be hosted under the <a href="https://github.com/napalm-automation-community">napalm-automation-community</a> on GitHub](#--new-napalm-drivers-will-be-hosted-under-the-napalm-automation-community-on-github)
-            * [- We'll use NAPALM [community driver for the Huawei CloudEngine Switch] (<a href="https://github.com/napalm-automation-community/napalm-ce">https://github.com/napalm-automation-community/napalm-ce</a>):](#--well-use-napalm-community-driver-for-the-huawei-cloudengine-switch-httpsgithubcomnapalm-automation-communitynapalm-ce)
-         * [1. Using NAPALM Python library in python3 shell:](#1-using-napalm-python-library-in-python3-shell)
-         * [2. Using Ansible-Runner to call Ansible playbook in Py script:](#2-using-ansible-runner-to-call-ansible-playbook-in-py-script)
-            * [- Installing](#--installing)
-            * [- Using (with methods from <a href="https://ansible-runner.readthedocs.io/en/latest/source/ansible_runner.html#ansible_runner.runner_config.RunnerConfig" rel="nofollow">doc</a>)](#--using-with-methods-from-doc)
-            * [- Playbook path is relative to <em>private_data_dir</em> value](#--playbook-path-is-relative-to-private_data_dir-value)
-            * [- Per <a href="https://ansible-runner.readthedocs.io/en/latest/source/ansible_runner.html#ansible_runner.runner_config.RunnerConfig" rel="nofollow">Ansible Runner doc</a>, you can either send a dict to <em>extravars</em> param of <em>ansible_runner.run()</em> method or have the extra-var key:value pairs in <em>env/extravars</em> in <em>private_data_dir</em>](#--per-ansible-runner-doc-you-can-either-send-a-dict-to-extravars-param-of-ansible_runnerrun-method-or-have-the-extra-var-keyvalue-pairs-in-envextravars-in-private_data_dir)
-            * [- Need to send all extra-var params as dictionary elements in <em>extravars</em> argument of the <em>ansible_runner.run()</em> method and also have <em>env/extravars</em> in <em>private_data_dir</em> formatted as dictionary (the 'external_vars':'./external_vars.yml' is not sent to playbook import, don't know why)](#--need-to-send-all-extra-var-params-as-dictionary-elements-in-extravars-argument-of-the-ansible_runnerrun-method-and-also-have-envextravars-in-private_data_dir-formatted-as-dictionary-the-external_varsexternal_varsyml-is-not-sent-to-playbook-import-dont-know-why)
-            * [- Call to create interface in NetBox, running playbook from Py shell:](#--call-to-create-interface-in-netbox-running-playbook-from-py-shell)
-            * [- Call to create cable connection in NetBox, running playbook from Py shell (with verbosity level):](#--call-to-create-cable-connection-in-netbox-running-playbook-from-py-shell-with-verbosity-level)
-         * [3. Using <a href="https://mitogen.networkgenomics.com/ansible_detailed.html" rel="nofollow">Mitogen for Ansible</a> to decrease Ansible execution time is currently supported only for Ansible 2.9:](#3-using-mitogen-for-ansible-to-decrease-ansible-execution-time-is-currently-supported-only-for-ansible-29)
-            * [- To measure execution time for Ansible one needs to add callback_whitelist = profile_tasks in [default] section in your <em>ansible.cfg</em>:](#--to-measure-execution-time-for-ansible-one-needs-to-add-callback_whitelist--profile_tasks-in-default-section-in-your-ansiblecfg)
-            * [- Download and extract <em>mitogen-0.2.9.tar.gz</em>](#--download-and-extract-mitogen-029targz)
-            * [- Modify <em>ansible.cfg</em> params for <em>strategy_plugins</em> and <em>strategy</em> to <em>mitogen_linear</em>:](#--modify-ansiblecfg-params-for-strategy_plugins-and-strategy-to-mitogen_linear)
-      * [[Napalm] usage example - configuring descriptions on Juniper JunOS QFX device:](#napalm-usage-example---configuring-descriptions-on-juniper-junos-qfx-device)
-
-
+- [Using Napalm to collect info from Huawei CE switches and NE router, following [this article](https://codingnetworks.blog/napalm-network-automation-python-working-with-huawei-vrp/) and using Ansible-Runner to run Ansible playbooks directly from Python](#using-napalm-to-collect-info-from-huawei-ce-switches-and-ne-router-following-this-article-and-using-ansible-runner-to-run-ansible-playbooks-directly-from-python)
+  - [0. First steps:](#0-first-steps)
+    - [- Install Python3 venv (on Ubuntu):](#--install-python3-venv-on-ubuntu)
+    - [- Creating Python venv:](#--creating-python-venv)
+    - [- Install Napalm:](#--install-napalm)
+    - [- New Napalm drivers will be hosted under the napalm-automation-community on GitHub](#--new-napalm-drivers-will-be-hosted-under-the-napalm-automation-community-on-github)
+    - [- We'll use NAPALM [community driver for the Huawei CloudEngine Switch] (https://github.com/napalm-automation-community/napalm-ce):](#--well-use-napalm-community-driver-for-the-huawei-cloudengine-switch-httpsgithubcomnapalm-automation-communitynapalm-ce)
+  - [1. Using NAPALM Python library in python3 shell:](#1-using-napalm-python-library-in-python3-shell)
+  - [2. Using Ansible-Runner to call Ansible playbook in Py script:](#2-using-ansible-runner-to-call-ansible-playbook-in-py-script)
+    - [- Installing](#--installing)
+    - [- Using (with methods from doc)](#--using-with-methods-from-doc)
+    - [- Playbook path is relative to _private_data_dir_ value](#--playbook-path-is-relative-to-private_data_dir-value)
+    - [- Per Ansible Runner doc, you can either send a dict to _extravars_ param of _ansible_runner.run()_ method or have the extra-var key:value pairs in _env/extravars_ in _private_data_dir_](#--per-ansible-runner-doc-you-can-either-send-a-dict-to-extravars-param-of-ansible_runnerrun-method-or-have-the-extra-var-keyvalue-pairs-in-envextravars-in-private_data_dir)
+    - [- Need to send all extra-var params as dictionary elements in _extravars_ argument of the _ansible_runner.run()_ method and also have _env/extravars_ in _private_data_dir_ formatted as dictionary (the 'external_vars':'./external_vars.yml' is not sent to playbook import, don't know why)](#--need-to-send-all-extra-var-params-as-dictionary-elements-in-extravars-argument-of-the-ansible_runnerrun-method-and-also-have-envextravars-in-private_data_dir-formatted-as-dictionary-the-external_varsexternal_varsyml-is-not-sent-to-playbook-import-dont-know-why)
+    - [- Call to create interface in NetBox, running playbook from Py shell:](#--call-to-create-interface-in-netbox-running-playbook-from-py-shell)
+    - [- Call to create cable connection in NetBox, running playbook from Py shell (with verbosity level):](#--call-to-create-cable-connection-in-netbox-running-playbook-from-py-shell-with-verbosity-level)
+  - [3. Using Mitogen for Ansible to decrease Ansible execution time is currently supported only for Ansible 2.9:](#3-using-mitogen-for-ansible-to-decrease-ansible-execution-time-is-currently-supported-only-for-ansible-29)
+    - [- To measure execution time for Ansible one needs to add ` callback_whitelist = profile_tasks ` in ` [default] ` section in your _ansible.cfg_:](#--to-measure-execution-time-for-ansible-one-needs-to-add-callback_whitelist--profile_tasks-in-default-section-in-your-ansiblecfg)
+    - [- Download and extract _mitogen-0.2.9.tar.gz_](#--download-and-extract-mitogen-029targz)
+    - [- Modify _ansible.cfg_ params for _strategy_plugins_ and _strategy_ to *mitogen_linear*:](#--modify-ansiblecfg-params-for-strategy_plugins-and-strategy-to-mitogen_linear)
+- [[Napalm] usage example - configuring descriptions on Juniper JunOS QFX device:](#napalm-usage-example---configuring-descriptions-on-juniper-junos-qfx-device)
 
 ## Using [Napalm](https://napalm.readthedocs.io/en/latest/index.html) to collect info from Huawei CE switches and NE router, following [this article](https://codingnetworks.blog/napalm-network-automation-python-working-with-huawei-vrp/) and using Ansible-Runner to run Ansible playbooks directly from Python
 
@@ -475,3 +477,4 @@ set interfaces ge-0/0/1 description TESTING-2
 >>>
 >>> device.commit_config() # or device.discard_config() if changes are not fine
 ```
+
