@@ -6,7 +6,7 @@ NAPALM
 Table of Contents
 -----------------
 
-- [Using Napalm to collect info from Huawei CE switches and NE router, following [this article](https://codingnetworks.blog/napalm-network-automation-python-working-with-huawei-vrp/) and using Ansible-Runner to run Ansible playbooks directly from Python](#using-napalm-to-collect-info-from-huawei-ce-switches-and-ne-router-following-this-article-and-using-ansible-runner-to-run-ansible-playbooks-directly-from-python)
+- [Using Napalm to collect info from Huawei CE swi9tches and NE router, following [this article](https://codingnetworks.blog/napalm-network-automation-python-working-with-huawei-vrp/) and using Ansible-Runner to run Ansible playbooks directly from Python](#using-napalm-to-collect-info-from-huawei-ce-swi9tches-and-ne-router-following-this-article-and-using-ansible-runner-to-run-ansible-playbooks-directly-from-python)
   - [0. First steps:](#0-first-steps)
     - [- Install Python3 venv (on Ubuntu):](#--install-python3-venv-on-ubuntu)
     - [- Creating Python venv:](#--creating-python-venv)
@@ -26,11 +26,11 @@ Table of Contents
     - [- To measure execution time for Ansible one needs to add ` callback_whitelist = profile_tasks ` in ` [default] ` section in your _ansible.cfg_:](#--to-measure-execution-time-for-ansible-one-needs-to-add-callback_whitelist--profile_tasks-in-default-section-in-your-ansiblecfg)
     - [- Download and extract _mitogen-0.2.9.tar.gz_](#--download-and-extract-mitogen-029targz)
     - [- Modify _ansible.cfg_ params for _strategy_plugins_ and _strategy_ to *mitogen_linear*:](#--modify-ansiblecfg-params-for-strategy_plugins-and-strategy-to-mitogen_linear)
-- [[Napalm] usage example - configuring descriptions on Juniper JunOS QFX device:](#napalm-usage-example---configuring-descriptions-on-juniper-junos-qfx-device)
+- [Using Napalm to configure interface descriptions on Juniper JunOS QFX device:](#using-napalm-to-configure-interface-descriptions-on-juniper-junos-qfx-device)
 
 ## Using [Napalm](https://napalm.readthedocs.io/en/latest/index.html) to collect info from Huawei CE switches and NE router, following [this article](https://codingnetworks.blog/napalm-network-automation-python-working-with-huawei-vrp/) and using Ansible-Runner to run Ansible playbooks directly from Python
-- [ ]  **huawei-napalm2netbox.py**
-- [ ]  **dell-napalm2netbox.py**
+- [ ]  _huawei-napalm2netbox.py_
+- [ ]  _dell-napalm2netbox.py_
 
 ### 0. First steps:
 
@@ -394,7 +394,7 @@ boburciu@Ubuntu1804-WSL$
 
 
 ## Using [Napalm](https://napalm.readthedocs.io/en/latest/index.html) to configure interface descriptions on Juniper JunOS QFX device:
-- [ ]  **junos-napalm-iface-description.py**
+- [ ]  _junos-napalm-iface-description.py_
 
 boburciu@Ubuntu1804-WSL$ ` cd ~/NAPALM/junos/ `
 ```
