@@ -29,6 +29,8 @@ Table of Contents
 - [[Napalm] usage example - configuring descriptions on Juniper JunOS QFX device:](#napalm-usage-example---configuring-descriptions-on-juniper-junos-qfx-device)
 
 ## Using [Napalm](https://napalm.readthedocs.io/en/latest/index.html) to collect info from Huawei CE switches and NE router, following [this article](https://codingnetworks.blog/napalm-network-automation-python-working-with-huawei-vrp/) and using Ansible-Runner to run Ansible playbooks directly from Python
+- [ ]  huawei-napalm2netbox.py
+- [ ]  dell-napalm2netbox.py
 
 ### 0. First steps:
 
@@ -391,7 +393,8 @@ boburciu@Ubuntu1804-WSL$
 
 
 
-## [Napalm] usage example - configuring descriptions on Juniper JunOS QFX device:
+## Using [Napalm](https://napalm.readthedocs.io/en/latest/index.html) to configure interface descriptions on Juniper JunOS QFX device:
+- [ ]  junos-napalm-iface-description.py
 boburciu@Ubuntu1804-WSL$ ` cd ~/NAPALM/junos/ `
 ```
 boburciu@Ubuntu1804-WSL/NAPALM/junos$ ls -lt
