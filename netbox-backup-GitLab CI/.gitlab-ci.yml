@@ -1,0 +1,36 @@
+---
+
+stages:
+  - backup-netbox-db
+
+variables:
+  BACKUP_PATH: "backup"
+  POSTGRES_USER: "netbox"
+  POSTGRES_DB: "netbox"
+  NETBOX_IP: "192.168.200.23"  
+
+
+################################################################################
+# Shared parameters
+################################################################################
+.shared:
+  tags:
+    - netbox-backup
+
+################################################################################
+# Jobs
+################################################################################
+
+
+save_sql_dump:
+  stage: backup-netbox-db
+  extends: .shared
+  script:
+    - export BACKUP_DATE=$(date +"%Y-%m-%d_%H.%M.%S");
+    - ssh -i /home/gitlab-runner/.ssh/id_rsa -l root ${NETBOX_IP} "cd /root/projects/netbox-docker; mkdir -p ${BACKUP_PATH}; sudo docker-compose exec -T postgres sh -c 'pg_dump  -cU $POSTGRES_USER $POSTGRES_DB' | gzip > ${BACKUP_PATH}/${BACKUP_DATE}_db_dump.sql.gz"
+
+# The tag "netbox-backup" is for a GitLab runner, available under https://gitlab.com > Project > Settings > CI/CD > Runners (Expand):
+# Available specific runners
+#  #7633275 (jy2n7a3A) 
+# feper-vm-docker
+# netbox-backup
