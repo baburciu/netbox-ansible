@@ -78,3 +78,17 @@ check_interval = 0
     [runners.cache.azure]
 [root@NetboX ~]#
 ```
+
+## Enabling GitLab runner Docker container to SSH other hosts with private key  
+```
+[root@gitlab-runner-and-netbox ~]# docker ps | grep gitlab 
+4370c00a1815   gitlab/gitlab-runner:latest   "/usr/bin/dumb-init …"   54 minutes ago   Up 54 minutes                                                             gitlab-runner
+[root@gitlab-runner-and-netbox ~]# docker exec -it 4370c00a1815 sh
+# mkdir /root/~.ssh/
+# chmod 700 ~/.ssh
+# exit
+[root@gitlab-runner-and-netbox ~]# docker cp ~/.ssh/id_rsa 4370c00a1815:/root/~.ssh/id_rsa
+[root@gitlab-runner-and-netbox ~]# docker exec -it 4370c00a1815 ls /root/~.ssh/
+id_rsa
+[root@gitlab-runner-and-netbox ~]#
+```
