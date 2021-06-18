@@ -106,4 +106,4 @@ Connection to 192.168.200.23 closed.
 [root@gitlab-runner-and-netbox ~]#
 ```
 
-## Writing CI file assumes usage of [eyword reference for the .gitlab-ci.yml file](https://docs.gitlab.com/ee/ci/yaml/)
+## Writing CI file assumes usage of [keyword reference for the .gitlab-ci.yml file](https://docs.gitlab.com/ee/ci/yaml/)
