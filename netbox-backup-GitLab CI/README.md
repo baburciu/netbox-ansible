@@ -104,6 +104,24 @@ drwxr-xr-x. 1 root          root            27 May 20 16:10 ..
 # chmod 700 /home/gitlab-runner/.ssh/
 ```
 [root@gitlab-runner-and-netbox ~]# ` docker cp ~/.ssh/id_rsa 4370c00a1815:/home/gitlab-runner/.ssh/id_rsa ` <br/>
+
+ ### Need to change ownership of private key file to GitLab runner user to avoid permission issues
+```
+# chown gitlab-runner:gitlab-runner /home/gitlab-runner/.ssh
+# 
+# chown gitlab-runner:gitlab-runner /home/gitlab-runner/.ssh/id_rsa
+# 
+# stat /home/gitlab-runner/.ssh/id_rsa
+  File: /home/gitlab-runner/.ssh/id_rsa
+  Size: 1675            Blocks: 8          IO Block: 4096   regular file
+Device: fd00h/64768d    Inode: 35062987    Links: 1
+Access: (0600/-rw-------)  Uid: (  999/gitlab-runner)   Gid: (  999/gitlab-runner)
+Access: 2021-06-18 10:38:15.576436746 +0000
+Modify: 2021-06-18 09:54:26.000000000 +0000
+Change: 2021-06-18 10:54:55.755385164 +0000
+ Birth: -
+# 
+```
 [root@gitlab-runner-and-netbox ~]# ` docker exec -it 4370c00a1815 ls /home/gitlab-runner/.ssh/ ` <br/>
 ```
 id_rsa
@@ -111,12 +129,16 @@ id_rsa
 ```
 [root@gitlab-runner-and-netbox ~]# ` docker exec -it 4370c00a1815 sh `
 ```
-# ssh -i /home/gitlab-runner/.ssh/id_rsa 192.168.200.23
+# 
+# su gitlab-runner
+gitlab-runner@4370c00a1815:/$
+gitlab-runner@4370c00a1815:/$ ssh -i /home/gitlab-runner/.ssh/id_rsa -l root 192.168.200.23
 The authenticity of host '192.168.200.23 (192.168.200.23)' can't be established.
 ECDSA key fingerprint is SHA256:IfdH2PbTRJ9k+Bi+N9Q/7O4C+uEyBX55IaV/c3I2n7Y.
 Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
 Warning: Permanently added '192.168.200.23' (ECDSA) to the list of known hosts.
-Last login: Fri Jun 18 13:31:18 2021 from 192.168.200.222
+Last login: Fri Jun 18 14:13:41 2021 from 192.168.200.222
+[root@NetboX ~]#
 [root@NetboX ~]# exit
 logout
 Connection to 192.168.200.23 closed.
@@ -126,3 +148,31 @@ Connection to 192.168.200.23 closed.
 ```
 
 ## Writing CI file assumes usage of [keyword reference for the .gitlab-ci.yml file](https://docs.gitlab.com/ee/ci/yaml/)
+
+## Getting backup of PostgreSQL database of NetBox with GitLab runner:
+```
+[root@gitlab-runner-and-netbox ~]# docker exec -it 4370c00a1815 sh
+# 
+# su gitlab-runner
+gitlab-runner@4370c00a1815:/$
+gitlab-runner@4370c00a1815:/$ export BACKUP_DATE=$(date +"%Y-%m-%d_%H.%M.%S")
+gitlab-runner@4370c00a1815:/$ export BACKUP_PATH="backup"
+gitlab-runner@4370c00a1815:/$ export POSTGRES_USER="netbox"
+gitlab-runner@4370c00a1815:/$ export POSTGRES_DB="netbox"
+gitlab-runner@4370c00a1815:/$ export NETBOX_IP="192.168.200.23"
+gitlab-runner@4370c00a1815:/$
+gitlab-runner@4370c00a1815:/$ ssh -i /home/gitlab-runner/.ssh/id_rsa -l root ${NETBOX_IP} "cd /root/projects/netbox-docker; mkdir ${BACKUP_PATH}; sudo docker-compose exec -T postgres sh -c 'pg_dump  -cU $POSTGRES_USER $POSTGRES_DB' | gzip > ${BACKUP_PATH}/${BACKUP_DATE}_db_dump.sql.gz"
+gitlab-runner@4370c00a1815:/$ ssh -i /home/gitlab-runner/.ssh/id_rsa -l root ${NETBOX_IP}
+Last login: Fri Jun 18 14:29:50 2021 from 192.168.200.222
+[root@NetboX ~]# ls -lt /root/projects/netbox-docker/backup/
+total 196
+-rw-r--r--. 1 root root 197846 Jun 18 14:30 2021-06-18_11.07.20_db_dump.sql.gz
+[root@NetboX ~]#
+[root@NetboX ~]# exit
+logout
+Connection to 192.168.200.23 closed.
+gitlab-runner@4370c00a1815:/$ exit
+exit
+# exit
+[root@gitlab-runner-and-netbox ~]#
+```
