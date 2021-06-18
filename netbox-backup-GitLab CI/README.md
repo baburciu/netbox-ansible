@@ -80,15 +80,28 @@ check_interval = 0
 ```
 
 ## Enabling GitLab runner Docker container to SSH other hosts with private key  
+
+[root@gitlab-runner-and-netbox ~]# ` docker ps | grep gitlab `  <br/>
 ```
-[root@gitlab-runner-and-netbox ~]# docker ps | grep gitlab 
 4370c00a1815   gitlab/gitlab-runner:latest   "/usr/bin/dumb-init …"   54 minutes ago   Up 54 minutes                                                             gitlab-runner
-[root@gitlab-runner-and-netbox ~]# docker exec -it 4370c00a1815 sh
+```
+[root@gitlab-runner-and-netbox ~]# ` docker exec -it 4370c00a1815 sh ` <br/>
+```
 # mkdir /root/~.ssh/
 # chmod 700 ~/.ssh
 # exit
-[root@gitlab-runner-and-netbox ~]# docker cp ~/.ssh/id_rsa 4370c00a1815:/root/~.ssh/id_rsa
-[root@gitlab-runner-and-netbox ~]# docker exec -it 4370c00a1815 ls /root/~.ssh/
+```
+[root@gitlab-runner-and-netbox ~]# ` docker cp ~/.ssh/id_rsa 4370c00a1815:/root/~.ssh/id_rsa ` <br/>
+[root@gitlab-runner-and-netbox ~]# ` docker exec -it 4370c00a1815 ls /root/~.ssh/ ` <br/>
+```
 id_rsa
+[root@gitlab-runner-and-netbox ~]#
+[root@gitlab-runner-and-netbox ~]# docker exec -it 4370c00a1815 sh
+# ssh -i /root/~.ssh/id_rsa 192.168.200.23
+Last login: Fri Jun 18 13:30:20 2021 from 192.168.200.222
+[root@NetboX ~]# exit
+logout
+Connection to 192.168.200.23 closed.
+# exit
 [root@gitlab-runner-and-netbox ~]#
 ```
