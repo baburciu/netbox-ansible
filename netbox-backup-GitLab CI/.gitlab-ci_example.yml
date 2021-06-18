@@ -1,0 +1,55 @@
+# how to run https://gitlab.com CI/CD job from a repo to a locally installed GitLab runner with the tag "dell-switch-automation"
+---
+
+stages:
+  - backup-netbox-db
+
+
+################################################################################
+# Shared parameters
+################################################################################
+.shared:
+  tags:
+    - dell-switch-automation
+
+################################################################################
+# Jobs
+################################################################################
+
+
+print_runner_hostname:
+  stage: backup-netbox-db
+  extends: .shared
+  script:
+    # provide a shell script as argument for this keyword.
+    - hostname
+
+
+### PIPELINE JOB OUTPUT: ###
+# Running with gitlab-runner 13.12.0 (7a6612da)
+#   on gitlab-runner-boburciu 3MZATrjs
+# Preparing the "shell" executor                    00:00
+# Using Shell executor...
+# Preparing environment                             00:00
+# Running on 2f4286e86cc0...
+# Getting source from Git repository                00:02
+# Fetching changes with git depth set to 50...
+# Initialized empty Git repository in /home/gitlab-runner/builds/3MZATrjs/0/bogdanadrian-burciu/netbox-webhook/.git/
+# Created fresh repository.
+# Checking out 1ad8d9d2 as main...
+# Skipping object checkout, Git LFS is not installed.
+# Skipping Git submodules setup
+# Executing "step_script" stage of the job script   00:00
+# $ hostname
+# 2f4286e86cc0
+# Cleaning up file based variables                  00:00
+# Job succeeded
+
+### JOB OUTPUT EXPLANATION ###
+# [root@NetboX ~]# docker ps
+# CONTAINER ID   IMAGE                         COMMAND                  CREATED        STATUS        PORTS                                                     NAMES
+# 2f4286e86cc0   gitlab/gitlab-runner:latest   "/usr/bin/dumb-init …"   20 hours ago   Up 20 hours                   
+# [root@NetboX ~]# docker exec -it 2f4286e86cc0 sh
+# # hostname
+# 2f4286e86cc0
+# #
