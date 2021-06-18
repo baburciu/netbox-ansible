@@ -4,9 +4,9 @@ GitLab
 ## Installing a GitLab runner locally as Docker container service 
 
 [root@NetboX ~]# `docker run -d --name gitlab-runner --restart always \` <br/>
-`\>   -v /srv/gitlab-runner/config:/etc/gitlab-runner \` <br/>
-`\>   -v /var/run/docker.sock:/var/run/docker.sock \` <br/>
-`\>   gitlab/gitlab-runner:latest` <br/>
+` -v /srv/gitlab-runner/config:/etc/gitlab-runner \` <br/>
+` -v /var/run/docker.sock:/var/run/docker.sock \` <br/>
+` gitlab/gitlab-runner:latest` <br/>
 ```
 Unable to find image 'gitlab/gitlab-runner:latest' locally
 latest: Pulling from gitlab/gitlab-runner
