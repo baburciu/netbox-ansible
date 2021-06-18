@@ -1,0 +1,25 @@
+# how to run https://gitlab.com CI/CD job from a repo to a locally installed GitLab runner with the tag "dell-switch-automation"
+---
+
+stages:
+  - backup-netbox-db
+
+
+################################################################################
+# Shared parameters
+################################################################################
+.shared:
+  tags:
+    - dell-switch-automation
+
+################################################################################
+# Jobs
+################################################################################
+
+
+print_runner_hostname:
+  stage: backup-netbox-db
+  extends: .shared
+  script:
+    # provide a shell script as argument for this keyword.
+    - hostname
