@@ -81,27 +81,46 @@ check_interval = 0
 
 ## Enabling GitLab runner Docker container to SSH other hosts with private key  
 
+ ### There's a specific user called _gitlab-runner_ or _gitlab_ci_multi_runner_ used by the GitLab runner, per [Shell executor doc](https://docs.gitlab.com/runner/executors/shell.html#running-as-unprivileged-user)
+ 
 [root@gitlab-runner-and-netbox ~]# ` docker ps | grep gitlab `  <br/>
 ```
 4370c00a1815   gitlab/gitlab-runner:latest   "/usr/bin/dumb-init …"   54 minutes ago   Up 54 minutes                                                             gitlab-runner
 ```
 [root@gitlab-runner-and-netbox ~]# ` docker exec -it 4370c00a1815 sh ` <br/>
 ```
-# mkdir /root/~.ssh/
-# chmod 700 ~/.ssh
-# exit
+# cat /etc/passwd | grep gitlab
+gitlab-runner:x:999:999:GitLab Runner:/home/gitlab-runner:/bin/bash
+#
+# ls -lat /home/gitlab-runner/
+total 8
+drwxr-xr-x. 3 gitlab-runner gitlab-runner   51 Jun 18 09:18 .
+drwxrwxr-x. 3 gitlab-runner gitlab-runner   22 Jun 18 09:18 builds
+drwxr-xr-x. 1 root          root            27 May 20 16:10 ..
+-rw-r--r--. 1 gitlab-runner gitlab-runner 3771 Feb 25  2020 .bashrc
+-rw-r--r--. 1 gitlab-runner gitlab-runner  807 Feb 25  2020 .profile
+#
+# mkdir /home/gitlab-runner/.ssh/
+# chmod 700 /home/gitlab-runner/.ssh/
 ```
-[root@gitlab-runner-and-netbox ~]# ` docker cp ~/.ssh/id_rsa 4370c00a1815:/root/~.ssh/id_rsa ` <br/>
-[root@gitlab-runner-and-netbox ~]# ` docker exec -it 4370c00a1815 ls /root/~.ssh/ ` <br/>
+[root@gitlab-runner-and-netbox ~]# ` docker cp ~/.ssh/id_rsa 4370c00a1815:/home/gitlab-runner/.ssh/id_rsa ` <br/>
+[root@gitlab-runner-and-netbox ~]# ` docker exec -it 4370c00a1815 ls /home/gitlab-runner/.ssh/ ` <br/>
 ```
 id_rsa
 [root@gitlab-runner-and-netbox ~]#
-[root@gitlab-runner-and-netbox ~]# docker exec -it 4370c00a1815 sh
-# ssh -i /root/~.ssh/id_rsa 192.168.200.23
-Last login: Fri Jun 18 13:30:20 2021 from 192.168.200.222
+```
+[root@gitlab-runner-and-netbox ~]# ` docker exec -it 4370c00a1815 sh `
+```
+# ssh -i /home/gitlab-runner/.ssh/id_rsa 192.168.200.23
+The authenticity of host '192.168.200.23 (192.168.200.23)' can't be established.
+ECDSA key fingerprint is SHA256:IfdH2PbTRJ9k+Bi+N9Q/7O4C+uEyBX55IaV/c3I2n7Y.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '192.168.200.23' (ECDSA) to the list of known hosts.
+Last login: Fri Jun 18 13:31:18 2021 from 192.168.200.222
 [root@NetboX ~]# exit
 logout
 Connection to 192.168.200.23 closed.
+# 
 # exit
 [root@gitlab-runner-and-netbox ~]#
 ```
