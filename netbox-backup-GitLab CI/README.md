@@ -18,6 +18,10 @@ GitLab runners
       - [2.2 Save cert to the GitLab runner container location:](#22-save-cert-to-the-gitlab-runner-container-location)
     - [3. Get the registration token from Project > Settings > CI/CD > Runners (Expand) > Set up a specific runner manually and then register (via proxy and using certificate by option *--tls-ca-file=/path/to/cert*)](#3-get-the-registration-token-from-project--settings--cicd--runners-expand--set-up-a-specific-runner-manually-and-then-register-via-proxy-and-using-certificate-by-option---tls-ca-filepathtocert)
   - [To setup GitLab Pipeline you need to set the path to *.gitlab-ci.yml* in Project > Settings > CI/CD > General pipelines (Expand) > Custom CI configuration path, following the official guide, for example to *NetBox/NetBox config backup/.gitlab-ci.yml* for a CI file located in Project named *Admin/NetBox/NetBox config backup/.gitlab-ci.yml*](#to-setup-gitlab-pipeline-you-need-to-set-the-path-to-gitlab-ciyml-in-project--settings--cicd--general-pipelines-expand--custom-ci-configuration-path-following-the-official-guide-for-example-to-netboxnetbox-config-backupgitlab-ciyml-for-a-ci-file-located-in-project-named-adminnetboxnetbox-config-backupgitlab-ciyml)
+  - [To have the GitLab runner SSH to another machine](#to-have-the-gitlab-runner-ssh-to-another-machine)
+    - [1. You need to create SSH key pair, add the .pub one to *~/.ssh/authorized_keys* on the target machine and add the private key to the runner container](#1-you-need-to-create-ssh-key-pair-add-the-pub-one-to-sshauthorized_keys-on-the-target-machine-and-add-the-private-key-to-the-runner-container)
+    - [2. Have the private key owned by the *gitlab-runner* user](#2-have-the-private-key-owned-by-the-gitlab-runner-user)
+
 ***
 
 ## Installing a GitLab runner locally as Docker container service 
@@ -216,3 +220,22 @@ Runner registered successfully. Feel free to start it, but if it's running alrea
 ***
 
 ## To setup GitLab Pipeline you need to set the path to *.gitlab-ci.yml* in Project > Settings > CI/CD > General pipelines (Expand) > Custom CI configuration path, following the [official guide](https://docs.gitlab.com/ee/ci/pipelines/settings.html#custom-cicd-configuration-file), for example to *NetBox/NetBox config backup/.gitlab-ci.yml* for a CI file located in Project named *Admin/NetBox/NetBox config backup/.gitlab-ci.yml*
+
+***
+
+## To have the GitLab runner SSH to another machine
+ ### 1. You need to create SSH key pair, add the .pub one to *~/.ssh/authorized_keys* on the target machine and add the private key to the runner container
+ ### 2. Have the private key owned by the *gitlab-runner* user
+[root@gitlab-runner-and-netbox ~]# ` docker exec -it 08f8586e6fc5 chown -R gitlab-runner:gitlab-runner /home/gitlab-runner `
+[root@gitlab-runner-and-netbox ~]# ` docker exec -it 08f8586e6fc5 stat /home/gitlab-runner/.ssh/id_rsa `
+```
+  File: /home/gitlab-runner/.ssh/id_rsa
+  Size: 1675            Blocks: 8          IO Block: 4096   regular file
+Device: fd00h/64768d    Inode: 68192253    Links: 1
+Access: (0600/-rw-------)  Uid: (  999/gitlab-runner)   Gid: (  999/gitlab-runner)
+Access: 2021-06-28 16:57:36.078703652 +0000
+Modify: 2021-06-28 16:57:17.909704589 +0000
+Change: 2021-06-29 11:10:39.012321329 +0000
+ Birth: -
+[root@gitlab-runner-and-netbox ~]#
+```
