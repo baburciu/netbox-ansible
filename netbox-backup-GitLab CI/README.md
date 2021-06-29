@@ -1,5 +1,24 @@
-GitLab
-======== 
+GitLab runners
+========
+- [GitLab runners](#gitlab-runners)
+  - [Installing a GitLab runner locally as Docker container service](#installing-a-gitlab-runner-locally-as-docker-container-service)
+  - [Registering GitLab runner to https://gitlab.com](#registering-gitlab-runner-to-httpsgitlabcom)
+    - [1. First create repo in Git](#1-first-create-repo-in-git)
+    - [2. Get the registration token from Project > Settings > CI/CD > Runners (Expand) > Set up a specific runner manually](#2-get-the-registration-token-from-project--settings--cicd--runners-expand--set-up-a-specific-runner-manually)
+    - [3. The GitLab runner configuration](#3-the-gitlab-runner-configuration)
+  - [Registering GitLab runner to private GitLab instance](#registering-gitlab-runner-to-private-gitlab-instance)
+    - [1. Running behind Forward Proxy](#1-running-behind-forward-proxy)
+      - [1.1 Configure Docker Daemon to use proxy (This configuration is used by docker daemon to pull images from Docker Hub)](#11-configure-docker-daemon-to-use-proxy-this-configuration-is-used-by-docker-daemon-to-pull-images-from-docker-hub)
+      - [1.2 Restart docker](#12-restart-docker)
+      - [1.3 Verify that the configuration has been loaded](#13-verify-that-the-configuration-has-been-loaded)
+      - [1.4 Configure Docker Client to pass proxy information to containers](#14-configure-docker-client-to-pass-proxy-information-to-containers)
+      - [New containers will have the HTTPS proxy set:](#new-containers-will-have-the-https-proxy-set)
+    - [2. Configure GitLab server certificate as trusted for TLS handshake from runner](#2-configure-gitlab-server-certificate-as-trusted-for-tls-handshake-from-runner)
+      - [2.1 Get cert from unmanaged GitLab from Mozilla browser: View Certificate -> Intermediate -> Download PEM (cert)](#21-get-cert-from-unmanaged-gitlab-from-mozilla-browser-view-certificate---intermediate---download-pem-cert)
+      - [2.2 Save cert to the GitLab runner container location:](#22-save-cert-to-the-gitlab-runner-container-location)
+    - [3. Get the registration token from Project > Settings > CI/CD > Runners (Expand) > Set up a specific runner manually and then register (via proxy and using certificate by option *--tls-ca-file=/path/to/cert*)](#3-get-the-registration-token-from-project--settings--cicd--runners-expand--set-up-a-specific-runner-manually-and-then-register-via-proxy-and-using-certificate-by-option---tls-ca-filepathtocert)
+  - [To setup GitLab Pipeline you need to set the path to *.gitlab-ci.yml* in Project > Settings > CI/CD > General pipelines (Expand) > Custom CI configuration path, following the official guide, for example to *NetBox/NetBox config backup/.gitlab-ci.yml* for a CI file located in Project named *Admin/NetBox/NetBox config backup/.gitlab-ci.yml*](#to-setup-gitlab-pipeline-you-need-to-set-the-path-to-gitlab-ciyml-in-project--settings--cicd--general-pipelines-expand--custom-ci-configuration-path-following-the-official-guide-for-example-to-netboxnetbox-config-backupgitlab-ciyml-for-a-ci-file-located-in-project-named-adminnetboxnetbox-config-backupgitlab-ciyml)
+***
 
 ## Installing a GitLab runner locally as Docker container service 
 
@@ -27,6 +46,8 @@ Status: Downloaded newer image for gitlab/gitlab-runner:latest
 2f4286e86cc0   gitlab/gitlab-runner:latest   "/usr/bin/dumb-init …"   21 seconds ago   Up 18 seconds                                                             gitlab-runner
 [root@NetboX ~]#
 ```
+
+***
 
 ## Registering GitLab runner to https://gitlab.com
  ### 1. First create repo in [Git](https://gitlab.com)
@@ -79,100 +100,119 @@ check_interval = 0
 [root@NetboX ~]#
 ```
 
-## Enabling GitLab runner Docker container to SSH other hosts with private key  
+***
 
- ### There's a specific user called _gitlab-runner_ or _gitlab_ci_multi_runner_ used by the GitLab runner, per [Shell executor doc](https://docs.gitlab.com/runner/executors/shell.html#running-as-unprivileged-user)
- 
-[root@gitlab-runner-and-netbox ~]# ` docker ps | grep gitlab `  <br/>
+## Registering GitLab runner to private GitLab instance
+ ### 1. Running behind Forward Proxy
+ #### 1.1 Configure Docker Daemon to use proxy (This configuration is used by docker daemon to pull images from Docker Hub)
+[root@gitlab-runner-and-netbox ~]# ` vim /etc/systemd/system/docker.service.d/http-proxy.conf ` <br/>
+[root@gitlab-runner-and-netbox ~]# ` cat /etc/systemd/system/docker.service.d/http-proxy.conf ` <br/>
 ```
-4370c00a1815   gitlab/gitlab-runner:latest   "/usr/bin/dumb-init …"   54 minutes ago   Up 54 minutes                                                             gitlab-runner
+[Service]
+Environment="HTTP_PROXY=http://192.168.X.X:8080"
+Environment="HTTPS_PROXY=https://192.168.X.X:8080"
 ```
-[root@gitlab-runner-and-netbox ~]# ` docker exec -it 4370c00a1815 sh ` <br/>
-```
-# cat /etc/passwd | grep gitlab
-gitlab-runner:x:999:999:GitLab Runner:/home/gitlab-runner:/bin/bash
-#
-# ls -lat /home/gitlab-runner/
-total 8
-drwxr-xr-x. 3 gitlab-runner gitlab-runner   51 Jun 18 09:18 .
-drwxrwxr-x. 3 gitlab-runner gitlab-runner   22 Jun 18 09:18 builds
-drwxr-xr-x. 1 root          root            27 May 20 16:10 ..
--rw-r--r--. 1 gitlab-runner gitlab-runner 3771 Feb 25  2020 .bashrc
--rw-r--r--. 1 gitlab-runner gitlab-runner  807 Feb 25  2020 .profile
-#
-# mkdir /home/gitlab-runner/.ssh/
-# chmod 700 /home/gitlab-runner/.ssh/
-```
-[root@gitlab-runner-and-netbox ~]# ` docker cp ~/.ssh/id_rsa 4370c00a1815:/home/gitlab-runner/.ssh/id_rsa ` <br/>
+[root@gitlab-runner-and-netbox ~]#
+ #### 1.2 Restart docker
+[root@gitlab-runner-and-netbox ~]# ` systemctl daemon-reload ` <br/>
+[root@gitlab-runner-and-netbox ~]# ` systemctl restart docker ` <br/>
 
- ### Need to change ownership of private key file to GitLab runner user to avoid permission issues
+ #### 1.3 Verify that the configuration has been loaded
+ [root@gitlab-runner-and-netbox ~]# ` systemctl show --property=Environment docker `
+Environment=HTTP_PROXY=http://192.168.X.X:8080 HTTPS_PROXY=https://192.168.X.X:8080
+
+ #### 1.4 Configure Docker Client to pass proxy information to containers
+[root@gitlab-runner-and-netbox ~]# ` vim ~/.docker/config.json ` <br/>
+[root@gitlab-runner-and-netbox ~]# ` cat ~/.docker/config.json ` <br/>
 ```
-# chown gitlab-runner:gitlab-runner /home/gitlab-runner/.ssh
-# 
-# chown gitlab-runner:gitlab-runner /home/gitlab-runner/.ssh/id_rsa
-# 
-# stat /home/gitlab-runner/.ssh/id_rsa
-  File: /home/gitlab-runner/.ssh/id_rsa
-  Size: 1675            Blocks: 8          IO Block: 4096   regular file
-Device: fd00h/64768d    Inode: 35062987    Links: 1
-Access: (0600/-rw-------)  Uid: (  999/gitlab-runner)   Gid: (  999/gitlab-runner)
-Access: 2021-06-18 10:38:15.576436746 +0000
-Modify: 2021-06-18 09:54:26.000000000 +0000
-Change: 2021-06-18 10:54:55.755385164 +0000
- Birth: -
-# 
-```
-[root@gitlab-runner-and-netbox ~]# ` docker exec -it 4370c00a1815 ls /home/gitlab-runner/.ssh/ ` <br/>
-```
-id_rsa
+{
+ "proxies":
+ {
+   "default":
+   {
+     "httpProxy": "http://192.168.X.X:8080",
+     "httpsProxy": "http://192.168.X.X:8080"
+   }
+ }
+}
 [root@gitlab-runner-and-netbox ~]#
 ```
-[root@gitlab-runner-and-netbox ~]# ` docker exec -it 4370c00a1815 sh `
+ #### New containers will have the HTTPS proxy set:
+[root@NetboX ~]# `docker run -d --name gitlab-runner-behind-feper-proxy --restart always \` <br/>
+` -v /srv/gitlab-runner/config:/etc/gitlab-runner \` <br/>
+` -v /var/run/docker.sock:/var/run/docker.sock \` <br/>
+` gitlab/gitlab-runner:latest` <br/> 
 ```
-# 
-# su gitlab-runner
-gitlab-runner@4370c00a1815:/$
-gitlab-runner@4370c00a1815:/$ ssh -i /home/gitlab-runner/.ssh/id_rsa -l root 192.168.200.23
-The authenticity of host '192.168.200.23 (192.168.200.23)' can't be established.
-ECDSA key fingerprint is SHA256:IfdH2PbTRJ9k+Bi+N9Q/7O4C+uEyBX55IaV/c3I2n7Y.
-Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
-Warning: Permanently added '192.168.200.23' (ECDSA) to the list of known hosts.
-Last login: Fri Jun 18 14:13:41 2021 from 192.168.200.222
-[root@NetboX ~]#
-[root@NetboX ~]# exit
-logout
-Connection to 192.168.200.23 closed.
-# 
-# exit
+08f8586e6fc5582e940fda04aa918bcd0bd1fe049cf8e4e1b43b7718a2fd0e23
+[root@gitlab-runner-and-netbox ~]#
+[root@gitlab-runner-and-netbox ~]# docker ps | grep gitlab-runner
+08f8586e6fc5   gitlab/gitlab-runner:latest   "/usr/bin/dumb-init …"   4 seconds ago   Up 4 seconds             gitlab-runner-behind-feper-proxy
+4370c00a1815   gitlab/gitlab-runner:latest   "/usr/bin/dumb-init …"   10 days ago     Up 3 minutes             gitlab-runner
+[root@gitlab-runner-and-netbox ~]#
 [root@gitlab-runner-and-netbox ~]#
 ```
-
-## Writing CI file assumes usage of [keyword reference for the .gitlab-ci.yml file](https://docs.gitlab.com/ee/ci/yaml/)
-
-## Getting backup of PostgreSQL database of NetBox with GitLab runner:
+[root@gitlab-runner-and-netbox ~]# ` docker exec -it 08f8586e6fc5 curl -k https://private-gitlab.internal -v `    
 ```
-[root@gitlab-runner-and-netbox ~]# docker exec -it 4370c00a1815 sh
-# 
-# su gitlab-runner
-gitlab-runner@4370c00a1815:/$
-gitlab-runner@4370c00a1815:/$ export BACKUP_DATE=$(date +"%Y-%m-%d_%H.%M.%S")
-gitlab-runner@4370c00a1815:/$ export BACKUP_PATH="backup"
-gitlab-runner@4370c00a1815:/$ export POSTGRES_USER="netbox"
-gitlab-runner@4370c00a1815:/$ export POSTGRES_DB="netbox"
-gitlab-runner@4370c00a1815:/$ export NETBOX_IP="192.168.200.23"
-gitlab-runner@4370c00a1815:/$
-gitlab-runner@4370c00a1815:/$ ssh -i /home/gitlab-runner/.ssh/id_rsa -l root ${NETBOX_IP} "cd /root/projects/netbox-docker; mkdir ${BACKUP_PATH}; sudo docker-compose exec -T postgres sh -c 'pg_dump  -cU $POSTGRES_USER $POSTGRES_DB' | gzip > ${BACKUP_PATH}/${BACKUP_DATE}_db_dump.sql.gz"
-gitlab-runner@4370c00a1815:/$ ssh -i /home/gitlab-runner/.ssh/id_rsa -l root ${NETBOX_IP}
-Last login: Fri Jun 18 14:29:50 2021 from 192.168.200.222
-[root@NetboX ~]# ls -lt /root/projects/netbox-docker/backup/
-total 196
--rw-r--r--. 1 root root 197846 Jun 18 14:30 2021-06-18_11.07.20_db_dump.sql.gz
-[root@NetboX ~]#
-[root@NetboX ~]# exit
-logout
-Connection to 192.168.200.23 closed.
-gitlab-runner@4370c00a1815:/$ exit
-exit
-# exit
+* Uses proxy env variable https_proxy == 'http://192.168.X.X:8080' 
+*   Trying 192.168.X.X:8080...
+* TCP_NODELAY set
+* Connected to 192.168.X.X (192.168.X.X) port 8080 (#0)
+* allocate connect buffer!
+* Establish HTTP proxy tunnel to private-gitlab.internal:443
+> CONNECT private-gitlab.internal:443 HTTP/1.1
+> Host: private-gitlab.internal:443
+> User-Agent: curl/7.68.0
+> Proxy-Connection: Keep-Alive
+>
+< HTTP/1.1 200 Connection established
+<
+* Proxy replied 200 to CONNECT request
+* CONNECT phase completed!
+:
+:
+<
+* Connection #0 to host 192.168.X.X left intact
+<html><body>You are being <a href="https://private-gitlab.internal/users/sign_in">redirected</a>.</body></html>[root@gitlab-runner-and-netbox ~]# 
+```
+
+ ### 2. Configure GitLab server certificate as trusted for TLS handshake from runner
+ #### 2.1 Get cert from unmanaged GitLab from Mozilla browser: View Certificate -> Intermediate -> Download PEM (cert)
+ #### 2.2 Save cert to the GitLab runner container location:
+[root@gitlab-runner-and-netbox ~]# ` ls -lt /srv/gitlab-runner/config `
+```
+total 11
+-rw-------. 1 root root  659 Jun 28 17:20 config.toml
 [root@gitlab-runner-and-netbox ~]#
 ```
+[root@gitlab-runner-and-netbox ~]# ` vim /srv/gitlab-runner/config/private-gitlab.internal.pem ` <br/>
+[root@gitlab-runner-and-netbox ~]# ` docker exec -it 08f8586e6fc5 ls -lt /etc/gitlab-runner ` <br/>
+```
+total 12
+-rw-r--r--. 1 root root 6401 Jun 28 14:16 private-gitlab.internal.pem
+-rw-------. 1 root root  321 Jun 18 09:13 config.toml
+```
+
+ ### 3. Get the registration token from Project > Settings > CI/CD > Runners (Expand) > Set up a specific runner manually and then register (via proxy and using certificate by option *--tls-ca-file=/path/to/cert*)
+[root@gitlab-runner-and-netbox ~]# ` docker run --rm -it -v /srv/gitlab-runner/config:/etc/gitlab-runner gitlab/gitlab-runner register --tls-ca-file=/etc/gitlab-runner/private-gitlab.internal.pem `
+```
+Runtime platform                                    arch=amd64 os=linux pid=8 revision=7a6612da version=13.12.0
+Running in system-mode.
+
+Enter the GitLab instance URL (for example, https://gitlab.com/):
+https://private-gitlab.internal/
+Enter the registration token:
+D91zGZBW6c3ed6Eo226y
+Enter a description for the runner:
+[8a9862ee6dc7]: feper-gitlab-runner
+Enter tags for the runner (comma-separated):
+feper-gitlab-runner
+Registering runner... succeeded                     runner=D91zGZBW
+Enter an executor: docker-ssh, shell, ssh, docker+machine, docker-ssh+machine, custom, parallels, virtualbox, kubernetes, docker:
+shell
+Runner registered successfully. Feel free to start it, but if it's running already the config should be automatically reloaded!
+[root@gitlab-runner-and-netbox ~]# 
+```
+
+***
+
+## To setup GitLab Pipeline you need to set the path to *.gitlab-ci.yml* in Project > Settings > CI/CD > General pipelines (Expand) > Custom CI configuration path, following the [official guide](https://docs.gitlab.com/ee/ci/pipelines/settings.html#custom-cicd-configuration-file), for example to *NetBox/NetBox config backup/.gitlab-ci.yml* for a CI file located in Project named *Admin/NetBox/NetBox config backup/.gitlab-ci.yml*
