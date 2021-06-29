@@ -7,8 +7,8 @@ variables:
   BACKUP_PATH: "backup"
   POSTGRES_USER: "netbox"
   POSTGRES_DB: "netbox"
-  NETBOX_IP: "192.168.200.23"  
-
+  NETBOX_IP: "192.168.X.X"  
+  BACKUP_IP: "192.168.Y.Y"  
 
 ################################################################################
 # Shared parameters
