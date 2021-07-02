@@ -1,5 +1,41 @@
 # netbox-ansible  [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fbogdanadrian-burciu%2Fnetbox-ansible&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=views+%28today+%2F+total%29&edge_flat=false)](https://hits.seeyoufarm.com)
 
+***
+  - [0. How to install Ansible Galaxy collection to correct path:](#0-how-to-install-ansible-galaxy-collection-to-correct-path)
+  - [1. How the NetBox objects are expressed as IaC, using the py script in dir _IaC_ to create phy devices with mgmt IP, mgmt interface, rack position, site and more](#1-how-the-netbox-objects-are-expressed-as-iac-using-the-py-script-in-dir-iac-to-create-phy-devices-with-mgmt-ip-mgmt-interface-rack-position-site-and-more)
+    - [Each device is expressed in terms of some extra-vars sent to Ansible playbooks as input:](#each-device-is-expressed-in-terms-of-some-extra-vars-sent-to-ansible-playbooks-as-input)
+    - [Taking info from an .xls file, the py script creates and populates yaml files with the values of a template overriten](#taking-info-from-an-xls-file-the-py-script-creates-and-populates-yaml-files-with-the-values-of-a-template-overriten)
+  - [2. How to add all physical appliances with management IPs](#2-how-to-add-all-physical-appliances-with-management-ips)
+    - [Add in NetBox, by calling external_vars.yml files as extra-var:](#add-in-netbox-by-calling-external_varsyml-files-as-extra-var)
+    - [Or use a bash script to optimize Ansible creation:](#or-use-a-bash-script-to-optimize-ansible-creation)
+    - [To add only part of IaC list:](#to-add-only-part-of-iac-list)
+      - [range of devices:](#range-of-devices)
+      - [add specific phyisical device in NetBox with mgmt IP address:](#add-specific-phyisical-device-in-netbox-with-mgmt-ip-address)
+    - [Results in Netbox WebUI > Racks page:](#results-in-netbox-webui--racks-page)
+  - [3. Add phy interfaces](#3-add-phy-interfaces)
+    - [To configure data-plane interfaces of phy device, we can use NAPALM py library to connect to NOS devices (ToR switches) and parse live their configuration and using _ansible-runner_ py library, call Ansible playbooks to update devices (with LAG ID, trunk/access mode, VLANs) by a py3 script - in dir __NAPALM/__](#to-configure-data-plane-interfaces-of-phy-device-we-can-use-napalm-py-library-to-connect-to-nos-devices-tor-switches-and-parse-live-their-configuration-and-using-ansible-runner-py-library-call-ansible-playbooks-to-update-devices-with-lag-id-trunkaccess-mode-vlans-by-a-py3-script---in-dir-napalm)
+  - [4. Add VMs and IP plan](#4-add-vms-and-ip-plan)
+    - [To configure VMs and IP prefixes and addresses for virtual interfaces (VM interfaces and VLANifs), we can use the py3 script getting input from an .xls file - in dir __IPplan/__](#to-configure-vms-and-ip-prefixes-and-addresses-for-virtual-interfaces-vm-interfaces-and-vlanifs-we-can-use-the-py3-script-getting-input-from-an-xls-file---in-dir-ipplan)
+  - [5. How to integrate NAPALM with Containerized NetBox, to allow for real-time collecting of facts in NetBox, from its network devices objects, based on netbox-docker guide](#5-how-to-integrate-napalm-with-containerized-netbox-to-allow-for-real-time-collecting-of-facts-in-netbox-from-its-network-devices-objects-based-on-netbox-docker-guide)
+    - [How to configure the NetBox with credentials for the Network OS devices it will NAPALM calls to:](#how-to-configure-the-netbox-with-credentials-for-the-network-os-devices-it-will-napalm-calls-to)
+    - [How to assign NAPALM driver to a NetBox device:](#how-to-assign-napalm-driver-to-a-netbox-device)
+      - [1. Create a platform where the driver section is filled with "junos" for the default Juniper NAPALM driver or "ce" for the _napalm-ce_ driver for Huawei devices](#1-create-a-platform-where-the-driver-section-is-filled-with-junos-for-the-default-juniper-napalm-driver-or-ce-for-the-napalm-ce-driver-for-huawei-devices)
+      - [2. Edit device and assign platform](#2-edit-device-and-assign-platform)
+    - [How to check if a NAPALM driver is installed in NetBox:](#how-to-check-if-a-napalm-driver-is-installed-in-netbox)
+    - [How to rebuild image from the _netboxcommunity/netbox:latest_ in Docker Hub, while adding napalm-driver in Dockerfile:](#how-to-rebuild-image-from-the-netboxcommunitynetboxlatest-in-docker-hub-while-adding-napalm-driver-in-dockerfile)
+  - [6. How to backup the PostgreSQL database of NetBox and the uploaded files (like images) and to restore, per netbox-docker official wiki](#6-how-to-backup-the-postgresql-database-of-netbox-and-the-uploaded-files-like-images-and-to-restore-per-netbox-docker-official-wiki)
+    - [DB Operations:](#db-operations)
+    - [File Operations:](#file-operations)
+  - [7. How to get NetBox access over HTTPS, by placing a Reverse-Proxy in front of it, like Caddy, per [netbox-docker guide](https://github.com/netbox-community/netbox-docker/wiki/TLS)](#7-how-to-get-netbox-access-over-https-by-placing-a-reverse-proxy-in-front-of-it-like-caddy-per-netbox-docker-guide)
+    - [create a server certificate (like from Vault PKI) with SANs: DNS Name=netbox.dnszone, IP Address=192.168.x.x, IP Address=127.0.0.1](#create-a-server-certificate-like-from-vault-pki-with-sans-dns-namenetboxdnszone-ip-address192168xx-ip-address127001)
+    - [configure the Caddy Reverse Proxy](#configure-the-caddy-reverse-proxy)
+    - [to troubleshoot check Caddy RP container logs:](#to-troubleshoot-check-caddy-rp-container-logs)
+    - [how to connect to NetBox (with HTTP to HTTPS forwarding):](#how-to-connect-to-netbox-with-http-to-https-forwarding)
+      - [open SSH tunnel and forward 192.168.x.x:443 to localhost:xyz (` ssh -i ~/.ssh/id_rsa user@bastion -L xyz:192.168.x.x:443`), then use https://localhost:xyz/ or https://127.0.0.1:xyz/ in browser](#open-ssh-tunnel-and-forward-192168xx443-to-localhostxyz--ssh--i-sshid_rsa-userbastion--l-xyz192168xx443-then-use-httpslocalhostxyz-or-https127001xyz-in-browser)
+      - [OR open dynamic SOCKS5 tunnel (` ssh -i ~/.ssh/id_rsa user@bastion -D zyx `) and set SOCKS5 proxy 127.0.0.1:zyx and pass DNS through it in browser (Mozilla Firefox), then use https://netbox.tooling.neo/ or https://192.168.x.x/ in browser](#or-open-dynamic-socks5-tunnel-ssh--i-sshid_rsa-userbastion--d-zyx-and-set-socks5-proxy-127001zyx-and-pass-dns-through-it-in-browser-mozilla-firefox-then-use-httpsnetboxtoolingneo-or-https192168xx-in-browser)
+
+***
+
 ## Ansible playbooks usage for Netbox automation, based on [Galaxy collection](https://docs.ansible.com/ansible/latest/collections/netbox/netbox/).
 [![Inline docs](http://inch-ci.org/github/bogdanadrian-burciu/netbox-ansible.svg?branch=master)](http://inch-ci.org/github/bogdanadrian-burciu/netbox-ansible)
 ## 0. How to install Ansible Galaxy collection to correct path:
@@ -161,7 +197,7 @@ boburciu@WX-5CG020BDT2: /netbox-ansible-automation$ ` ls -lt ~/parse_excel_serve
 boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$
 ```
 ### Add in NetBox, by calling external_vars.yml files as extra-var:
-boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` for i in `ls -lt ~/parse_excel_servers/ | grep external_vars_ | awk '{print $9}'`; do echo ""; echo ""; echo "***** running playbook for variables in $i *****"; echo ""; echo ""; echo ""; ansible-playbook -i ./hosts create_device_wMgmtIntIP_inRack_inTenant_inRack_inSite.yml -e "external_vars='../parse_excel_servers/$i' -v"; done `  <br/>
+boburciu@WX-5CG020BDT2:~/netbox-ansible-automation$ ` for i in `ls -lt ~/parse_excel_servers/ | grep external_vars_ | awk '{print $9}'`; do echo ""; echo ""; echo "***** running playbook for variables in $i *****"; echo ""; echo ""; echo ""; ansible-playbook -i ./hosts create_device_wMgmtIntIP_inRack_inTenant_inRack_inSite.yml -e "external_vars='../parse_excel_servers/$i' ansible_python_interpreter='/usr/bin/python3'" -v; done `  <br/>
 
 ### Or use a bash script to optimize Ansible creation:
 ` ./IaC/run_ansible_optimized.sh -d ~/parse_excel_servers/ `
