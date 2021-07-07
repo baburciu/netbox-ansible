@@ -1,3 +1,6 @@
+# Dockerfile for image containing napalm-ce and napalm-fortios code
+# docker image build . --tag netbox:napalm-huawei-fortinet --build-arg FROM=netboxcommunity/netbox:latest --build-arg NETBOX_PATH=".netbox"
+
 ARG FROM
 FROM ${FROM} as builder
 
