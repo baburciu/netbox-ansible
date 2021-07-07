@@ -6,7 +6,7 @@ NAPALM
 Table of Contents
 -----------------
 
-- [Using Napalm to collect info from Huawei CE swi9tches and NE router, following [this article](https://codingnetworks.blog/napalm-network-automation-python-working-with-huawei-vrp/) and using Ansible-Runner to run Ansible playbooks directly from Python](#using-napalm-to-collect-info-from-huawei-ce-swi9tches-and-ne-router-following-this-article-and-using-ansible-runner-to-run-ansible-playbooks-directly-from-python)
+- [Using Napalm to collect info from Huawei CE switches and NE router, following [this article](https://codingnetworks.blog/napalm-network-automation-python-working-with-huawei-vrp/) and using Ansible-Runner to run Ansible playbooks directly from Python](#using-napalm-to-collect-info-from-huawei-ce-swi9tches-and-ne-router-following-this-article-and-using-ansible-runner-to-run-ansible-playbooks-directly-from-python)
   - [0. First steps:](#0-first-steps)
     - [- Install Python3 venv (on Ubuntu):](#--install-python3-venv-on-ubuntu)
     - [- Creating Python venv:](#--creating-python-venv)
@@ -92,7 +92,7 @@ Automate all the things!!!
 
  #### - We'll use NAPALM [community driver for the Huawei CloudEngine Switch] (https://github.com/napalm-automation-community/napalm-ce):
  (napalm-huawei) boburciu@Ubuntu1804-WSL$ ` pip3 install napalm-ce ` <br/>
- (napalm-huawei) boburciu@Ubuntu1804-WSL$ ` napalm --user orangeoln --password secret_here --vendor ce 192.168.X.Y  call get_interfaces ` <br/>
+ (napalm-huawei) boburciu@Ubuntu1804-WSL$ ` napalm --user user_here --password secret_here --vendor ce 192.168.X.Y  call get_interfaces ` <br/>
 ``` 
 {
     "10GE1/0/1": {
@@ -147,7 +147,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 ```
 >>> ` import napalm ` <br/>
 >>> ` driver=napalm.get_network_driver("ce") ` <br/>
->>> ` device=driver(hostname="192.168.X.Y", username="orangeoln", password="secret_here") ` <br/>
+>>> ` device=driver(hostname="192.168.X.Y", username="user_here", password="secret_here") ` <br/>
 >>> ` device.open() ` <br/>
 >>> ` device.get_facts() ` <br/>
 ```
