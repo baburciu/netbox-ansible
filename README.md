@@ -516,15 +516,15 @@ drwx------. 2 70 70     6 Jan 25  2021 pg_twophase
 -rw-------. 1 70 70     3 Jan 25  2021 PG_VERSION
 [root@gitlab-runner-and-netbox netbox-docker]#
 ```
-[root@gitlab-runner-and-netbox netbox-docker]# `rm -rf /var/lib/docker/volumes/netbox-docker_netbox-postgres-data/_data`
-[root@gitlab-runner-and-netbox netbox-docker]# `ls -lt /var/lib/docker/volumes/netbox-docker_netbox-postgres-data/_data`
+[root@gitlab-runner-and-netbox netbox-docker]# `rm -rf /var/lib/docker/volumes/netbox-docker_netbox-postgres-data/_data` <br/>
+[root@gitlab-runner-and-netbox netbox-docker]# `ls -lt /var/lib/docker/volumes/netbox-docker_netbox-postgres-data/_data` <br/>
 ```
 ls: cannot access /var/lib/docker/volumes/netbox-docker_netbox-postgres-data/_data: No such file or directory
 [root@gitlab-runner-and-netbox netbox-docker]#
 ```
 [root@gitlab-runner-and-netbox netbox-docker]# `mkdir /var/lib/docker/volumes/netbox-docker_netbox-postgres-data/_data`
-[root@gitlab-runner-and-netbox netbox-docker]# `docker-compose down`
-[root@gitlab-runner-and-netbox netbox-docker]# `docker-compose up`
+[root@gitlab-runner-and-netbox netbox-docker]# `docker-compose down` <br/>
+[root@gitlab-runner-and-netbox netbox-docker]# `docker-compose up` <br/>
 ```
 netbox-docker_redis-cache_1 is up-to-date
 netbox-docker_redis_1 is up-to-date
