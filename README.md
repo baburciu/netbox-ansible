@@ -26,7 +26,9 @@
   - [6. How to backup the PostgreSQL database of NetBox and the uploaded files (like images) and to restore, per netbox-docker official wiki](#6-how-to-backup-the-postgresql-database-of-netbox-and-the-uploaded-files-like-images-and-to-restore-per-netbox-docker-official-wiki)
     - [DB Operations:](#db-operations)
     - [File Operations:](#file-operations)
-  - [7. How to get NetBox access over HTTPS, by placing a Reverse-Proxy in front of it, like Caddy, per [netbox-docker guide](https://github.com/netbox-community/netbox-docker/wiki/TLS)](#7-how-to-get-netbox-access-over-https-by-placing-a-reverse-proxy-in-front-of-it-like-caddy-per-netbox-docker-guide)
+  - [7. How to clear all NetBox database]
+  (#7-how-to-clear-all-netbox-database)    
+  - [8. How to get NetBox access over HTTPS, by placing a Reverse-Proxy in front of it, like Caddy, per [netbox-docker guide](https://github.com/netbox-community/netbox-docker/wiki/TLS)](#7-how-to-get-netbox-access-over-https-by-placing-a-reverse-proxy-in-front-of-it-like-caddy-per-netbox-docker-guide)
     - [create a server certificate (like from Vault PKI) with SANs: DNS Name=netbox.dnszone, IP Address=192.168.x.x, IP Address=127.0.0.1](#create-a-server-certificate-like-from-vault-pki-with-sans-dns-namenetboxdnszone-ip-address192168xx-ip-address127001)
     - [configure the Caddy Reverse Proxy](#configure-the-caddy-reverse-proxy)
     - [to troubleshoot check Caddy RP container logs:](#to-troubleshoot-check-caddy-rp-container-logs)
@@ -439,7 +441,115 @@ Restore of the _media_ directory:
 docker-compose exec -T netbox tar x -jvf - -C /opt/netbox/netbox/media < media-backup.tar.bz2 
 ```
 
-## 7. How to get NetBox access over HTTPS, by placing a Reverse-Proxy in front of it, like [Caddy](https://hub.docker.com/_/caddy?tab=description), per [netbox-docker guide](https://github.com/netbox-community/netbox-docker/wiki/TLS)
+## 7. How to clear all NetBox database 
+#### (including users - except default *admin/admin*)
+[root@gitlab-runner-and-netbox netbox-docker]# `cat docker-compose.yml`
+```
+version: '3.4'
+services:
+:
+  # postgres
+  postgres:
+    image: postgres:12-alpine
+    env_file: env/postgres.env
+    volumes:
+    - netbox-postgres-data:/var/lib/postgresql/data
+:
+volumes:
+:
+  netbox-postgres-data:
+    driver: local
+:
+```
+[root@gitlab-runner-and-netbox netbox-docker]# `docker volume ls`
+```
+DRIVER    VOLUME NAME
+:
+local     netbox-docker_netbox-postgres-data
+:
+```
+[root@gitlab-runner-and-netbox netbox-docker]# `docker volume inspect netbox-docker_netbox-postgres-data`
+```
+[
+    {
+        "CreatedAt": "2021-08-19T12:19:36+03:00",
+        "Driver": "local",
+        "Labels": {
+            "com.docker.compose.project": "netbox-docker",
+            "com.docker.compose.version": "1.27.4",
+            "com.docker.compose.volume": "netbox-postgres-data"
+        },
+        "Mountpoint": "/var/lib/docker/volumes/netbox-docker_netbox-postgres-data/_data",
+        "Name": "netbox-docker_netbox-postgres-data",
+        "Options": null,
+        "Scope": "local"
+    }
+]
+[root@gitlab-runner-and-netbox netbox-docker]#
+```
+[root@gitlab-runner-and-netbox netbox-docker]# `ls -lt /var/lib/docker/volumes/netbox-docker_netbox-postgres-data/_data`
+```
+total 60
+drwx------. 2 70 70    63 Aug 19 12:35 pg_stat_tmp
+drwx------. 4 70 70    68 Aug 19 12:24 pg_logical
+drwx------. 2 70 70  4096 Aug 19 12:19 global
+drwx------. 2 70 70     6 Aug 19 12:19 pg_stat
+-rw-------. 1 70 70    94 Aug 19 12:19 postmaster.pid
+-rw-------. 1 70 70    24 Aug 19 12:19 postmaster.opts
+drwx------. 2 70 70    18 Aug 19 12:19 pg_notify
+drwx------. 3 70 70    92 Apr  2 18:09 pg_wal
+drwx------. 6 70 70    54 Jan 25  2021 base
+-rw-------. 1 70 70  4782 Jan 25  2021 pg_hba.conf
+drwx------. 2 70 70    18 Jan 25  2021 pg_subtrans
+drwx------. 2 70 70    18 Jan 25  2021 pg_xact
+-rw-------. 1 70 70  1636 Jan 25  2021 pg_ident.conf
+-rw-------. 1 70 70    88 Jan 25  2021 postgresql.auto.conf
+-rw-------. 1 70 70 26580 Jan 25  2021 postgresql.conf
+drwx------. 2 70 70     6 Jan 25  2021 pg_commit_ts
+drwx------. 2 70 70     6 Jan 25  2021 pg_dynshmem
+drwx------. 4 70 70    36 Jan 25  2021 pg_multixact
+drwx------. 2 70 70     6 Jan 25  2021 pg_replslot
+drwx------. 2 70 70     6 Jan 25  2021 pg_serial
+drwx------. 2 70 70     6 Jan 25  2021 pg_snapshots
+drwx------. 2 70 70     6 Jan 25  2021 pg_tblspc
+drwx------. 2 70 70     6 Jan 25  2021 pg_twophase
+-rw-------. 1 70 70     3 Jan 25  2021 PG_VERSION
+[root@gitlab-runner-and-netbox netbox-docker]#
+```
+[root@gitlab-runner-and-netbox netbox-docker]# `rm -rf /var/lib/docker/volumes/netbox-docker_netbox-postgres-data/_data`
+[root@gitlab-runner-and-netbox netbox-docker]# `ls -lt /var/lib/docker/volumes/netbox-docker_netbox-postgres-data/_data`
+```
+ls: cannot access /var/lib/docker/volumes/netbox-docker_netbox-postgres-data/_data: No such file or directory
+[root@gitlab-runner-and-netbox netbox-docker]#
+```
+[root@gitlab-runner-and-netbox netbox-docker]# `mkdir /var/lib/docker/volumes/netbox-docker_netbox-postgres-data/_data`
+[root@gitlab-runner-and-netbox netbox-docker]# `docker-compose down`
+[root@gitlab-runner-and-netbox netbox-docker]# `docker-compose up`
+```
+netbox-docker_redis-cache_1 is up-to-date
+netbox-docker_redis_1 is up-to-date
+netbox-docker_netbox-worker_1 is up-to-date
+Creating netbox-docker_postgres_1 ... done
+Attaching to netbox-docker_redis-cache_1, netbox-docker_redis_1, netbox-docker_netbox-worker_1, netbox-docker_postgres_1, netbox-docker_netbox_1, netbox-docker_nginx_1
+:
+postgres_1       | CREATE DATABASE
+postgres_1       |
+:
+postgres_1       | PostgreSQL init process complete; ready for start up.
+:
+netbox_1         | ✅ Initialisation is done.
+netbox_1         | [2021-08-19 09:42:47 +0000] [1] [INFO] Starting gunicorn 20.0.4
+netbox_1         | [2021-08-19 09:42:47 +0000] [1] [INFO] Listening at: http://0.0.0.0:8001 (1)
+```
+
+###  How to find PostgreSQL database version in container
+[root@gitlab-runner-and-netbox netbox-docker]# `docker-compose exec postgres sh -c 'psql -U $POSTGRES_USER -d $POSTGRES_DB -V'`
+```
+psql (PostgreSQL) 12.5
+[root@gitlab-runner-and-netbox netbox-docker]#
+```
+
+## 8. How to get NetBox access over HTTPS, by placing a Reverse-Proxy in front of it, like [Caddy](https://hub.docker.com/_/caddy?tab=description), per [netbox-docker guide](https://github.com/netbox-community/netbox-docker/wiki/TLS)
 
 ### create a server certificate (like from Vault PKI) with SANs: DNS Name=netbox.dnszone, IP Address=192.168.x.x, IP Address=127.0.0.1
 ubuntu@netbox-vm:~/vault$ ` sudo mv vault_netbox_key_1.key ../netbox-docker/vault_netbox_key_ipsan.key ` <br/>
