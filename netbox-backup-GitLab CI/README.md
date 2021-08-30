@@ -114,7 +114,7 @@ check_interval = 0
 ```
 [Service]
 Environment="HTTP_PROXY=http://192.168.X.X:8080"
-Environment="HTTPS_PROXY=https://192.168.X.X:8080"
+Environment="HTTPS_PROXY=http://192.168.X.X:8080"
 ```
 [root@gitlab-runner-and-netbox ~]#
  #### 1.2 Restart docker
