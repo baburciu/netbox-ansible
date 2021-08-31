@@ -26,16 +26,22 @@
   - [6. How to backup the PostgreSQL database of NetBox and the uploaded files (like images) and to restore, per netbox-docker official wiki](#6-how-to-backup-the-postgresql-database-of-netbox-and-the-uploaded-files-like-images-and-to-restore-per-netbox-docker-official-wiki)
     - [DB Operations:](#db-operations)
     - [File Operations:](#file-operations)
-  - [7. How to clear all NetBox database]
-  (#7-how-to-clear-all-netbox-database)    
-  - [8. How to get NetBox access over HTTPS, by placing a Reverse-Proxy in front of it, like Caddy, per [netbox-docker guide](https://github.com/netbox-community/netbox-docker/wiki/TLS)](#7-how-to-get-netbox-access-over-https-by-placing-a-reverse-proxy-in-front-of-it-like-caddy-per-netbox-docker-guide)
+  - [7. How to clear all NetBox database](#7-how-to-clear-all-netbox-database)
+      - [(including users - except default *admin/admin*)](#including-users---except-default-adminadmin)
+    - [How to find PostgreSQL database version in container](#how-to-find-postgresql-database-version-in-container)
+  - [8. How to get NetBox access over HTTPS](#8-how-to-get-netbox-access-over-https)
+    - [Done by placing a Reverse-Proxy in front of it, like Caddy, per [netbox-docker guide](https://github.com/netbox-community/netbox-docker/wiki/TLS):](#done-by-placing-a-reverse-proxy-in-front-of-it-like-caddy-per-netbox-docker-guide)
     - [create a server certificate (like from Vault PKI) with SANs: DNS Name=netbox.dnszone, IP Address=192.168.x.x, IP Address=127.0.0.1](#create-a-server-certificate-like-from-vault-pki-with-sans-dns-namenetboxdnszone-ip-address192168xx-ip-address127001)
     - [configure the Caddy Reverse Proxy](#configure-the-caddy-reverse-proxy)
     - [to troubleshoot check Caddy RP container logs:](#to-troubleshoot-check-caddy-rp-container-logs)
     - [how to connect to NetBox (with HTTP to HTTPS forwarding):](#how-to-connect-to-netbox-with-http-to-https-forwarding)
       - [open SSH tunnel and forward 192.168.x.x:443 to localhost:xyz (` ssh -i ~/.ssh/id_rsa user@bastion -L xyz:192.168.x.x:443`), then use https://localhost:xyz/ or https://127.0.0.1:xyz/ in browser](#open-ssh-tunnel-and-forward-192168xx443-to-localhostxyz--ssh--i-sshid_rsa-userbastion--l-xyz192168xx443-then-use-httpslocalhostxyz-or-https127001xyz-in-browser)
       - [OR open dynamic SOCKS5 tunnel (` ssh -i ~/.ssh/id_rsa user@bastion -D zyx `) and set SOCKS5 proxy 127.0.0.1:zyx and pass DNS through it in browser (Mozilla Firefox), then use https://netbox.tooling.neo/ or https://192.168.x.x/ in browser](#or-open-dynamic-socks5-tunnel-ssh--i-sshid_rsa-userbastion--d-zyx-and-set-socks5-proxy-127001zyx-and-pass-dns-through-it-in-browser-mozilla-firefox-then-use-httpsnetboxtoolingneo-or-https192168xx-in-browser)
-
+  - [9. How to add a visual Topology view in NetBox Organization > Sites:](#9-how-to-add-a-visual-topology-view-in-netbox-organization--sites)
+      - [Clone NextBox UI Plugin repo, where a Dockerfile exists for building a custom netbox Docker image containing the plugin](#clone-nextbox-ui-plugin-repo-where-a-dockerfile-exists-for-building-a-custom-netbox-docker-image-containing-the-plugin)
+      - [Ensure the proper Proxy is set for the container, so that the Docker image can be build with packages from Internet:](#ensure-the-proper-proxy-is-set-for-the-container-so-that-the-docker-image-can-be-build-with-packages-from-internet)
+      - [set the **custom netbox-ui-plugin** image to be created from a previous image (if specific packages like NAPALM were installed on that image)](#set-the-custom-netbox-ui-plugin-image-to-be-created-from-a-previous-image-if-specific-packages-like-napalm-were-installed-on-that-image)
+    - [Edit and assign NetBox devices with tags of type *icon_router*, *icon_switch*, *icon_server*, per official NextBox UI Plugin doc, so that a representative icon is available for them in Topology view (those without get question mark **?**)](#edit-and-assign-netbox-devices-with-tags-of-type-icon_router-icon_switch-icon_server-per-official-nextbox-ui-plugin-doc-so-that-a-representative-icon-is-available-for-them-in-topology-view-those-without-get-question-mark-)
 ***
 
 ## Ansible playbooks usage for Netbox automation, based on [Galaxy collection](https://docs.ansible.com/ansible/latest/collections/netbox/netbox/).
@@ -549,8 +555,9 @@ psql (PostgreSQL) 12.5
 [root@gitlab-runner-and-netbox netbox-docker]#
 ```
 
-## 8. How to get NetBox access over HTTPS, by placing a Reverse-Proxy in front of it, like [Caddy](https://hub.docker.com/_/caddy?tab=description), per [netbox-docker guide](https://github.com/netbox-community/netbox-docker/wiki/TLS)
+## 8. How to get NetBox access over HTTPS
 
+### Done by placing a Reverse-Proxy in front of it, like [Caddy](https://hub.docker.com/_/caddy?tab=description), per [netbox-docker guide](https://github.com/netbox-community/netbox-docker/wiki/TLS):
 ### create a server certificate (like from Vault PKI) with SANs: DNS Name=netbox.dnszone, IP Address=192.168.x.x, IP Address=127.0.0.1
 ubuntu@netbox-vm:~/vault$ ` sudo mv vault_netbox_key_1.key ../netbox-docker/vault_netbox_key_ipsan.key ` <br/>
 ubuntu@netbox-vm:~/vault$ ` sudo mv vault_netbox_cert_1.crt ../netbox-docker/vault_netbox_cert_ipsan.crt ` <br/>
@@ -610,3 +617,135 @@ ubuntu@netbox-vm:~/netbox-docker$
 ### how to connect to NetBox (with HTTP to HTTPS forwarding):
    #### open SSH tunnel and forward 192.168.x.x:443 to localhost:xyz (` ssh -i ~/.ssh/id_rsa user@bastion -L xyz:192.168.x.x:443`), then use https://localhost:xyz/ or https://127.0.0.1:xyz/ in browser
    #### OR open dynamic SOCKS5 tunnel (` ssh -i ~/.ssh/id_rsa user@bastion -D zyx `) and set SOCKS5 proxy 127.0.0.1:zyx and pass DNS through it in browser (Mozilla Firefox), then use https://netbox.tooling.neo/ or https://192.168.x.x/ in browser
+
+
+## 9. How to add a visual Topology view in NetBox Organization > Sites:
+
+#### Clone [NextBox UI Plugin](https://github.com/iDebugAll/nextbox-ui-plugin) repo, where a Dockerfile exists for building a custom netbox Docker image containing the plugin
+[root@gitlab-runner-and-netbox projects]# `git clone https://github.com/iDebugAll/nextbox-ui-plugin`
+[root@gitlab-runner-and-netbox projects]# 
+
+#### Ensure the proper Proxy is set for the container, so that the Docker image can be build with packages from Internet:
+[root@gitlab-runner-and-netbox nextbox-ui-plugin]# `vim /etc/systemd/system/docker.service.d/http-proxy.conf`
+[root@gitlab-runner-and-netbox nextbox-ui-plugin]# `cat /etc/systemd/system/docker.service.d/http-proxy.conf`
+```
+[Service]
+Environment="HTTP_PROXY=http://192.168.201.130:8080"
+Environment="HTTPS_PROXY=http://192.168.201.130:8080"
+
+```
+[root@gitlab-runner-and-netbox nextbox-ui-plugin]# `systemctl daemon-reload`
+[root@gitlab-runner-and-netbox nextbox-ui-plugin]# `systemctl restart docker`
+[root@gitlab-runner-and-netbox nextbox-ui-plugin]# `systemctl show --property=Environment docker`
+```
+Environment=HTTP_PROXY=http://192.168.201.130:8080 HTTPS_PROXY=http://192.168.201.130:8080
+[root@gitlab-runner-and-netbox nextbox-ui-plugin]# cat ~/.docker/config.json
+{
+ "proxies":
+ {
+   "default":
+   {
+     "httpProxy": "http://192.168.201.130:8080",
+     "httpsProxy": "http://192.168.201.130:8080"
+   }
+ }
+}
+```
+
+#### set the **custom netbox-ui-plugin** image to be created from a previous image (if specific packages like NAPALM were installed on that image)
+[root@gitlab-runner-and-netbox projects]# `vim nextbox-ui-plugin/Dockerfile` <br/>
+[root@gitlab-runner-and-netbox projects]# `cat nextbox-ui-plugin/Dockerfile` <br/>
+```
+ARG FROM_IMAGE=netbox
+ARG FROM_TAG=napalm-huawei-fortinet
+ARG FROM=${FROM_IMAGE}:${FROM_TAG}
+FROM ${FROM}
+
+ENV VIRTUAL_ENV=/opt/netbox/venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+COPY ./nextbox_ui_plugin /source/nextbox-ui-plugin/nextbox_ui_plugin/
+COPY ./setup.py /source/nextbox-ui-plugin/
+COPY ./MANIFEST.in /source/nextbox-ui-plugin/
+COPY ./README.md /source/nextbox-ui-plugin/
+COPY --chown=1000:1000 --chmod=644 ./nextbox_ui_plugin/static/nextbox_ui_plugin /opt/netbox/netbox/static/nextbox_ui_plugin
+RUN pip3 install --no-cache-dir nextbox-ui-plugin
+```
+[root@gitlab-runner-and-netbox projects]# `cd nextbox-ui-plugin` <br/>
+[root@gitlab-runner-and-netbox nextbox-ui-plugin]# `docker build -t netbox-custom .` <br/>
+```
+Sending build context to Docker daemon  10.92MB
+Step 1/12 : ARG FROM_IMAGE=netbox
+Step 2/12 : ARG FROM_TAG=napalm-huawei-fortinet
+Step 3/12 : ARG FROM=${FROM_IMAGE}:${FROM_TAG}
+Step 4/12 : FROM ${FROM}
+:
+Successfully tagged netbox-custom:latest
+```
+[root@gitlab-runner-and-netbox nextbox-ui-plugin]# `docker image ls`
+```
+REPOSITORY               TAG                      IMAGE ID       CREATED         SIZE
+netbox-custom            latest                   8fdf1515e906   7 seconds ago   370MB
+<none>                   <none>                   35c29aca8441   16 hours ago    432MB
+netboxcommunity/netbox   latest-ldap              4dbbdeaf05a4   7 days ago      409MB
+netbox                   napalm-huawei-fortinet   dfbe342cff44   7 weeks ago     340MB
+alpine                   latest                   d4ff818577bc   2 months ago    5.6MB
+gitlab/gitlab-runner     latest                   6965be4d8032   3 months ago    819MB
+netbox                   napalm                   3ab20b99381c   5 months ago    336MB
+postgres                 12-alpine                7ec50832fed0   7 months ago    159MB
+redis                    6-alpine                 933c79ea2511   7 months ago    31.6MB
+netboxcommunity/netbox   latest                   8e452c542927   7 months ago    229MB
+nginx                    1.19-alpine              629df02b47c8   8 months ago    22.3MB
+[root@gitlab-runner-and-netbox nextbox-ui-plugin]#
+```
+[root@gitlab-runner-and-netbox nextbox-ui-plugin]# `cd ../netbox-docker_Feper/`
+[root@gitlab-runner-and-netbox netbox-docker_Feper]# `cat -n docker-compose.yml | head`
+```
+     1  version: '3.4'
+     2  services:
+     3    netbox: &netbox
+     4      image: netbox:napalm-huawei-fortinet
+     5      depends_on:
+     6      - postgres
+     7      - redis
+     8      - redis-cache
+     9      - netbox-worker
+    10      env_file: env/netbox.env
+```
+[root@gitlab-runner-and-netbox netbox-docker_Feper]# `vim +4 docker-compose.yml` <br/>
+[root@gitlab-runner-and-netbox netbox-docker_Feper]# `cat -n docker-compose.yml | head` <br/>
+```
+     1  version: '3.4'
+     2  services:
+     3    netbox: &netbox
+     4      image: netbox-custom:latest
+     5      depends_on:
+     6      - postgres
+     7      - redis
+     8      - redis-cache
+     9      - netbox-worker
+    10      env_file: env/netbox.env
+[root@gitlab-runner-and-netbox netbox-docker_Feper]#
+```
+[root@gitlab-runner-and-netbox netbox-docker_Feper]# `cat -n configuration/configuration.py | grep PLUGIN`
+```
+   192  PLUGINS = []
+   196  PLUGINS_CONFIG = {
+```       
+[root@gitlab-runner-and-netbox netbox-docker_Feper]# `vim +192 configuration/configuration.py` <br/>
+[root@gitlab-runner-and-netbox netbox-docker_Feper]# `cat -n configuration/configuration.py | grep PLUGIN` <br/>
+```
+   192  PLUGINS = ['nextbox_ui_plugin']
+   196  PLUGINS_CONFIG = {
+```
+[root@gitlab-runner-and-netbox netbox-docker_Feper]# `docker-compose down`
+```
+Stopping netbox-docker_feper_nginx_1         ...
+Stopping netbox-docker_feper_netbox_1        ...
+Stopping netbox-docker_feper_netbox-worker_1 ...
+Stopping netbox-docker_feper_redis_1         ...
+Stopping netbox-docker_feper_postgres_1      ...
+Stopping netbox-docker_feper_redis-cache_1   ...
+```
+[root@gitlab-runner-and-netbox netbox-docker_Feper]# `docker-compose up -d &`
+
+### Edit and assign NetBox devices with tags of type *icon_router*, *icon_switch*, *icon_server*, per official [NextBox UI Plugin](https://github.com/iDebugAll/nextbox-ui-plugin#enable-the-plugin) doc, so that a representative icon is available for them in Topology view (those without get question mark **?**)
