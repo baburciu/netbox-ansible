@@ -16,7 +16,7 @@ for i in "${!last_name[@]}"; do
     un_string=${un%@*}  # get the text prior to @ in mail
     username=${un_string,,}   # transform to lowercase
     pwd_hash=`echo -n $username | sha384sum`
-    password=Pikeo${pwd_hash:0:10}
+    password=SomeText${pwd_hash:0:10}
     echo "username is $username"
 
     # NetBox: create user account and assign to permissive group
