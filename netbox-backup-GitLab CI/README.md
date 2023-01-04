@@ -1,6 +1,5 @@
 GitLab runners
 ========
-- [GitLab runners](#gitlab-runners)
   - [Installing a GitLab runner locally as Docker container service](#installing-a-gitlab-runner-locally-as-docker-container-service)
   - [Registering GitLab runner to https://gitlab.com](#registering-gitlab-runner-to-httpsgitlabcom)
     - [1. First create repo in Git](#1-first-create-repo-in-git)
@@ -21,8 +20,7 @@ GitLab runners
   - [To have the GitLab runner SSH to another machine](#to-have-the-gitlab-runner-ssh-to-another-machine)
     - [1. You need to create SSH key pair, add the .pub one to *~/.ssh/authorized_keys* on the target machine and add the private key to the runner container](#1-you-need-to-create-ssh-key-pair-add-the-pub-one-to-sshauthorized_keys-on-the-target-machine-and-add-the-private-key-to-the-runner-container)
     - [2. Have the private key owned by the *gitlab-runner* user](#2-have-the-private-key-owned-by-the-gitlab-runner-user)
-
-***
+  - [Using Docker-in-Docker executor behind proxy](#using-docker-in-docker-executor-behind-proxy)
 
 ## Installing a GitLab runner locally as Docker container service 
 
@@ -238,4 +236,47 @@ Modify: 2021-06-28 16:57:17.909704589 +0000
 Change: 2021-06-29 11:10:39.012321329 +0000
  Birth: -
 [root@gitlab-runner-and-netbox ~]#
+```
+
+## Using Docker-in-Docker executor behind proxy
+GitLab Runner does not require a restart when you change most options. This includes parameters in the [[runners]] section and most parameters in the global section, except for listen_address. If a runner was already registered, you don’t need to register it again.
+GitLab Runner checks for configuration modifications every 3 seconds and reloads if necessary.
+More on runner configuration on [advanced page](https://docs.gitlab.com/runner/configuration/advanced-configuration.html).
+```shell
+root@capi-bootstrap-capd-bb:/home/ubuntu/telco-cloud/capi-bootstrap# ip r sh dev docker0
+172.17.0.0/16 proto kernel scope link src 172.17.0.1
+root@capi-bootstrap-capd-bb:/home/ubuntu/telco-cloud/capi-bootstrap# cat /srv/gitlab-runner/config/config.toml
+concurrent = 5
+check_interval = 0
+shutdown_timeout = 0
+
+[session_server]
+  session_timeout = 1800
+
+[[runners]]
+  name = "my-runner"
+  url = "https://gitlab.com/"
+  id = 20131826
+  token = "XXXX"
+  token_obtained_at = 2023-01-04T08:39:11Z
+  token_expires_at = 0001-01-01T00:00:00Z
+  executor = "docker"
+  environment = ["HTTPS_PROXY=http://1.2.3.4:3128", "HTTP_PROXY=http://1.2.3.4:3128", "NO_PROXY=172.17.0.0/16"]    # will inject env vars to DinD containers, otherwise missing since ~/.docker/config.json is only for Docker Client to pass proxy information to containers, while DinD are created by GitLab .gitlab-ci.yml 
+  pre_clone_script = "git config --global http.proxy $HTTP_PROXY; git config --global https.proxy $HTTPS_PROXY"    # have DinD containers run git commands behind proxy
+  [runners.custom_build_dir]
+  [runners.cache]
+    MaxUploadedArchiveSize = 0
+    [runners.cache.s3]
+    [runners.cache.gcs]
+    [runners.cache.azure]
+  [runners.docker]
+    tls_verify = false
+    image = "alpine:3.15"
+    privileged = true
+    disable_entrypoint_overwrite = false
+    oom_kill_disable = false
+    disable_cache = false
+    volumes = ["/cache"]
+    shm_size = 0
+root@capi-bootstrap-capd-bb:/home/ubuntu/telco-cloud/capi-bootstrap# 
 ```
