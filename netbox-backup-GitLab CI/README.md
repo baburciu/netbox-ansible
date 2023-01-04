@@ -21,6 +21,9 @@ GitLab runners
     - [1. You need to create SSH key pair, add the .pub one to *~/.ssh/authorized_keys* on the target machine and add the private key to the runner container](#1-you-need-to-create-ssh-key-pair-add-the-pub-one-to-sshauthorized_keys-on-the-target-machine-and-add-the-private-key-to-the-runner-container)
     - [2. Have the private key owned by the *gitlab-runner* user](#2-have-the-private-key-owned-by-the-gitlab-runner-user)
   - [Using Docker-in-Docker executor behind proxy](#using-docker-in-docker-executor-behind-proxy)
+    - [runner config when behind a proxy](#runner-config-when-behind-a-proxy)
+    - [have dockerd exposed on localhost tcp:2375](#have-dockerd-exposed-on-localhost-tcp2375)
+  - [pipeline](#pipeline)
 
 ## Installing a GitLab runner locally as Docker container service 
 
@@ -239,9 +242,10 @@ Change: 2021-06-29 11:10:39.012321329 +0000
 ```
 
 ## Using Docker-in-Docker executor behind proxy
-GitLab Runner does not require a restart when you change most options. This includes parameters in the [[runners]] section and most parameters in the global section, except for listen_address. If a runner was already registered, you don’t need to register it again.
-GitLab Runner checks for configuration modifications every 3 seconds and reloads if necessary.
+GitLab Runner does not require a restart when you change most options, including parameters in the [[runners]] section and most parameters in the global section, except for listen_address, it reloads config automatically if necessary. <br/>
 More on runner configuration on [advanced page](https://docs.gitlab.com/runner/configuration/advanced-configuration.html).
+
+### runner config when behind a proxy
 ```shell
 root@capi-bootstrap-capd-bb:/home/ubuntu/telco-cloud/capi-bootstrap# ip r sh dev docker0
 172.17.0.0/16 proto kernel scope link src 172.17.0.1
@@ -261,7 +265,7 @@ shutdown_timeout = 0
   token_obtained_at = 2023-01-04T08:39:11Z
   token_expires_at = 0001-01-01T00:00:00Z
   executor = "docker"
-  environment = ["HTTPS_PROXY=http://1.2.3.4:3128", "HTTP_PROXY=http://1.2.3.4:3128", "NO_PROXY=172.17.0.0/16"]    # will inject env vars to DinD containers, otherwise missing since ~/.docker/config.json is only for Docker Client to pass proxy information to containers, while DinD are created by GitLab .gitlab-ci.yml 
+  environment = ["HTTPS_PROXY=http://1.2.3.4:3128", "HTTP_PROXY=http://1.2.3.4:3128", "NO_PROXY=172.17.0.0/16, docker"]    # will inject env vars to DinD containers, otherwise missing since ~/.docker/config.json is only for Docker Client to pass proxy information to containers, while DinD are created by GitLab .gitlab-ci.yml. the "docker is needed" because "kind create cluster" would sent a request to the URL http://docker:2375/v1.24/containers/ and this one matches the proxy, if not present in no_proxy
   pre_clone_script = "git config --global http.proxy $HTTP_PROXY; git config --global https.proxy $HTTPS_PROXY"    # have DinD containers run git commands behind proxy
   [runners.custom_build_dir]
   [runners.cache]
@@ -279,4 +283,69 @@ shutdown_timeout = 0
     volumes = ["/cache"]
     shm_size = 0
 root@capi-bootstrap-capd-bb:/home/ubuntu/telco-cloud/capi-bootstrap# 
+```
+
+### have dockerd exposed on localhost tcp:2375
+```shell
+root@capi-bootstrap-capd-bb:~# cat /etc/docker/daemon.json
+{"hosts": ["tcp://0.0.0.0:2375", "unix:///var/run/docker.sock"]}
+root@capi-bootstrap-capd-bb:~# dockerd &> dockerd-logfile &
+root@capi-bootstrap-capd-bb:~# docker ps
+CONTAINER ID   IMAGE                         COMMAND                  CREATED         STATUS         PORTS           NAMES
+7d194ae59ef1   c2a760fa8767                  "docker-entrypoint.s…"   2 minutes ago   Up 2 minutes                   runner-yzy-j8u-project-37797811-concurrent-0-82cc1a9c03842dd2-build-3
+4a32676a9a2a   d736edfbfb0c                  "dockerd-entrypoint.…"   2 minutes ago   Up 2 minutes   2375-2376/tcp   runner-yzy-j8u-project-37797811-concurrent-0-82cc1a9c03842dd2-docker-0
+ad5f3f5dac51   gitlab/gitlab-runner:latest   "/usr/bin/dumb-init …"   9 months ago    Up 2 hours                     gitlab-runner
+root@capi-bootstrap-capd-bb:~#
+root@capi-bootstrap-capd-bb:~# netstat -tupan | grep 2375
+(Not all processes could be identified, non-owned process info
+ will not be shown, you would have to be root to see it all.)
+tcp6       0      0 :::2375                 :::*                    LISTEN      -
+root@capi-bootstrap-capd-bb:~# docker exec -it 4a32676a9a2a sh -c "netstat -tupan | grep 2375"
+tcp        0      0 :::2375                 :::*                    LISTEN      29/dockerd
+tcp        0      0 ::ffff:172.17.0.3:2375  ::ffff:172.17.0.4:36390 ESTABLISHED 29/dockerd
+root@capi-bootstrap-capd-bb:~# 
+```
+
+## pipeline
+```shell
+.create-kind:
+  stage: deploy
+  before_script:
+    # FIXME: build an image with following tools (+clusterctl)
+    - apk add --no-cache curl bash git gettext # for envsubst
+    - curl -Lo /usr/local/bin/kind https://kind.sigs.k8s.io/dl/v0.15.0/kind-linux-amd64
+    - chmod +x /usr/local/bin/kind
+    - curl -Lo /usr/local/bin/kubectl https://dl.k8s.io/release/v1.25.0/bin/linux/amd64/kubectl
+    - chmod +x /usr/local/bin/kubectl
+    - curl -Lo /usr/local/bin/kubetail https://raw.githubusercontent.com/johanhaleby/kubetail/master/kubetail
+    - chmod +x /usr/local/bin/kubetail
+    - curl -L https://get.helm.sh/helm-v3.10.1-linux-amd64.tar.gz | tar xz
+    - mv linux-amd64/helm /usr/local/bin/
+    - curl -Lo /usr/bin/yq https://github.com/mikefarah/yq/releases/download/v4.30.6/yq_linux_amd64
+    - chmod +x /usr/bin/yq
+
+    - DOCKER_IP=$(getent hosts docker | awk '{print $1}')
+    - |
+      # create a cluster with access to API endpoint through docker-in-docker address
+      cat <<EOF | kind create cluster --name capd --config=-
+      kind: Cluster
+      apiVersion: kind.x-k8s.io/v1alpha4
+      networking:
+        apiServerAddress: "$DOCKER_IP"
+        apiServerPort: 6443
+      EOF
+    - kubectl cluster-info --context kind-capd
+
+    - KIND_PREFIX=$(docker network inspect kind -f '{{ (index .IPAM.Config 0).Subnet }}')
+    - ip route add $KIND_PREFIX via $DOCKER_IP
+
+    - export DOCKER_HOST=tcp://$DOCKER_IP:2375
+    - find somedir/*-some/ -name values.yaml -exec yq -i '.path.to.yaml.value = strenv(ENV_VAR_EXPORTED_ABOVE)' {} \;
+
+
+test-w-kind:
+  timeout: 60min
+  extends: .create-kind
+  script:
+    - ./run.sh somedir/*-some/    
 ```
