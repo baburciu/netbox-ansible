@@ -245,6 +245,39 @@ Change: 2021-06-29 11:10:39.012321329 +0000
 GitLab Runner does not require a restart when you change most options, including parameters in the [[runners]] section and most parameters in the global section, except for listen_address, it reloads config automatically if necessary. <br/>
 More on runner configuration on [advanced page](https://docs.gitlab.com/runner/configuration/advanced-configuration.html).
 
+### DinD architecture
+
+if you use
+```shell
+[[runners]]
+:
+  executor = "docker"
+:
+  [runners.docker]
+:
+    volumes = ["/var/run/docker.sock:/var/run/docker.sock"]  # this should not be used for DinD
+```
+your cannot use pipeline jobs with 
+```shell
+  services:
+    - name: docker:dind
+      alias: docker
+```
+as the containers are not Docker in Docker, but Docker host, per [this note](https://gitlab.com/gitlab-org/gitlab-runner/-/issues/4260#note_194153107). <br/>
+But the gitlab runner should have the "/var/run/docker.sock:/var/run/docker.sock" mount, for it to access Docker daemon on the host.
+
+In turn, the DinD client container would probably connect to DinD daemon container via `tcp://docker:2375/`. Here `docker` s a "service", i.e. running in a separate container, by default named after the image name. The following would work in the same way:
+```shell
+  services:
+   - name: docker:dind
+     alias: thedockerhost
+	 
+  variables:
+    # Tell docker CLI how to talk to Docker daemon; see
+    # https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-docker-in-docker-executor
+    DOCKER_HOST: tcp://thedockerhost:2375/	 
+```
+
 ### runner container cmds when behind a proxy
 ```shell
 # to create GitLab runner:
