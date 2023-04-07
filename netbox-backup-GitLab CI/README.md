@@ -245,6 +245,45 @@ Change: 2021-06-29 11:10:39.012321329 +0000
 GitLab Runner does not require a restart when you change most options, including parameters in the [[runners]] section and most parameters in the global section, except for listen_address, it reloads config automatically if necessary. <br/>
 More on runner configuration on [advanced page](https://docs.gitlab.com/runner/configuration/advanced-configuration.html).
 
+### runner container cmds when behind a proxy
+```shell
+# to create GitLab runner:
+docker run -d --name gitlab-runner --restart always \
+--env HTTP_PROXY="$http_proxy" \
+--env HTTPS_PROXY="$http_proxy" \
+--env GIT_SSL_NO_VERIFY=true \
+-v /srv/gitlab-runner/config:/etc/gitlab-runner \
+-v /var/run/docker.sock:/var/run/docker.sock \   # <== when Docker in Docker (docker executor) is to be used, for runner to access Docker daemon
+ gitlab/gitlab-runner:latest
+ 
+
+# to unregister a runner described in config (/srv/gitlab-runner/config/config.toml) like:
+[[runners]]
+  name = "CAPO infra"
+  url = "https://gitlab.com/"
+  limit = 4
+  id = 21447349
+  token = "22KV9kh-XXXXXX"
+  
+ubuntu@telcocloud-runner:~$ sudo docker run --rm -it --env HTTP_PROXY="$http_proxy" --env HTTPS_PROXY="$http_proxy" --env GIT_SSL_NO_VERIFY=true -v /srv/gitlab-runner/config:/etc/gitlab-runner gitlab/gitlab-runner unregister --url https://gitlab.com/ --token 22KV9kh-XXXXXX
+Updating CA certificates...
+rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+Runtime platform                                    arch=amd64 os=linux pid=7 revision=6d480948 version=15.7.1
+Running in system-mode.
+
+Unregistering runner from GitLab succeeded          runner=22KV9kh-
+ubuntu@telcocloud-runner:~$
+ 
+
+# to register a runner when behind proxy
+docker run --rm -it  \
+--env HTTP_PROXY="$http_proxy" \
+--env HTTPS_PROXY="$http_proxy" \
+--env GIT_SSL_NO_VERIFY=true \
+-v /srv/gitlab-runner/config:/etc/gitlab-runner \
+ gitlab/gitlab-runner:latest register
+```
+
 ### runner config when behind a proxy
 ```shell
 root@capi-bootstrap-capd-bb:/home/ubuntu/telco-cloud/capi-bootstrap# ip r sh dev docker0
